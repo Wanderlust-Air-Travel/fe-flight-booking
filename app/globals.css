@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+  --cl-pri: #3775A4;
+  --cl-sec: #ffffff;
+  --cl-third: #00558f;
+  --cl-four:#64AF53;
+  --cl-white: #ffffff;
+  --hd:16rem;
+  --hdt:6.4rem;
+  --text-normal: 1.6rem !important;
+  --text-md: 2rem !important;
+
+}
+
+
+html{
+  font-size: 10px;
+}
+
+.font-pri{
+  font-family: var(--font-open-sans);
+}
+
+.text-base{
+  font-size: var(--text-normal);
+}
+
+.text-md{
+  font-size: var(--text-md) !important;
+
+}
+
+body {
+  font-family: var(--font-pri);
+}
+
+
+.container{
+  width: 100%;
+  max-width: 134.4rem;
+  margin: 0 auto;
+  padding: 0 1.6rem;
+  height: 100%;
+}
+
+
+.cl-pri{
+  color: var(--cl-pri);
+}
+
+.cl-sec{
+  color: var(--cl-sec);
+}
+
+.cl-white{
+  color: #ffffff !important;
+}
+
+.shadow{
+  box-shadow: 0 0 0.1rem #000000;
+
+}
