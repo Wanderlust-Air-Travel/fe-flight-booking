@@ -1,9 +1,18 @@
+"use client";
+import BannerHome from "./components/Banner/Banner";
+import useIsActiveStore from "./zustand/store";
 
 
 export default function Home() {
+
+  const { isActive } = useIsActiveStore();
+  
+
   return (
     <>
-      <h1>Hello World</h1>
+      <main className={`${isActive ? "pt-[calc(var(--hd)-var(--hdt))]" : "pt-[var(--hd)]"}`} >
+        <BannerHome />
+      </main>
     </>
   );
 }
