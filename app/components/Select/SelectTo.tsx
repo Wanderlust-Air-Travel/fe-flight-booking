@@ -1,6 +1,6 @@
 import { SelectComponent } from "./SelectComponent"
 
-const SelectFrom = () => {
+const SelectTo = () => {
 
     const data = [
         {
@@ -51,9 +51,9 @@ const SelectFrom = () => {
 
     return (
         <>
-            <SelectComponent placeholder="From Where?" icon="/icFrom.svg" data={data} />
+            <SelectComponent placeholder="From To?" icon="/icTo.svg" data={data} />
         </>
     )
 }
 
-export default SelectFrom
+export default SelectTo
