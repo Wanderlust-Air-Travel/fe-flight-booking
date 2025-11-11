@@ -1,5 +1,5 @@
 "use client"
-import useIsActiveStore from "@/app/zustand/store";
+import useIsActiveStore from "@/app/zustand/storeHeader";
 import { ChevronDown, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

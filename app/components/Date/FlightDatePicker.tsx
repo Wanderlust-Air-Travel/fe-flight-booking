@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { DateRange, Range, RangeKeyDict } from "react-date-range";
+import { DateRange, Calendar, Range, RangeKeyDict } from "react-date-range";
 import { addDays } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
+import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 
 type TripType = "oneway" | "round";
 
@@ -20,28 +21,59 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
         key: "selection",
     });
 
-    const handleSelect = (ranges: RangeKeyDict) => {
+    const {setData } = useFightSearchBarStore();
+
+
+
+    const handleRangeSelect = (ranges: RangeKeyDict) => {
         const selected = ranges.selection;
 
-        // ✅ Nếu one-way, ép endDate = startDate
-        if (tripType === "oneway" && selected.startDate) {
-            selected.endDate = selected.startDate;
-        }
+        const newRange: Range = {
+            startDate: selected.startDate || new Date(),
+            endDate: selected.endDate || selected.startDate || new Date(),
+            key: "selection",
+        };
 
-        setRange(selected);
+        setRange(newRange);
 
-        if (onChangeDate && selected.startDate) {
-            onChangeDate({
-                startDate: selected.startDate,
-                endDate: tripType === "round" ? selected.endDate ?? selected.startDate : undefined,
+        // luôn update zustand
+        if (newRange.startDate) {
+            setData({
+                startDate: newRange.startDate?.toLocaleDateString("vi-VN"),
+                endDate: newRange.endDate?.toLocaleDateString("vi-VN"),
+            });
+
+            // callback là optional
+            onChangeDate?.({
+                startDate: newRange.startDate,
+                endDate: newRange.endDate,
             });
         }
     };
 
-    const formatDate = (date?: Date) => (date ? date.toLocaleDateString("vi-VN") : "");
+    const handleOneWaySelect = (date: Date) => {
+        const newRange: Range = {
+            startDate: date,
+            endDate: date,
+            key: "selection",
+        };
+
+        setRange(newRange);
+
+        setData({
+            startDate: date?.toLocaleDateString("vi-VN"),
+            endDate: "",
+        });
+
+        onChangeDate?.({ startDate: date });
+    };
+
+
+    const formatDate = (date?: Date) =>
+        date ? date.toLocaleDateString("vi-VN") : "";
 
     return (
-        <div className="flex flex-col gap-4 w-full max-w-xl bg-white rounded-xl shadow p-4">
+        <div className="flex flex-col gap-4 w-full  bg-white rounded-md p-4 overflow-hidden">
             {/* Loại chuyến đi */}
             <div className="flex items-center gap-6 text-[1.4rem] font-medium text-gray-700">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -70,29 +102,25 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
             </div>
 
             {/* Lịch */}
-            <DateRange
-                onChange={handleSelect}
-                moveRangeOnFirstSelection={false}
-                ranges={[range]}
-                months={tripType === "round" ? 2 : 1}
-                direction="horizontal"
-                showDateDisplay={false}
-                editableDateInputs={false}
-            />
-
-            {/* Hiển thị kết quả */}
-            <div className="text-[1.3rem] text-gray-700">
-                {tripType === "oneway" ? (
-                    <p>
-                        Ngày đi: <b>{formatDate(range.startDate)}</b>
-                    </p>
-                ) : (
-                    <p>
-                        Ngày đi: <b>{formatDate(range.startDate)}</b> – Ngày về:{" "}
-                        <b>{formatDate(range.endDate)}</b>
-                    </p>
-                )}
-            </div>
+            {tripType === "oneway" ? (
+             
+                <Calendar
+                    date={range.startDate || new Date()}
+                    onChange={(date) => handleOneWaySelect(date as Date)}
+                    showDateDisplay={false as any} 
+                />
+            ) : (
+              
+                <DateRange
+                    onChange={handleRangeSelect}
+                    moveRangeOnFirstSelection={false}
+                    ranges={[range]}
+                    months={2}
+                    direction="horizontal"
+                    showDateDisplay={false}
+                    editableDateInputs={false}
+                />
+            )}
         </div>
     );
 }

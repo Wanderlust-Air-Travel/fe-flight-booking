@@ -1,6 +1,6 @@
 "use client";
 import BannerHome from "./components/Banner/Banner";
-import useIsActiveStore from "./zustand/store";
+import useIsActiveStore from "./zustand/storeHeader";
 
 
 export default function Home() {

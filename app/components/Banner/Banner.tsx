@@ -1,5 +1,5 @@
 "use client";
-import useIsActiveStore from "@/app/zustand/store";
+import useIsActiveStore from "@/app/zustand/storeHeader";
 import axios from "axios";
 import Image from "next/image";
 import { useEffect, useState } from "react";
