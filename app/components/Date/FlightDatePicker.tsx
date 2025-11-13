@@ -21,7 +21,7 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
         key: "selection",
     });
 
-    const {setData } = useFightSearchBarStore();
+    const { setData } = useFightSearchBarStore();
 
 
 
@@ -103,15 +103,17 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
 
             {/* Lịch */}
             {tripType === "oneway" ? (
-             
+
                 <Calendar
                     date={range.startDate || new Date()}
                     onChange={(date) => handleOneWaySelect(date as Date)}
-                    showDateDisplay={false as any} 
+                    showDateDisplay={false as any}
+                    minDate={new Date()}
                 />
             ) : (
-              
+
                 <DateRange
+
                     onChange={handleRangeSelect}
                     moveRangeOnFirstSelection={false}
                     ranges={[range]}
@@ -119,6 +121,7 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
                     direction="horizontal"
                     showDateDisplay={false}
                     editableDateInputs={false}
+                    minDate={new Date()}
                 />
             )}
         </div>

@@ -13,6 +13,8 @@ import Image from "next/image"
 interface SelectComponentProp {
     placeholder: string,
     icon: string,
+    value:string,
+    onChange:(val: string) => void,
     data: {
         name: string,
         des: string,
@@ -21,9 +23,12 @@ interface SelectComponentProp {
     }[]
 }
 
-export function SelectComponent({ placeholder, icon, data }: SelectComponentProp) {
+export function SelectComponent({ placeholder, icon, data,value,onChange }: SelectComponentProp) {
+
+    
+
     return (
-        <Select>
+        <Select value={value} onValueChange={onChange}>
             <SelectTrigger className="w-full border-none outline-none text-start !h-[4.8rem] shadow-none text-[1.4rem] !text-[var(--cl-pri)] px-[1rem] select-none">
                 <div className="flex gap-x-[0.8rem] items-center">
                     <Image className="flex-shrink-0" src={icon} alt="icon" width={32} height={32} priority />

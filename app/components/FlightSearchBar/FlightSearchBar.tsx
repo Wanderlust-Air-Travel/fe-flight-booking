@@ -1,36 +1,89 @@
-import { Input } from "@/components/ui/input"
-import FlightDatePicker from "../Date/FlightDatePicker"
-import SelectFrom from "../Select/SelectFrom"
-import SelectTo from "../Select/SelectTo"
-import Image from "next/image"
 import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import Image from "next/image"
+import FlightDatePicker from "../Date/FlightDatePicker"
 import Person from "../Person/Person"
+import { SelectComponent } from "../Select/SelectComponent"
+import { useEffect, useState } from "react"
+
+const dataLocation = [
+    {
+        name: "Hà Nội",
+        des: "Sân bay quốc tế Nội Bài",
+        value: "ha-noi",
+        code: "HAN",
+    },
+    {
+        name: "Hồ Chí Minh",
+        des: "Sân bay quốc tế TSN",
+        value: "ho-chi-minh",
+        code: "SGN",
+    },
+    {
+        name: "Đà Nẵng",
+        des: "Sân bay quốc tế Đà Nẵng",
+        value: "da-nang",
+        code: "DAD",
+    },
+    {
+        name: "Nha Trang",
+        des: "Sân bay quốc tế Cam Ranh",
+        value: "nha-trang",
+        code: "CXR",
+    },
+    {
+        name: "Phú Quốc",
+        des: "Sân bay quốc tế Phú Quốc",
+        value: "phu-quoc",
+        code: "PQC",
+    },
+    {
+        name: "Huế",
+        des: "Sân bay quốc tế Phú Bài",
+        value: "hue",
+        code: "HUI",
+    },
+    {
+        name: "Cần Thơ",
+        des: "Sân bay quốc tế Cần Thơ",
+        value: "can-tho",
+        code: "VCA",
+    },
+];
 
 const FlightSearchBar = () => {
+    const [from, setFrom] = useState<string>("");
+    const [to, setTo] = useState<string>("");
 
-    const { data } = useFightSearchBarStore();
+    const { data,setData } = useFightSearchBarStore();
 
+    useEffect(()=>{
+        setData({
+            from:from,
+            to:to
+        })
+    },[to,from])
     console.log(data)
 
 
     return (
         <>
             <div className="flex w-full items-center bg-white rounded-md border-[#CBD4E6] border-[0.1rem]">
-                <div className="w-[20%]">
-                    <SelectFrom />
+                <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">
+                    <SelectComponent value={from} onChange={setFrom} placeholder="From Where?" icon="/icFrom.svg" data={dataLocation.filter(item=>item.value !== to)} />
                 </div>
-                <div className="w-[20%]">
-                    <SelectTo />
+                <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">
+                    <SelectComponent value={to} onChange={setTo} placeholder="From To?" icon="/icTo.svg" data={dataLocation.filter(item=>item.value !== from)} />
                 </div>
-                <div className="w-[20%]">
+                <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">
                     <label htmlFor="isOpenId" className="relative w-full block">
                         <div className="h-[4.8rem] flex gap-x-[0.8rem] items-center select-none">
                             <Image src="/icDate.svg" alt="icDate" width={32} height={32} priority />
                             <Input
                                 placeholder="Choose Schedule"
                                 readOnly
-                                className="px-0 h-full outline-none shadow-none border-none placeholder:text-[var(--cl-pri)] pointer-events-none"
+                                className="px-0 h-full outline-none shadow-none border-none placeholder:text-[var(--cl-pri)] pointer-events-none text-[var(--cl-pri)]"
                                 value={
                                     data.startDate
                                         ? data.endDate
@@ -47,15 +100,15 @@ const FlightSearchBar = () => {
                         </div>
                     </label>
                 </div>
-                <div className="w-[20%]">
+                <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">
                     <label htmlFor="isOpenPerson" className="relative w-full block">
                         <div className="h-[4.8rem] flex gap-x-[0.8rem] items-center select-none">
                             <Image src="/icPerson.svg" alt="icPerson" width={32} height={32} priority />
                             <Input
                                 placeholder="Choose Quantity"
                                 readOnly
-                                className="px-0 h-full outline-none shadow-none border-none placeholder:text-[var(--cl-pri)] pointer-events-none"
-                                value=""
+                                className="px-0 h-full outline-none shadow-none border-none placeholder:text-[var(--cl-pri)] pointer-events-none text-center text-[var(--cl-pri)]"
+                                value={data.totalPerson ? data.totalPerson : ""}
                             />
                         </div>
                         <input id="isOpenPerson" name="isOpen" type="checkbox" className="peer hidden" />
