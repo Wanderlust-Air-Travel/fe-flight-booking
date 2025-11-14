@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DateRange, Calendar, Range, RangeKeyDict } from "react-date-range";
 import { addDays } from "date-fns";
 import "react-date-range/dist/styles.css";
@@ -67,6 +67,10 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
 
         onChangeDate?.({ startDate: date });
     };
+
+    useEffect(()=>{
+        setData({service:tripType})
+    },[tripType])
 
 
     const formatDate = (date?: Date) =>

@@ -3,6 +3,7 @@ import { create } from "zustand";
 interface FightSearchBarData {
   from: string;
   to: string;
+  service:string,
   startDate: string;
   endDate?: string;
   totalPerson: number;
@@ -17,6 +18,7 @@ const useFightSearchBarStore = create<FightSearchBarStoreState>((set) => ({
   data: {
     from: "",
     to: "",
+    service:"",
     startDate: "",
     endDate: "",
     totalPerson: 0,

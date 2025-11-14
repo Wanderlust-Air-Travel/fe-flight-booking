@@ -11,9 +11,11 @@
   --cl-sec: #ffffff;
   --cl-third: #00558f;
   --cl-four: #64AF53;
+  --cl-five:#C5FF95;
   --cl-white: #ffffff;
   --hd: 16rem;
   --hdt: 6.4rem;
+  --text-sm:1.2rem !important;
   --text-normal: 1.6rem !important;
   --text-md: 2rem !important;
   --radius: 0.625rem;
@@ -55,6 +57,20 @@ html {
   font-size: 10px;
 }
 
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 0.3rem;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cl-pri);
+
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: #ffffff;
+
+}
+
 .font-pri {
   font-family: var(--font-open-sans);
 }
@@ -64,7 +80,12 @@ html {
 }
 
 .text-md {
-  font-size: var(--text-md) !important;
+  font-size: var(--text-md);
+
+}
+
+.text-sm{
+  font-size: var(--text-sm);
 
 }
 
@@ -124,6 +145,8 @@ body {
     opacity: 1;
   }
 }
+
+
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -203,4 +226,8 @@ body {
 
 :is(.\*\:\[span\]\:last\:gap-2 > *):is(span):last-child {
   width: 100% !important;
+}
+
+.filter-white{
+  filter: brightness(0) saturate(100%) invert(100%) sepia(12%) saturate(7454%) hue-rotate(187deg) brightness(117%) contrast(109%);
 }

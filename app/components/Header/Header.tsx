@@ -89,7 +89,7 @@ const Header = () => {
                 <div className="container">
                     <div className="flex h-full justify-between gap-x-[3.2rem]">
                         <Link
-                            className="group max-w-[18rem] w-full !h-auto overflow-hidden"
+                            className="group max-w-[18rem] w-full !h-auto overflow-hidden block"
                             href="/"
                         >
                             <Image
