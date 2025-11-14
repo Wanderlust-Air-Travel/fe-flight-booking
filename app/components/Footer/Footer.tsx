@@ -1,5 +1,7 @@
+"use client"
 import Image from "next/image"
 import Link from "next/link"
+import { usePathname } from "next/navigation";
 
 interface FooterItem {
     label: string;
@@ -14,7 +16,7 @@ interface FooterSection {
     }[]
 }
 
-export const dataFooters: FooterSection[] = [
+const dataFooters: FooterSection[] = [
     {
         title: "About",
         list: [
@@ -69,8 +71,9 @@ export const dataFooters: FooterSection[] = [
 
 
 const Footer = () => {
+    const router = usePathname();
     return (
-        <footer >
+        <footer className="pt-[var(--rowY)]">
 
             <div  className="flex flex-col">
                 <div className="bg-[var(--cl-pri)]">
@@ -88,7 +91,7 @@ const Footer = () => {
                                         height={100}
                                         priority
                                         unoptimized
-                                        className="w-full h-full object-contain transition ease-linear xl:group-hover:scale-95 filter-white"
+                                        className="w-full h-full object-contain transition ease-linear group-hover:scale-95 filter-white"
                                     />
                                 </Link>
                             </div>
@@ -106,7 +109,7 @@ const Footer = () => {
                                                             dataFooter.list.map((list, index) => {
                                                                 return (
                                                                     <li key={index}>
-                                                                        <Link className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-five)]" href={list.link}>
+                                                                        <Link className={`text-sm hover:!text-[var(--cl-four)] ${router === list.link ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`} href={list.link}>
                                                                             {list.label}
                                                                         </Link>
                                                                     </li>

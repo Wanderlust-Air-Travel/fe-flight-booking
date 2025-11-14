@@ -94,8 +94,8 @@ const FlightSearchBar = () => {
                             />
                         </div>
                         <input id="isOpenId" name="isOpen" type="checkbox" className="peer hidden" />
-                        <div className="hidden peer-checked:block fixed inset-0 z-10" />
-                        <div className="absolute top-[calc(100%+0.5rem)] left-0 z-20  opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto">
+                        <div className="hidden peer-checked:block fixed inset-0 z-10 w-[100vw] h-[100vh]" />
+                        <div className="absolute top-[calc(100%+0.5rem)] left-0 z-20 shadow2 opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto">
                             <FlightDatePicker />
                         </div>
                     </label>
@@ -112,8 +112,8 @@ const FlightSearchBar = () => {
                             />
                         </div>
                         <input id="isOpenPerson" name="isOpen" type="checkbox" className="peer hidden" />
-                        <div className="hidden peer-checked:block fixed inset-0 z-10" />
-                        <div className="absolute z-20 top-[calc(100%+0.5rem)] left-0 w-full opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto">
+                        <div className="hidden peer-checked:block fixed inset-0 z-10 w-[100vw] h-[100vh]" />
+                        <div className="absolute z-20 top-[calc(100%+0.5rem)] shadow2  left-0 w-full opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto">
                             <Person />
                         </div>
                     </label>

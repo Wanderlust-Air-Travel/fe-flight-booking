@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "aos/dist/aos.css";
 
 
 @custom-variant dark (&:is(.dark *));
@@ -7,18 +8,21 @@
 
 
 :root {
-  --cl-pri: #3775A4;
+  --cl-pri: #00558f; 
   --cl-sec: #ffffff;
-  --cl-third: #00558f;
+  --cl-third: #3775A4;
   --cl-four: #64AF53;
   --cl-five:#C5FF95;
   --cl-white: #ffffff;
+  --cl-gray:#667085;
   --hd: 16rem;
   --hdt: 6.4rem;
   --text-sm:1.2rem !important;
   --text-normal: 1.6rem !important;
   --text-md: 2rem !important;
+  --text-lg:3.2rem !important;
   --radius: 0.625rem;
+  --rowY:4rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -63,12 +67,10 @@ html {
 }
 ::-webkit-scrollbar-thumb {
   background: var(--cl-pri);
-
   border-radius: 999px;
 }
 ::-webkit-scrollbar-track {
   background: #ffffff;
-
 }
 
 .font-pri {
@@ -81,17 +83,23 @@ html {
 
 .text-md {
   font-size: var(--text-md);
-
 }
 
 .text-sm{
   font-size: var(--text-sm);
+}
 
+.text-lg{
+  font-size: var(--text-lg);
 }
 
 body {
   font-family: var(--font-pri);
   line-height: 1.5;
+  color: #000000;
+}
+main{
+  min-height: 100dvh;
 }
 
 .container {
@@ -119,7 +127,13 @@ body {
 
 }
 
-.shadow2 {}
+.shadow2 {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.clipath{
+  clip-path: inset(0 0 0 0);
+}
 
 .modal::before {
   content: "";
@@ -145,8 +159,6 @@ body {
     opacity: 1;
   }
 }
-
-
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

@@ -37,7 +37,7 @@ const Person = () => {
 
     const handleMinusMinor = () => {
         setMinor((prev) => {
-            if (adult <= 0) {
+            if (minor <= 0) {
                 return 0;
             }
             return prev - 1

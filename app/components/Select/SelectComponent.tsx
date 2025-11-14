@@ -36,8 +36,8 @@ export function SelectComponent({ placeholder, icon, data,value,onChange }: Sele
                 </div>
 
             </SelectTrigger>
-            <SelectContent >
-                <SelectGroup className="max-h-[15rem]">
+            <SelectContent className="shadow2 !border-none overflow-hidden" >
+                <SelectGroup className="max-h-[15rem] ">
                     {
                         data?.map((item, index) => {
                             return (

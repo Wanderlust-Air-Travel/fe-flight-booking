@@ -3,6 +3,8 @@ import useIsActiveStore from "@/app/zustand/storeHeader";
 import { ChevronDown, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 
 interface menuListsInterface {
     title: string,
@@ -49,7 +51,7 @@ const menuLists: menuListsInterface[] = [
 const Header = () => {
 
     const { isActive, handleIsActive } = useIsActiveStore();
-
+    const router = usePathname();
     const handleClose = (): void => {
         handleIsActive();
     }
@@ -102,15 +104,15 @@ const Header = () => {
                                 className="w-full h-full object-contain transition ease-linear xl:group-hover:scale-95"
                             />
                         </Link>
-                        <ul className="flex gap-x-[1.2rem] items-center mx-[-1rem]">
+                        <ul className="flex gap-x-[1.2rem] items-center ">
                             {menuLists.map((menuList, index) => {
                                 return (
                                     <li
                                         key={index}
-                                        className="group last:[&>a]:h-auto last:flex last:flex-col last:justify-center last:[&>a]:bg-[var(--cl-pri)] h-full last:[&>a]:text-[var(--cl-sec)] last:[&>a]:px-[2rem] last:[&>a]:py-[1.2rem] last:[&>a]:rounded-lg xl:last:[&>a]:hover:bg-[var(--cl-four)] relative xl:last:[&>a]:hover:!text-[var(--cl-white)]"
+                                        className="group last:[&>a]:h-auto last:flex last:flex-col last:justify-center last:[&>a]:bg-[var(--cl-pri)] h-full last:[&>a]:text-[var(--cl-sec)] last:[&>a]:px-[2rem] last:[&>a]:py-[1.2rem] last:[&>a]:rounded-lg last:[&>a]:hover:bg-[var(--cl-four)] relative last:[&>a]:hover:!text-[var(--cl-white)]"
                                     >
                                         <Link
-                                            className={`$index p-[1rem] text-[var(--cl-third)] text-md xl:group-hover:text-[var(--cl-four)] transition ease-linear h-full flex justify-center items-center gap-x-2`}
+                                            className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex justify-center items-center gap-x-2 ${router === menuList.path ? "text-[var(--cl-four)]" : "text-[var(--cl-third)]"}`}
                                             href={menuList.path}
                                         >
                                             {menuList.title}
@@ -118,7 +120,7 @@ const Header = () => {
                                                 menuList.child?.length > 0 && (
                                                     <span className="w-[2rem] h-[2rem] flex justify-center items-center ">
                                                         <ChevronDown
-                                                            className="text-[var(--cl-third)] w-full h-full mt-[0.5rem] transition xl:group-hover:rotate-[180deg] xl:group-hover:text-[var(--cl-four)]"
+                                                            className="text-[var(--cl-third)] w-full h-full mt-[0.5rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-four)]"
                                                         />
                                                     </span>
                                                 )}
@@ -127,7 +129,7 @@ const Header = () => {
                                         {menuList.child &&
                                             menuList.child?.length > 0 && (
                                                 <ul
-                                                    className="absolute top-[101%] l-0 min-w-[16rem] shadow-bg-dark-500 shadow-md bg-white opacity-0 pointer-events-none transition translate-y-[5%] xl:group-hover:opacity-100 xl:group-hover:pointer-events-auto xl:group-hover:translate-y-[0%]"
+                                                    className="absolute top-[101%] l-0 min-w-[16rem] shadow-bg-dark-500 shadow-md bg-white opacity-0 pointer-events-none transition translate-y-[5%] group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-[0%]"
                                                 >
                                                     {menuList.child.map(
                                                         (child, index) => {
