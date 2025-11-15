@@ -13,11 +13,14 @@
   --cl-third: #3775A4;
   --cl-four: #64AF53;
   --cl-five:#C5FF95;
+  --cl-six:#EEF7FF;
   --cl-white: #ffffff;
   --cl-gray:#667085;
+  --cl-red:#D83D32;
   --hd: 16rem;
   --hdt: 6.4rem;
   --text-sm:1.2rem !important;
+  --text-mn:1.4rem !important;
   --text-normal: 1.6rem !important;
   --text-md: 2rem !important;
   --text-lg:3.2rem !important;
@@ -79,6 +82,11 @@ html {
 
 .text-base {
   font-size: var(--text-normal);
+}
+
+.text-mn{
+  font-size: var(--text-mn);
+
 }
 
 .text-md {

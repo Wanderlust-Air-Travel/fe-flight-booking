@@ -2,59 +2,160 @@
 import { NextResponse } from 'next/server';
 
 const tripList = [
-  {
-    icon: "Hawaiian Airlines", 
-    startTime: "7:00 AM",
+  { 
+    id:1,
+    code:1,
+    icon: "/logoBrand.png",
+    totalTime: "7:00 AM",
     airline: "Hawaiian Airlines",
-    duration: "16h 45m",
-    price: "$624",
+    duration: "7:00AM - 4:15PM",
+    durationLocation: "HAN (Nhà ga 1) - SGN (Nhà ga 3)",
     stopCount: 1,
     stopDuration: "2h 45m in HNL",
+    service: "one way",
+    cabin: [
+      {
+        type: "economy",
+        title: "Economy",
+        price: 1000000,
+        quantity:5,
+      },
+      {
+        type: "business",
+        title: "Business",
+        price: 10000000,
+        quantity:5,
+      },
+    ]
   },
   {
-    icon: "Japan Airlines", 
-    startTime: "7:35 AM",
+    id:2,
+    code:1,
+    icon: "/logoBrand.png",
+    totalTime: "7h 35m",
     airline: "Japan Airlines",
-    duration: "18h 22m",
-    price: "$663",
+    duration: "7:00AM - 4:15PM",
+    durationLocation: "HAN (Nhà ga 1) - SGN (Nhà ga 3)",
     stopCount: 1,
     stopDuration: "50m in HKG",
+    service: "one way",
+    cabin: [
+      {
+        type: "economy",
+        title: "Economy",
+        price: 1000000,
+        quantity:5,
+      },
+      {
+        type: "business",
+        title: "Business",
+        price: 10000000,
+        quantity:5,
+      },
+    ]
   },
   {
-    icon: "Hawaiian Airlines", 
-    startTime: "8:20 AM",
+    id:3,
+    code:1,
+    icon: "/logoBrand.png",
+    totalTime: "8:20 AM",
     airline: "Hawaiian Airlines",
-    duration: "18h 04m",
-    price: "$690",
+    duration: "7:00AM - 4:15PM",
+    durationLocation: "HAN (Nhà ga 1) - SGN (Nhà ga 3)",
     stopCount: 1,
     stopDuration: "1h 50m in PVG",
+    service: "one way",
+    cabin: [
+      {
+        type: "economy",
+        title: "Economy",
+        price: 1000000,
+        quantity:5,
+      },
+      {
+        type: "business",
+        title: "Business",
+        price: 10000000,
+        quantity:5,
+      },
+    ]
   },
   {
-    icon: "Delta", 
-    startTime: "9:47 AM",
+    id:4,
+    code:1,
+    icon: "/logoBrand.png",
+    totalTime: "9:47 AM",
     airline: "Delta",
-    duration: "18h 52m",
-    price: "$756",
+    duration: "7:00AM - 4:15PM",
+    durationLocation: "HAN (Nhà ga 1) - SGN (Nhà ga 3)",
     stopCount: 1,
     stopDuration: "4h 05m in ICN",
+    service: "one way",
+    cabin: [
+      {
+        type: "economy",
+        title: "Economy",
+        price: 1000000,
+        quantity:5,
+      },
+      {
+        type: "business",
+        title: "Business",
+        price: 10000000,
+        quantity:5,
+      },
+    ]
   },
   {
-    icon: "Hawaiian Airlines", 
-    startTime: "11:15 AM",
+    id:5,
+    code:2,
+    icon: "/logoBrand.png",
+    totalTime: "11:15 AM",
     airline: "Hawaiian Airlines",
-    duration: "16h 05m",
-    price: "$837",
+    duration: "7:00AM - 4:15PM",
+    durationLocation: "HAN (Nhà ga 1) - SGN (Nhà ga 3)",
     stopCount: 0,
     stopDuration: "Nonstop",
+    service: "one way",
+    cabin: [
+      {
+        type: "economy",
+        title: "Economy",
+        price: 1000000,
+        quantity:5,
+      },
+      {
+        type: "business",
+        title: "Business",
+        price: 10000000,
+        quantity:5,
+      },
+    ]
   },
-  {
-    icon: "Delta", 
-    startTime: "10:55 AM",
+  { 
+    id:6,
+    code:1,
+    icon: "/logoBrand.png",
+    totalTime: "10:55 AM",
     airline: "Delta",
-    duration: "15h 45m",
-    price: "$839",
+    duration: "7:00AM - 4:15PM",
     stopCount: 0,
     stopDuration: "Nonstop",
+    service: "one way",
+    cabin: [
+      {
+        type: "economy",
+        title: "Economy",
+        price: 1000000,
+        quantity:5,
+      },
+      {
+        type: "business",
+        title: "Business",
+        price: 10000000,
+        quantity:5,
+      },
+    ]
   },
 ];
 
