@@ -9,6 +9,7 @@ import { ListProps } from "@/types/ticket-list-type";
 import axios from "axios";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { useRouter } from "next/navigation";
+import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 
 
 

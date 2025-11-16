@@ -22,4 +22,8 @@ export interface InfoTicketType {
 interface InfoTicketTypeState {
   data: InfoTicketType;
   setData: (data: Partial<InfoTicketType>) => void;
+   // 👇 thêm để check hydrate
+   isHydrated: boolean;
+    // 👇 thêm
+  setHydrated: (value: boolean) => void;
 }

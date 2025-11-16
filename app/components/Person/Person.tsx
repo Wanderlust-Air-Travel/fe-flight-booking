@@ -3,10 +3,10 @@ import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 import { Minus, Plus } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 
-const Person = () => {
+const Person = ({classNameParent,classNameChild}:any) => {
     const { setData } = useFightSearchBarStore();
 
-    const [adult, setAdult] = useState<number>(0);
+    const [adult, setAdult] = useState<number>(1);
     const [minor, setMinor] = useState<number>(0);
 
 
@@ -22,8 +22,8 @@ const Person = () => {
 
     const handleMinusAdult = () => {
         setAdult((prev) => {
-            if (adult <= 0) {
-                return 0;
+            if (adult <= 1) {
+                return 1;
             }
             return prev - 1
         })
@@ -52,9 +52,9 @@ const Person = () => {
 
 
     return (
-        <div className="flex flex-col bg-white gap-y-[0.8rem] p-4 rounded-sm overflow-hidden">
+        <div className={`${classNameParent} flex flex-col bg-white gap-y-[0.8rem] p-4 rounded-sm overflow-hidden`}>
             <div className="flex gap-x-[1rem] justify-between items-center">
-                <p className="text-[1.6rem] text-[var(--cl-pri)]">Adults:</p>
+                <p className={`text-[1.6rem] text-[var(--cl-pri)]  ${classNameChild}`}>Adults:</p>
                 <div className="flex items-center gap-x-[0.8rem]">
                     <button onClick={handleMinusAdult} className="group w-[3.2rem] h-[3.2rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)]">
                         <Minus className="text-[var(--cl-pri)] group-hover:text-[var(--cl-white)]" strokeWidth={0.8} />
@@ -66,7 +66,7 @@ const Person = () => {
                 </div>
             </div>
             <div className="flex gap-x-[1rem] justify-between items-center">
-                <p className="text-[1.6rem] text-[var(--cl-pri)]">Minors:</p>
+                <p className={`text-[1.6rem] text-[var(--cl-pri)] ${classNameChild}`}>Minors:</p>
                 <div className="flex items-center gap-x-[0.8rem]">
                     <button onClick={handleMinusMinor} className="group w-[3.2rem] h-[3.2rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)]">
                         <Minus className="text-[var(--cl-pri)] group-hover:text-[var(--cl-white)]" strokeWidth={0.8} />

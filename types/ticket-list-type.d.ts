@@ -1,7 +1,7 @@
 export interface TicketListType {
     id: number;
     type: string;
-    code:number;
+    code: number;
     list: {
         typeTicket: string,
         price: number,
@@ -16,7 +16,7 @@ export interface TicketListType {
 
 
 export interface ListProps {
-    type:string,
+    type: string,
     list: {
         typeTicket: string,
         price: number,
@@ -30,7 +30,7 @@ export interface ListProps {
 interface TicketProps {
     tickets: TicketItem;
     type: string;
-    index:number;
+    index: number;
     active: boolean;
-  onChoose: () => void;   // nhận hàm từ cha
+    onChoose: () => void;   // nhận hàm từ cha
 }
