@@ -5,6 +5,8 @@ const tripList = [
   { 
     id:1,
     code:1,
+    startDate:"02/03/2026",
+    endDate:"",
     icon: "/logoBrand.png",
     totalTime: "7:00 AM",
     airline: "Hawaiian Airlines",
@@ -30,7 +32,9 @@ const tripList = [
   },
   {
     id:2,
-    code:1,
+    code:2,
+    startDate:"02/03/2026",
+    endDate:"",
     icon: "/logoBrand.png",
     totalTime: "7h 35m",
     airline: "Japan Airlines",
@@ -57,6 +61,8 @@ const tripList = [
   {
     id:3,
     code:1,
+    startDate:"02/03/2026",
+    endDate:"",
     icon: "/logoBrand.png",
     totalTime: "8:20 AM",
     airline: "Hawaiian Airlines",
@@ -83,6 +89,8 @@ const tripList = [
   {
     id:4,
     code:1,
+    startDate:"02/03/2026",
+    endDate:"",
     icon: "/logoBrand.png",
     totalTime: "9:47 AM",
     airline: "Delta",
@@ -109,6 +117,8 @@ const tripList = [
   {
     id:5,
     code:2,
+    startDate:"02/03/2026",
+    endDate:"",
     icon: "/logoBrand.png",
     totalTime: "11:15 AM",
     airline: "Hawaiian Airlines",
@@ -135,10 +145,13 @@ const tripList = [
   { 
     id:6,
     code:1,
+    startDate:"02/03/2026",
+    endDate:"",
     icon: "/logoBrand.png",
     totalTime: "10:55 AM",
     airline: "Delta",
     duration: "7:00AM - 4:15PM",
+    durationLocation: "HAN (Nhà ga 1) - SGN (Nhà ga 3)",
     stopCount: 0,
     stopDuration: "Nonstop",
     service: "one way",

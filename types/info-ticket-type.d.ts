@@ -1,0 +1,25 @@
+export interface InfoTicketType {
+  id: number;
+  icon:string;
+  code: number;
+  airline: string;
+  startDate: string;
+  duration: string;
+  durationLocation: string;
+  service: string;
+  endDate: string;
+  totalPerson: number;
+  stopCount: number;
+  stopDuration: string;
+  totalTime: string;
+  typeTicket: string;
+  price: number;
+  desc: {
+    text: string;
+    status: boolean;
+  }[];
+}
+interface InfoTicketTypeState {
+  data: InfoTicketType;
+  setData: (data: Partial<InfoTicketType>) => void;
+}

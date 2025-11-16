@@ -23,7 +23,7 @@ const ServiceHome = () => {
                     if(index < 8){
                         return (
                         
-                            <li className="w-[calc(100%/4)] px-[1.2rem]" key={index} data-aos="fade-up" data-aos-delay={`${index * 50}`}>
+                            <li className="w-[calc(100%/4)] px-[1.2rem]" key={index} data-aos="fade-up">
                                 <ItemService image={service.image} title={service.title} service={service.service} startDate={service.startDate} endDate={service.endDate} price={service.price} link={service.link} />
                             </li>
                         )

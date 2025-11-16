@@ -1,6 +1,8 @@
 export interface TripListType {
     id:number,
     code:number,
+    startDate:string,
+    endDate:string,
     icon: string;
     totalTime: string;
     airline: string;

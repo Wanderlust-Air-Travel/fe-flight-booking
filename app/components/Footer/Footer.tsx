@@ -109,7 +109,7 @@ const Footer = () => {
                                                             dataFooter.list.map((list, index) => {
                                                                 return (
                                                                     <li key={index}>
-                                                                        <Link className={`text-sm hover:!text-[var(--cl-four)] ${router === list.link ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`} href={list.link}>
+                                                                        <Link className={`text-base hover:!text-[var(--cl-four)] ${router === list.link ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`} href={list.link}>
                                                                             {list.label}
                                                                         </Link>
                                                                     </li>

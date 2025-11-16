@@ -1,10 +1,7 @@
+import { IsActiveState } from "@/types/header-type";
 import { create } from "zustand";
 
 
-interface IsActiveState {
-    isActive: boolean;
-    handleIsActive: () => void;
-}
 
 
 const useIsActiveStore = create<IsActiveState>((set) => ({

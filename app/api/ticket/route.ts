@@ -128,6 +128,27 @@ const ticketList = [
       },
     ],
   },
+  {
+    id: 4,
+    code: 2,
+    type: "business",
+    list: [
+      {
+        typeTicket: "Business Flex",
+        price: 7074000,
+        desc: [
+          { text: "Hành lý xách tay: 2 kiện, 7kg/kiện", status: true },
+          { text: "01 kiện hành lý ký gửi 40kg", status: true },
+          { text: "Hoàn/hủy trước giờ khởi hành: 300.000 VND (*)", status: true },
+          { text: "Hoàn/hủy sau giờ khởi hành: 300.000 VND (*)", status: true },
+          { text: "Thay đổi miễn phí", status: true },
+          { text: "Hệ số cộng điểm Bamboo Club: 2.00", status: true },
+          { text: "Chọn ghế ngồi miễn phí", status: true },
+          { text: "Đổi chuyến tại sân bay miễn phí", status: true },
+        ],
+      },
+    ],
+  },
 ];
 
 // API GET

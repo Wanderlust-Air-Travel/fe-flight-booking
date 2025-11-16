@@ -13,11 +13,10 @@ export interface TicketListType {
 }
 
 
-export interface TicketProps {
-    tickets: TicketListType;
-}
+
 
 export interface ListProps {
+    type:string,
     list: {
         typeTicket: string,
         price: number,
@@ -26,4 +25,12 @@ export interface ListProps {
             status: boolean
         }[]
     }[]
+}
+
+interface TicketProps {
+    tickets: TicketItem;
+    type: string;
+    index:number;
+    active: boolean;
+  onChoose: () => void;   // nhận hàm từ cha
 }

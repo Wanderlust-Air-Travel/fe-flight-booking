@@ -1,18 +1,7 @@
+import { FightSearchBarStoreState } from "@/types/fight-search-bar";
 import { create } from "zustand";
 
-interface FightSearchBarData {
-  from: string;
-  to: string;
-  service:string,
-  startDate: string;
-  endDate?: string;
-  totalPerson: number;
-}
 
-interface FightSearchBarStoreState {
-  data: FightSearchBarData;
-  setData: (data: Partial<FightSearchBarData>) => void;
-}
 
 const useFightSearchBarStore = create<FightSearchBarStoreState>((set) => ({
   data: {
