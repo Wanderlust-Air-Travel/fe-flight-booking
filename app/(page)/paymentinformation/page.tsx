@@ -82,12 +82,12 @@ const PaymentInformation = () => {
                                                 onCheckedChange={(checked) => {
                                                     const value = checked === true;
                                                     setFieldValue("acceptTerms", value);
-                                                    setFieldTouched("acceptTerms", true, false); // 🔥 đảm bảo touched luôn TRUE
+                                                    setFieldTouched("acceptTerms", true, false);
                                                 }}
                                                 className="w-[2.4rem] h-[2.4rem] flex-shrink-0"
                                             />
 
-                                            <p className="text-[var(--cl-pri)] text-base leading-[1.5]">
+                                            <p className="text-[var(--cl-pri)] text-base">
                                                 I have read and agree that my data will be processed in accordance with the
                                                 <Link className="hover:text-[var(--cl-four)]" href="/" > Privacy Policy</Link>,<Link className="hover:text-[var(--cl-four)]" href="/" >Terms of Use for Online Booking Function</Link> and <Link className="hover:text-[var(--cl-four)]" href="/">Website Terms of Use</Link>
                                             </p>

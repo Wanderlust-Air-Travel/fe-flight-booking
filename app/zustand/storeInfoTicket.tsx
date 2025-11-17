@@ -1,4 +1,4 @@
-// useInfoTicket.ts
+
 "use client";
 
 import { InfoTicketTypeState } from "@/types/info-ticket-type";
