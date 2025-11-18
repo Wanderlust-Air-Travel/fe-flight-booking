@@ -4,5 +4,5 @@ export interface InputProps {
     placeholder?: string;
     type?: string;
     formatDob?:boolean;
-
+    password?:boolean;
 }

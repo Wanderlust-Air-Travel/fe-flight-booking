@@ -2,6 +2,8 @@
 import { Input } from "@/components/ui/input";
 import { InputProps } from "@/types/input-props";
 import { useFormikInput } from "./UseFormikInput";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 
 
@@ -11,8 +13,11 @@ export const InputFormat = ({
     placeholder,
     type = "text",
     formatDob = false,
+    password = false,
 }: InputProps) => {
     const { field, error, isError } = useFormikInput(name);
+
+    const [isShow, setIShow] = useState<boolean>(false)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.target.value;
@@ -38,6 +43,10 @@ export const InputFormat = ({
         });
     };
 
+    const handleShowPass = () => {
+        setIShow(!isShow)
+    }
+
     return (
         <label className="flex flex-col gap-y-[0.8rem]">
             <p className="text-mn text-[var(--cl-pri)] font-medium">{label}</p>
@@ -46,11 +55,29 @@ export const InputFormat = ({
                 <Input
                     {...field}
                     onChange={handleChange}
-                    type={type}
+                    type={
+                        password
+                            ? (isShow ? "text" : "password")
+                            : (type || "text")
+                    }
                     placeholder={placeholder}
                     maxLength={formatDob ? 10 : undefined}
-                    className="h-[4rem] px-[1rem] placeholder:text-[var(--cl-six)] !text-[var(--cl-pri)] text-mn border-[0.1rem] border-[var(--cl-six)] focus:!border-[var(--cl-pri)] transition ease-linear"
+                    className={`h-[4rem] px-[1rem] placeholder:text-[var(--cl-six)] !text-[var(--cl-pri)] text-mn border-[0.1rem] border-[var(--cl-six)] focus:!border-[var(--cl-pri)] transition ease-linear ${password && "pr-[4rem]"}`}
                 />
+
+                {
+                    password && (
+                        <span onClick={handleShowPass} className="absolute top-1/2 -translate-y-1/2 right-0 w-[4rem] h-full flex justify-center items-center cursor-pointer z-10">
+                            {
+                                !isShow
+                                    ?
+                                    <Eye className="text-[var(--cl-pri)] w-[50%] h-[50%]" />
+                                    :
+                                    <EyeOff className="text-[var(--cl-pri)] w-[50%] h-[50%]" />
+                            }
+                        </span>
+                    )
+                }
 
                 {isError && (
                     <p className="inputError">

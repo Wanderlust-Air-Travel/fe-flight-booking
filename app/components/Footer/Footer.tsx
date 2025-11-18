@@ -138,8 +138,8 @@ const Footer = () => {
                 </div>
                 <div className="bg-white">
                     <div className="container">
-                        <div className="flex py-[2rem] justify-between items-center gap-x-[2rem]">
-                            <ul className="flex items-center gap-x-[2rem]">
+                        <div className="flex py-[1.6rem] justify-between items-center gap-x-[2rem]">
+                            <ul className="flex items-center gap-x-[1.2rem]">
                                 <li>
                                     <Link className="hover:scale-[1.2] block transition ease-linear" href="/">
                                         <Image src="/facebook.svg" alt="facebook" width={24} height={24} priority />

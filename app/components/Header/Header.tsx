@@ -1,6 +1,7 @@
 "use client"
 import useIsActiveStore from "@/app/zustand/storeHeader";
-import { ChevronDown, X } from "lucide-react";
+import useUserStore from "@/app/zustand/storeUser";
+import { ChevronDown, CircleUserRound, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,23 +38,32 @@ const menuLists: menuListsInterface[] = [
         title: "About",
         path: "/about"
     },
-    {
-        title: "Sign in",
-        path: "/signin"
-    },
-    {
-        title: "Sign up",
-        path: "/signup"
-    },
+    // {
+    //     title: "Sign in",
+    //     path: "/signin"
+    // },
+    // {
+    //     title: "Sign up",
+    //     path: "/signup"
+    // },
 ];
 
 
 const Header = () => {
 
     const { isActive, handleIsActive } = useIsActiveStore();
+    const { isLoggedIn, user ,logout } = useUserStore();
     const router = usePathname();
     const handleClose = (): void => {
         handleIsActive();
+    }
+    const hydrated = useUserStore.persist.hasHydrated();
+
+    console.log(hydrated)
+
+    const handleLogout = () =>{
+        logout();
+
     }
 
     return (
@@ -91,7 +101,7 @@ const Header = () => {
                 <div className="container">
                     <div className="flex h-full justify-between gap-x-[3.2rem]">
                         <Link
-                            className="group max-w-[18rem] w-full !h-auto overflow-hidden block"
+                            className="group max-w-[20rem] w-full !h-auto overflow-hidden block"
                             href="/"
                         >
                             <Image
@@ -112,7 +122,7 @@ const Header = () => {
                                         className="group last:[&>a]:h-auto last:flex last:flex-col last:justify-center last:[&>a]:bg-[var(--cl-pri)] h-full last:[&>a]:text-[var(--cl-sec)] last:[&>a]:px-[2rem] last:[&>a]:py-[1.2rem] last:[&>a]:rounded-lg last:[&>a]:hover:bg-[var(--cl-four)] relative last:[&>a]:hover:!text-[var(--cl-white)]"
                                     >
                                         <Link
-                                            className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex justify-center items-center gap-x-2 ${router === menuList.path ? "text-[var(--cl-four)]" : "text-[var(--cl-third)]"}`}
+                                            className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex justify-center items-center gap-x-2 ${router === menuList.path ? "text-[var(--cl-four)]" : "text-[var(--cl-third)]"} uppercase`}
                                             href={menuList.path}
                                         >
                                             {menuList.title}
@@ -120,7 +130,7 @@ const Header = () => {
                                                 menuList.child?.length > 0 && (
                                                     <span className="w-[2rem] h-[2rem] flex justify-center items-center ">
                                                         <ChevronDown
-                                                            className="text-[var(--cl-third)] w-full h-full mt-[0.5rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-four)]"
+                                                            className="text-[var(--cl-third)] w-full h-full mt-[0.35rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-four)]"
                                                         />
                                                     </span>
                                                 )}
@@ -129,14 +139,14 @@ const Header = () => {
                                         {menuList.child &&
                                             menuList.child?.length > 0 && (
                                                 <ul
-                                                    className="absolute top-[100%] l-0 min-w-[16rem] shadow-bg-dark-500 shadow-md bg-white opacity-0 pointer-events-none transition translate-y-[5%] group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-[0%]"
+                                                    className="absolute top-[100%] l-0 min-w-[16rem] shadow-bg-dark-900 shadow-lg bg-white opacity-0 pointer-events-none transition translate-y-[5%] group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-[0%]"
                                                 >
                                                     {menuList.child.map(
                                                         (child, index) => {
                                                             return (
                                                                 <li key={index} className="">
                                                                     <Link
-                                                                        className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base xl:hover:text-[var(--cl-sec)] xl:hover:bg-[var(--cl-pri)] transition ease-linear"
+                                                                        className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base xl:hover:text-[var(--cl-sec)] xl:hover:bg-[var(--cl-pri)] transition ease-linear uppercase text-nowrap"
                                                                         href={child.path}
                                                                     >
                                                                         {child.title}
@@ -150,6 +160,69 @@ const Header = () => {
                                     </li>
                                 );
                             })}
+                            {
+                                hydrated && (
+                                    isLoggedIn
+                                    ?
+                                    <li className="group flex items-center gap-x-[0.4rem] h-full flex-shrink-0 relative">
+                                        <div className="flex h-full items-center gap-x-[0.4rem]">
+                                            <Image src="/icAva.png" alt="icAva" width={26} height={26} className="flex-shrink-0 mt-[0.25rem]" priority unoptimized />
+                                            <div className="flex flex-col">
+                                                <p className="text-md text-[var(--cl-pri)] uppercase font-medium">{user?.fullname}</p>
+                                            </div>
+                                            <span className="w-[2rem] h-[2rem] flex justify-center items-center ">
+                                                <ChevronDown
+                                                    className="text-[var(--cl-pri)] w-full h-full mt-[0.25rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-pri)]"
+                                                />
+                                            </span>
+                                        </div>
+                                        <ul
+                                            className="absolute top-[100%] l-0 w-full min-w-[16rem] shadow-bg-dark-900 shadow-lg bg-white opacity-0 pointer-events-none transition translate-y-[5%] group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-[0%]"
+                                        >
+                                            <li>
+                                                <Link
+                                                    className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-pri)] transition ease-linear uppercase text-nowrap"
+                                                    href="/"
+                                                >
+                                                    History
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <button onClick={handleLogout}
+                                                    className="p-[1rem] text-base flex items-center text-[var(--cl-red)] text-base hover:text-[var(--cl-white)] hover:bg-[var(--cl-red)] w-full transition ease-linear uppercase text-nowrap cursor-pointer"
+                                                    
+                                                >
+                                                    Logout
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    :
+                                    (
+                                        <>
+                                            <li className="group">
+                                                <Link
+                                                    className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex uppercase justify-center items-center gap-x-2 ${router === "/signin" ? "text-[var(--cl-four)]" : "text-[var(--cl-third)]"}`}
+                                                    href="/signin"
+                                                >
+                                                    Sign in
+                                                </Link>
+                                            </li>
+
+
+                                            <li className={`group h-auto flex flex-col justify-center px-[2rem] py-[0.6rem] rounded-lg hover:bg-[var(--cl-four)] relative  ${router === "/signup" ? "bg-[var(--cl-four)]" : "bg-[var(--cl-pri)]"} transition `}>
+                                                <Link
+                                                    className={`p-[1rem] text-md text-[var(--cl-white)] transition ease-linear h-full flex justify-center items-center gap-x-2 uppercase`}
+                                                    href="/signup"
+                                                >
+                                                    Sign up
+                                                </Link>
+                                            </li>
+                                        </>
+                                    )
+
+                                )
+                            }
                         </ul>
                     </div>
                 </div>

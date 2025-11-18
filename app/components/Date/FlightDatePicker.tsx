@@ -77,7 +77,7 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
         date ? date.toLocaleDateString("vi-VN") : "";
 
     return (
-        <div className="flex flex-col gap-4 w-full  bg-white rounded-md p-4 overflow-hidden">
+        <div className="flex flex-col gap-2 w-full  bg-white rounded-md p-4 overflow-hidden">
             {/* Loại chuyến đi */}
             <div className="flex items-center gap-6 text-[1.4rem] font-medium text-gray-700">
                 <label className="flex items-center gap-2 cursor-pointer">

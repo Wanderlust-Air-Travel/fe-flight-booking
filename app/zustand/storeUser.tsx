@@ -1,6 +1,6 @@
 // "use client"
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { AuthState } from "@/types/user-login-type";
 
 
@@ -12,7 +12,7 @@ const useUserStore = create<AuthState>()(
             accessToken: null,
             refreshToken: null,
             isLoggedIn: false,
-            
+
 
             login: (data) => {
                 set({
@@ -33,7 +33,18 @@ const useUserStore = create<AuthState>()(
             }
         }),
         {
-            name: "auth-storage"
+            name: "auth-storage",
+            skipHydration: false, // ⭐ QUAN TRỌNG
+            storage: createJSONStorage(() => {
+                // nếu có remember thì xài localStorage
+                if (localStorage.getItem("remember") === "1") {
+                    return localStorage;
+                } else {
+                    // không remember → sessionStorage
+                    return sessionStorage;
+                }
+
+            }),
         }
     )
 )

@@ -313,3 +313,7 @@ main {
   left: 1rem;
   right: unset !important;
 }
+
+.rdrMonth{
+  padding: unset !important;
+}
