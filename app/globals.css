@@ -14,7 +14,7 @@
   --cl-four: #64AF53;
   --cl-five: #C5FF95;
   --cl-six: #DBDFEA;
-  --cl-seven:#6699BC;
+  --cl-seven:#D3DAD9;
   --cl-white: #ffffff;
   --cl-gray: #667085;
   --cl-red: #D83D32;
@@ -122,8 +122,7 @@ body {
 
 main {
   min-height: 80vh;
-  overflow: hidden;
-  /* justify-content: center; */
+
 }
 
 .container {

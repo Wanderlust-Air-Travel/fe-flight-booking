@@ -57,7 +57,7 @@ const Header = () => {
     const handleClose = (): void => {
         handleIsActive();
     }
-    const hydrated = useUserStore.persist.hasHydrated();
+    const hydrated = useUserStore((state) => state.hydrated);
 
     console.log(hydrated)
 

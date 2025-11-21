@@ -3,8 +3,6 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { AuthState } from "@/types/user-login-type";
 
-
-
 const useUserStore = create<AuthState>()(
     persist(
         (set) => ({
@@ -13,6 +11,8 @@ const useUserStore = create<AuthState>()(
             refreshToken: null,
             isLoggedIn: false,
 
+            // trạng thái hydrate
+            hydrated: false,
 
             login: (data) => {
                 set({
@@ -20,7 +20,7 @@ const useUserStore = create<AuthState>()(
                     accessToken: data.access_token,
                     refreshToken: data.refresh_token,
                     isLoggedIn: true,
-                })
+                });
             },
 
             logout: () => {
@@ -29,24 +29,31 @@ const useUserStore = create<AuthState>()(
                     accessToken: null,
                     refreshToken: null,
                     isLoggedIn: false,
-                })
-            }
+                });
+            },
         }),
+
         {
             name: "auth-storage",
-            skipHydration: false, // ⭐ QUAN TRỌNG
+            skipHydration: false,
+
             storage: createJSONStorage(() => {
-                // nếu có remember thì xài localStorage
-                if (localStorage.getItem("remember") === "1") {
+                // nếu có remember → dùng localStorage
+                if (typeof window !== "undefined" &&
+                    localStorage.getItem("remember") === "1") {
                     return localStorage;
-                } else {
-                    // không remember → sessionStorage
-                    return sessionStorage;
                 }
 
+                // ngược lại sessionStorage
+                return sessionStorage;
             }),
+
+            // ⭐ khi storage được hydrate xong → đánh dấu
+            onRehydrateStorage: () => (state) => {
+                if (state) state.hydrated = true;
+            },
         }
     )
-)
+);
 
 export default useUserStore;

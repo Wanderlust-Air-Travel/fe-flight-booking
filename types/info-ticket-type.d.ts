@@ -14,6 +14,7 @@ export interface InfoTicketType {
   totalTime: string;
   typeTicket: string;
   price: number;
+  type:string,
   desc: {
     text: string;
     status: boolean;

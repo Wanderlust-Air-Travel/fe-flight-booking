@@ -18,7 +18,7 @@ export default function Home() {
 
   return (
     <>
-      <main className={`${isActive ? "pt-[calc(var(--hd)-var(--hdt))]" : "pt-[var(--hd)]"} flex flex-col gap-y-[var(--rowY)]`} >
+      <main className={`overflow-hidden ${isActive ? "pt-[calc(var(--hd)-var(--hdt))]" : "pt-[var(--hd)]"} flex flex-col gap-y-[var(--rowY)] `} >
         <BannerHome />
 
         <section className="flex w-full">

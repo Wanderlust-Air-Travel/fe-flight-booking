@@ -15,6 +15,7 @@ const useInfoTicket = create<InfoTicketTypeState>()(
         airline: "",
         startDate: "",
         duration: "",
+        type:"",
         durationLocation: "",
         service: "",
         endDate: "",

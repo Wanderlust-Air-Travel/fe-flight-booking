@@ -9,7 +9,7 @@ import { ListProps } from "@/types/ticket-list-type";
 import axios from "axios";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { useRouter } from "next/navigation";
-import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
+
 
 
 
@@ -45,17 +45,17 @@ const TripList = ({ trips }: TripListProps) => {
 
 
 
-    const handleChoose = (index2: number, ticket: {
-        typeTicket: string;
-        price: number;
-        desc: { text: string; status: boolean }[];
-    },
-        trip: TripListType) => {
+    const handleChoose = (index2: number, ticket: {typeTicket: string;price: number;desc: { text: string; status: boolean }[];},
+        trip: TripListType,type:string) => {
+
+        console.log(ticket)
+
+
         setActiveIndex(index2);
 
         setData({
             id: trip.id,
-            icon:trip.icon,
+            icon: trip.icon,
             code: trip.code,
             airline: trip.airline,
             startDate: trip.startDate,
@@ -66,18 +66,20 @@ const TripList = ({ trips }: TripListProps) => {
             stopCount: trip.stopCount,
             stopDuration: trip.stopDuration,
             totalTime: trip.totalTime,
+            type:type,
             typeTicket: ticket.typeTicket,
             price: ticket.price,
             desc: ticket.desc,
+
         })
 
 
 
     }
 
-    const handleAccept = () =>{
+    const handleAccept = () => {
         router.push("/inforticket")
-        
+
     }
 
 
@@ -174,7 +176,7 @@ const TripList = ({ trips }: TripListProps) => {
                                                                 console.log(index2 === activeIndex)
                                                                 return (
                                                                     <li key={index2} className="w-[calc(100%/3)] block px-[1.2rem]">
-                                                                        <Ticket type={tickets?.type} tickets={ticket} index={index2} onChoose={() => { handleChoose(index2, ticket, trip) }} active={activeIndex === index2} />
+                                                                        <Ticket type={tickets?.type} tickets={ticket} index={index2} onChoose={() => { handleChoose(index2, ticket, trip, tickets.type) }} active={activeIndex === index2} />
                                                                     </li>
                                                                 )
                                                             })

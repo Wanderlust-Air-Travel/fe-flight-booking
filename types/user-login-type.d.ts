@@ -1,23 +1,25 @@
 interface User {
-  id:string,
+  id: string;
   email: string;
   fullname: string;
   phone: number;
-  
 }
 
 export interface AuthState {
   user: User | null;
   accessToken: string | null;
-  refreshToken: string | null;  
+  refreshToken: string | null;
   isLoggedIn: boolean;
 
   login: (data: {
     user: User;
     access_token: string;
     refresh_token: string;
-    isLoggedIn:boolean
+    isLoggedIn: boolean;
   }) => void;
 
   logout: () => void;
+
+  // ⭐ THÊM DÒNG NÀY
+  hydrated: boolean;
 }
