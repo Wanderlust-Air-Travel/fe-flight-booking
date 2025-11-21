@@ -11,6 +11,8 @@ const useFightSearchBarStore = create<FightSearchBarStoreState>((set) => ({
     startDate: "",
     endDate: "",
     totalPerson: 0,
+    adult:1,
+    minor:0
   },
 
   setData: (newData) =>

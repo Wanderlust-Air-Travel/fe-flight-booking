@@ -16,7 +16,7 @@ const Person = ({classNameParent,classNameChild}:any) => {
 
 
     useEffect(() => {
-        setData({ totalPerson: total });
+        setData({ totalPerson: total, adult:adult ,minor:minor  });
     }, [adult,minor])
 
 

@@ -44,7 +44,7 @@ const SignUp = () => {
 
 
 
-        axios.post("http://localhost:3001/auth/register", {
+        axios.post("http://localhost:3000/auth/register", {
             email: value.email,
             password: value.password,
             fullname: value.fullname,

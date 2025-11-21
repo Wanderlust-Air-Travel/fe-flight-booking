@@ -7,14 +7,14 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 
-type TripType = "oneway" | "round";
+type TripType = "one_way" | "round_trip";
 
 interface FlightDatePickerProps {
     onChangeDate?: (data: { startDate: Date; endDate?: Date }) => void;
 }
 
 export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps) {
-    const [tripType, setTripType] = useState<TripType>("oneway");
+    const [tripType, setTripType] = useState<TripType>("one_way");
     const [range, setRange] = useState<Range>({
         startDate: new Date(),
         endDate: addDays(new Date(), 5),
@@ -85,8 +85,8 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
                         type="radio"
                         name="tripType"
                         value="oneway"
-                        checked={tripType === "oneway"}
-                        onChange={() => setTripType("oneway")}
+                        checked={tripType === "one_way"}
+                        onChange={() => setTripType("one_way")}
                         className="accent-[var(--cl-pri)]"
                     />
                     <span>One way</span>
@@ -97,8 +97,8 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
                         type="radio"
                         name="tripType"
                         value="round"
-                        checked={tripType === "round"}
-                        onChange={() => setTripType("round")}
+                        checked={tripType === "round_trip"}
+                        onChange={() => setTripType("round_trip")}
                         className="accent-[var(--cl-pri)]"
                     />
                     <span>Round trip</span>
@@ -106,7 +106,7 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
             </div>
 
             {/* Lịch */}
-            {tripType === "oneway" ? (
+            {tripType === "one_way" ? (
 
                 <Calendar
                     date={range.startDate || new Date()}

@@ -5,6 +5,8 @@
   startDate: string;
   endDate?: string;
   totalPerson: number;
+  minor:number,
+  adult:number
 }
 
 export interface FightSearchBarStoreState {

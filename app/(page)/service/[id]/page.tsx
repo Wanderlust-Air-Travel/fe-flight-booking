@@ -1,14 +1,13 @@
 "use client";
 import FlightSearchBar from "@/app/components/FlightSearchBar/FlightSearchBar";
 import TripList from "@/app/components/TripList/TripList";
-import useIsActiveStore from "@/app/zustand/storeHeader";
 import { TripListType } from "@/types/trip-list-type";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 const ServiceDetails = () => {
 
-    const { isActive } = useIsActiveStore();
+
     const [trips,setTrips] = useState<TripListType[]>([]);
 
     useEffect(()=>{
@@ -26,7 +25,7 @@ const ServiceDetails = () => {
     
 
     return (
-        <main className={`${isActive ? "pt-[calc(var(--hd)-var(--hdt))]" : "pt-[var(--hd)]"} flex flex-col gap-y-[var(--rowY)]`} >
+        <main className={`pt-[var(--hd)] flex flex-col gap-y-[var(--rowY)]`} >
             <section className="pt-[var(--rowY)] w-full">
                 <div className="container">
                     <FlightSearchBar />

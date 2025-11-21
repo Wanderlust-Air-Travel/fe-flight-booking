@@ -41,7 +41,7 @@ const SignIn = () => {
 
 
 
-        axios.post("http://localhost:3001/auth/login", {
+        axios.post("http://localhost:3000/auth/login", {
             email: value.identifier,
             password: value.password
         })
