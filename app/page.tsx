@@ -12,13 +12,10 @@ import ServiceHome from "./components/Services/ServiceHome";
 
 export default function Home() {
 
-  const { isActive } = useIsActiveStore();
-
-
 
   return (
     <>
-      <main className="overflow-hidden">
+      <main className="overflow-hidden pt-[var(--hd)] flex flex-col gap-y-[var(--rowY)]">
         <BannerHome />
 
         <section className="flex w-full">

@@ -54,7 +54,7 @@ const dataLocation = [
     name: "Hải Phòng",
     des: "Sân bay quốc tế Cát Bi",
     value: "hai-phong",
-    code: "HPH",te
+    code: "HPH",
   },
   {
     name: "Quảng Ninh",

@@ -1,4 +1,4 @@
-// InputFormat.tsx
+"use client"
 import { Input } from "@/components/ui/input";
 import { InputProps } from "@/types/input-props";
 import { useFormikInput } from "./UseFormikInput";

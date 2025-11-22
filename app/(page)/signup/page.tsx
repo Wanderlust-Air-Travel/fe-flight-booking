@@ -1,7 +1,5 @@
 "use client"
-import useIsActiveStore from "@/app/zustand/storeHeader"
 import { Formik } from "formik";
-
 import { Button } from "@/components/ui/button";
 import { InputFormat } from "@/app/hook/InputFormat";
 import Image from "next/image";
@@ -32,8 +30,6 @@ const initialValues = {
 
 
 const SignUp = () => {
-
-    const { isActive } = useIsActiveStore();
     const { login } = useUserStore();
     const [error, setError] = useState<string>("")
     const router = useRouter();
@@ -41,9 +37,6 @@ const SignUp = () => {
 
 
     const handleSubmit = (value: valueType, setSubmitting: (isSubmitting: boolean) => void) => {
-
-
-
         axios.post("http://localhost:3000/auth/register", {
             email: value.email,
             password: value.password,
@@ -71,13 +64,11 @@ const SignUp = () => {
 
 
             })
-
-
     }
 
     return (
-        <main className={`${isActive ? "pt-[calc(var(--hd)-var(--hdt))]" : "pt-[var(--hd)]"} flex justify-center flex-col gap-y-[var(--rowY)] -mb-[var(--rowY)]`} >
-            <section className={`${isActive ? "h-[calc(100dvh-var(--hd)-var(--hdt))]" : "h-[calc(100dvh-var(--hd))]"}`}>
+        <main className={`pt-[var(--hd)] flex justify-center flex-col gap-y-[var(--rowY)] -mb-[var(--rowY)]`} >
+            <section className={`h-[calc(100dvh-var(--hd))]`}>
                 <div className="container">
                     <div className="flex h-full -mx-[1.2rem]">
                         <div className="w-[55%] px-[1.2rem]">

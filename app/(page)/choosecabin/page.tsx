@@ -1,6 +1,5 @@
 "use client"
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
-import useIsActiveStore from "@/app/zustand/storeHeader";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { SeatGroup, SeatItem } from "@/types/seat-type";
 import axios from "axios";
@@ -11,7 +10,6 @@ import { ChangeEvent, useEffect, useState } from "react";
 
 
 const ChooseCabin = () => {
-    const { isActive } = useIsActiveStore();
     const [seatBusiness, setSeatBusiness] = useState<SeatGroup | null>(null)
     const [seatEconomy, setSeatEconomy] = useState<SeatGroup | null>(null)
 
@@ -79,7 +77,7 @@ const ChooseCabin = () => {
 
 
     return (
-        <main className={`${isActive ? "pt-[calc(var(--hd)-var(--hdt))]" : "pt-[var(--hd)]"} flex flex-col gap-y-[var(--rowY)]`} >
+        <main className={`flex flex-col gap-y-[var(--rowY)]`} >
             <InfoTicketBox />
 
             <section className="">
@@ -194,7 +192,7 @@ const ChooseCabin = () => {
                             </div>
                         </div>
                         <div className="px-[1.2rem] w-[100%] flex-1">
-                            <div className={`sticky ${isActive ? "top-[calc(var(--hd)-var(--hdt)+1rem)]" : "top-[calc(var(--hd)+1rem)]"} flex flex-col border-[var(--cl-third)] border-[0.1rem] rounded-[1rem] p-[1.6rem]  gap-y-[2rem]`}>
+                            <div className={`sticky top-[calc(var(--hd)+1rem)] flex flex-col border-[var(--cl-third)] border-[0.1rem] rounded-[1rem] p-[1.6rem]  gap-y-[2rem]`}>
                                 <h2 className="text-center text-md text-[var(--cl-pri)] font-bold">
                                     Choose Position
                                 </h2>

@@ -1,3 +1,4 @@
+"use client"
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { Check, ChevronDown, X } from "lucide-react";
 import Image from "next/image";
@@ -97,7 +98,7 @@ const InfoTicketBox = () => {
                                                 </div>
                                                 <div className="w-full flex-1">
                                                     <div className="flex gap-x-[1rem] items-center" onClick={(handleOpen)}>
-                                                        <div className={`${data.typeTicket.includes("Economy") ? "bg-[var(--cl-four)] hover:bg-green-700" : "bg-[var(--cl-pri)] hover:bg-blue-950"} flex flex-col items-center p-[1.2rem] w-full rounded-md cursor-pointer gap-y-[0.2rem]  transition ease-linear`} >
+                                                        <div className={`${data.typeTicket.includes("Economy") ? "bg-[var(--cl-four)] hover:bg-[var(--cl-five)]" : "bg-[var(--cl-pri)] hover:bg-blue-950"} flex flex-col items-center p-[1.2rem] w-full rounded-md cursor-pointer gap-y-[0.2rem]  transition ease-linear`} >
                                                             <p className="text-base text-white font-bold text-center" >
                                                                 {data.typeTicket}
                                                             </p>

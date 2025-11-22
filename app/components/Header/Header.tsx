@@ -67,7 +67,7 @@ const Header = () => {
             className={`h-[var(--hd)] shadow fixed top-0 left-0 w-full z-[999]`}
         >
             <div
-                className={`bg-white h-[calc(var(--hd)-var(--hdt))] transition ease-linear`}
+                className={`bg-[var(--cl-pri)] h-full transition ease-linear`}
             >
                 <div className="container">
                     <div className="flex h-full justify-between gap-x-[3.2rem]">
@@ -82,7 +82,7 @@ const Header = () => {
                                 height={100}
                                 priority
                                 unoptimized
-                                className="w-full h-full object-contain transition ease-linear xl:group-hover:scale-95"
+                                className="w-full h-full object-contain transition ease-linear xl:group-hover:scale-95 filter-white"
                             />
                         </Link>
                         <ul className="flex gap-x-[1.2rem] items-center ">
@@ -93,7 +93,7 @@ const Header = () => {
                                         className="group last:[&>a]:h-auto last:flex last:flex-col last:justify-center last:[&>a]:bg-[var(--cl-pri)] h-full last:[&>a]:text-[var(--cl-sec)] last:[&>a]:px-[2rem] last:[&>a]:py-[1.2rem] last:[&>a]:rounded-lg last:[&>a]:hover:bg-[var(--cl-four)] relative last:[&>a]:hover:!text-[var(--cl-white)]"
                                     >
                                         <Link
-                                            className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex justify-center items-center gap-x-2 ${router === menuList.path ? "text-[var(--cl-four)]" : "text-[var(--cl-third)]"} uppercase`}
+                                            className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex justify-center items-center gap-x-2 ${router === menuList.path ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"} uppercase`}
                                             href={menuList.path}
                                         >
                                             {menuList.title}
@@ -101,7 +101,7 @@ const Header = () => {
                                                 menuList.child?.length > 0 && (
                                                     <span className="w-[2rem] h-[2rem] flex justify-center items-center ">
                                                         <ChevronDown
-                                                            className="text-[var(--cl-third)] w-full h-full mt-[0.35rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-four)]"
+                                                            className="text-[var(--cl-white)] w-full h-full mt-[0.35rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-four)]"
                                                         />
                                                     </span>
                                                 )}
@@ -117,7 +117,7 @@ const Header = () => {
                                                             return (
                                                                 <li key={index} className="">
                                                                     <Link
-                                                                        className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base xl:hover:text-[var(--cl-sec)] xl:hover:bg-[var(--cl-pri)] transition ease-linear uppercase text-nowrap"
+                                                                        className="p-[1rem] text-base flex items-center text-[var(--cl-pri)] text-base xl:hover:text-[var(--cl-sec)] xl:hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
                                                                         href={child.path}
                                                                     >
                                                                         {child.title}
@@ -173,7 +173,7 @@ const Header = () => {
                                         <>
                                             <li className="group">
                                                 <Link
-                                                    className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex uppercase justify-center items-center gap-x-2 ${router === "/signin" ? "text-[var(--cl-four)]" : "text-[var(--cl-third)]"}`}
+                                                    className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex uppercase justify-center items-center gap-x-2 ${router === "/signin" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`}
                                                     href="/signin"
                                                 >
                                                     Sign in
@@ -181,9 +181,9 @@ const Header = () => {
                                             </li>
 
 
-                                            <li className={`group h-auto flex flex-col justify-center px-[2rem] py-[0.6rem] rounded-lg hover:bg-[var(--cl-four)] relative  ${router === "/signup" ? "bg-[var(--cl-four)]" : "bg-[var(--cl-pri)]"} transition `}>
+                                            <li className={`group h-auto flex flex-col justify-center px-[2rem] py-[0.6rem] rounded-lg hover:bg-[var(--cl-white)]  relative  ${router === "/signup" ? "bg-[var(--cl-white)]" : "bg-[var(--cl-four)]"} transition `}>
                                                 <Link
-                                                    className={`p-[1rem] text-md text-[var(--cl-white)] transition ease-linear h-full flex justify-center items-center gap-x-2 uppercase`}
+                                                    className={`p-[1rem] text-md transition ease-linear h-full flex justify-center items-center gap-x-2 uppercase group-hover:text-[var(--cl-pri)] ${router === "/signup" ? "text-[var(--cl-pri)]" : "text-[var(--cl-white)]"}`}
                                                     href="/signup"
                                                 >
                                                     Sign up
