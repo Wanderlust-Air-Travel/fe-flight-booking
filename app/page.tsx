@@ -5,12 +5,31 @@ import BannerHome from "./components/Banner/Banner";
 import useIsActiveStore from "./zustand/storeHeader";
 import { Button } from "@/components/ui/button";
 import ServiceHome from "./components/Services/ServiceHome";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+import useFightSearchBarStore from "./zustand/storeFightSearchBar";
 
 
 
 
 
 export default function Home() {
+
+  const pathName = usePathname();
+  const {setData} = useFightSearchBarStore()
+  useEffect(()=>{
+    if(pathName === "/"){
+      setData({
+        adult:1,
+        startDate:"",
+        endDate:"",
+        from:"",
+        to:"",
+        
+      })
+    }
+  },[pathName])
+
 
 
   return (

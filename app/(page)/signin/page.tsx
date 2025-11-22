@@ -36,7 +36,7 @@ const SignIn = () => {
 
 
     const handleSubmit = (value: valueType, setSubmitting: (isSubmitting: boolean) => void) => {
-        axios.post("http://localhost:3000/auth/login", {
+        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`, {
             email: value.identifier,
             password: value.password
         })

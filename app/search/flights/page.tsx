@@ -1,24 +1,28 @@
 "use client";
 import FlightSearchBar from "@/app/components/FlightSearchBar/FlightSearchBar";
-import { convertToYMD } from "@/app/components/FormatDate/FormatDate";
 import TripList from "@/app/components/TripList/TripList";
-import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 import { TripListType } from "@/types/trip-list-type";
 import axios from "axios";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const ServiceDetailsResultSearch = () => {
   const [trips, setTrips] = useState<TripListType[]>([]);
-  const { data, setData } = useFightSearchBarStore();
+
+
+
+  const searchParams = useSearchParams();
+
+  const origin = searchParams.get("origin");
+  const destination = searchParams.get("destination");
+  const departDate = searchParams.get("departDate");
+  const adults = searchParams.get("adults");
+  const minors = searchParams.get("minors");
 
   useEffect(() => {
     axios
       .get(
-        `http://localhost:3000/search/flights?origin=${data.from}&destination=${
-          data.to
-        }&departDate=${convertToYMD(data.startDate)}&tripType=one_way&adults=${
-          data.adult
-        }&minors=${data.minor}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/flights?origin=${origin}&destination=${destination}&departDate=${departDate}&tripType=one_way&adults=${adults}&minors=${minors}`
       )
       .then((res) => {
         setTrips(res.data);
@@ -26,8 +30,9 @@ const ServiceDetailsResultSearch = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
-  
+  }, [origin, destination, departDate, adults, minors]);
+
+
 
   console.log(trips);
 
@@ -44,7 +49,7 @@ const ServiceDetailsResultSearch = () => {
             <h2 className="text-lg text-[var(--cl-pri)] font-bold uppercase">
               Trip list
             </h2>
-            {/* <TripList trips={trips} /> */}
+            <TripList trips={trips} />
           </div>
         </div>
       </section>

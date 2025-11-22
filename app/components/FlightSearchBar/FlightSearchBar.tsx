@@ -2,13 +2,12 @@ import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import FlightDatePicker from "../Date/FlightDatePicker";
+import { convertToYMD } from "../FormatDate/FormatDate";
 import Person from "../Person/Person";
 import { SelectComponent } from "../Select/SelectComponent";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { convertToYMD } from "../FormatDate/FormatDate";
 
 const dataLocation = [
   {
@@ -93,32 +92,47 @@ const dataLocation = [
 ];
 
 const FlightSearchBar = () => {
-  const [from, setFrom] = useState<string>("");
-  const [to, setTo] = useState<string>("");
-
   const { data, setData } = useFightSearchBarStore();
+  const [from, setFrom] = useState<string>(data.from || "");
+  const [to, setTo] = useState<string>(data.to || "");
+
   const router = useRouter();
 
   useEffect(() => {
-    setData({
-      from: from,
-      to: to,
-    });
-  }, [to, from]);
+   
+      setFrom(data.from || "");
+      setTo(data.to || "");
+
+  }, [data.from,data.to]);
   console.log(data);
+
+
 
   const handleSearch = () => {
     const startDateFormat = convertToYMD(data.startDate);
-
     router.push(
       `/search/flights?origin=${data.from}` +
-        `&destination=${data.to}` +
-        `&departDate=${startDateFormat}` +
-        `&tripType=one_way&adults=${data.adult}&minors=${data.minor}`
+      `&destination=${data.to}` +
+      `&departDate=${startDateFormat}` +
+      `&tripType=one_way&adults=${data.adult}&minors=${data.minor}`
     );
 
     console.log(startDateFormat);
   };
+
+  const handleChangeForm = (value:string) =>{
+    setFrom(value);
+    setData({from:value})
+  }
+
+  const handleChangeTo = (value:string) =>{
+    setTo(value);
+    setData({to:value});
+  }
+
+  console.log("from",from);
+  console.log("to",to);
+
 
   return (
     <>
@@ -126,19 +140,19 @@ const FlightSearchBar = () => {
         <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">
           <SelectComponent
             value={from}
-            onChange={setFrom}
+            onChange={handleChangeForm}
             placeholder="From Where?"
             icon="/icFrom.svg"
-            data={dataLocation.filter((item) => item.value !== to)}
+            data={dataLocation.filter((item) => item.code !== to)}
           />
         </div>
         <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">
           <SelectComponent
             value={to}
-            onChange={setTo}
+            onChange={handleChangeTo}
             placeholder="From To?"
             icon="/icTo.svg"
-            data={dataLocation.filter((item) => item.value !== from)}
+            data={dataLocation.filter((item) => item.code !== from)}
           />
         </div>
         <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">

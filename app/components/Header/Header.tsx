@@ -127,7 +127,7 @@ const Header = () => {
                                                         }
                                                     )}
                                                 </ul>
-                                            )}
+                                            )}      
                                     </li>
                                 );
                             })}
@@ -139,11 +139,11 @@ const Header = () => {
                                         <div className="flex h-full items-center gap-x-[0.4rem]">
                                             <Image src="/icAva.png" alt="icAva" width={26} height={26} className="flex-shrink-0 mt-[0.25rem]" priority unoptimized />
                                             <div className="flex flex-col">
-                                                <p className="text-md text-[var(--cl-pri)] uppercase font-medium">{user?.fullname}</p>
+                                                <p className="text-md text-[var(--cl-white)] uppercase font-medium">{user?.fullname}</p>
                                             </div>
                                             <span className="w-[2rem] h-[2rem] flex justify-center items-center ">
                                                 <ChevronDown
-                                                    className="text-[var(--cl-pri)] w-full h-full mt-[0.25rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-pri)]"
+                                                    className="text-[var(--cl-white)] w-full h-full mt-[0.25rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-white)]"
                                                 />
                                             </span>
                                         </div>
@@ -152,7 +152,7 @@ const Header = () => {
                                         >
                                             <li>
                                                 <Link
-                                                    className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-pri)] transition ease-linear uppercase text-nowrap"
+                                                    className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
                                                     href="/"
                                                 >
                                                     History

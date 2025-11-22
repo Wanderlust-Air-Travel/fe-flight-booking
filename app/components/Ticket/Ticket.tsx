@@ -11,8 +11,8 @@ const Ticket = ({ tickets,type,active,onChoose,index }:TicketProps ) => {
 
 
     return (
-        <div className={`ticketCabin ${type === "economy" ? "border-[var(--cl-four)]" : "border-[var(--cl-pri)]"} ${active && "translate-y-[-2%]"} w-full h-full flex flex-col border-[0.1rem] rounded-[1rem] overflow-hidden transition ease-liner duration-200 cursor-pointer`} onClick={onChoose}>
-            <div className={`${type === "economy" ? "bg-[var(--cl-four)]" : "bg-[var(--cl-pri)]"} flex flex-col justify-center items-center px-[1.6rem] py-[1.6rem]`}>
+        <div className={`ticketCabin ${type === "economy" ? "border-[var(--cl-five)]" : "border-[var(--cl-pri)]"} ${active && "translate-y-[-2%]"} w-full h-full flex flex-col border-[0.1rem] rounded-[1rem] overflow-hidden transition ease-liner duration-200 cursor-pointer`} onClick={onChoose}>
+            <div className={`${type === "economy" ? "bg-[var(--cl-five)]" : "bg-[var(--cl-pri)]"} flex flex-col justify-center items-center px-[1.6rem] py-[1.6rem]`}>
                 <p className="text-md text-white font-bold uppercase">{tickets.typeTicket}</p>
                 <p className="text-base text-white">{FormatPrice(Number(tickets.price))}</p>
             </div>

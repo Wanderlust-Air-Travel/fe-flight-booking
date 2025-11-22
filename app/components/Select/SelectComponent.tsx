@@ -25,7 +25,7 @@ interface SelectComponentProp {
 
 export function SelectComponent({ placeholder, icon, data,value,onChange }: SelectComponentProp) {
 
-    
+    console.log(data)
 
     return (
         <Select value={value} onValueChange={onChange}>
@@ -41,7 +41,7 @@ export function SelectComponent({ placeholder, icon, data,value,onChange }: Sele
                     {
                         data?.map((item, index) => {
                             return (
-                                <SelectItem key={index} className="group" value={item.value}>
+                                <SelectItem key={index} className="group" value={item.code}>
                                     <div className="flex justify-between gap-x-[1rem] w-full group-hover:!bg-[var(--cl-pri)] p-2">
                                         <div className="flex flex-col gap-y-[0.2rem]">
                                             <p className="text-[1.4rem] text-[var(--cl-pri)] group-hover:!text-white">

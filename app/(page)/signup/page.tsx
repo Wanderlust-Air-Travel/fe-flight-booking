@@ -37,7 +37,7 @@ const SignUp = () => {
 
 
     const handleSubmit = (value: valueType, setSubmitting: (isSubmitting: boolean) => void) => {
-        axios.post("http://localhost:3000/auth/register", {
+        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/register`, {
             email: value.email,
             password: value.password,
             fullname: value.fullname,

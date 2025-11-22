@@ -12,26 +12,57 @@ import { ListProps } from "@/types/ticket-list-type";
 import axios from "axios";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { useRouter } from "next/navigation";
+import { convertToDMY, convertToLocalTime } from "../FormatDate/FormatDate";
 
 const TripList = ({ trips }: TripListProps) => {
 
     // ❗ FIX 1: Nhiều panel => phải dùng mảng ref
     const itemRefs = useRef<HTMLDivElement[]>([]);
-
-    const [tickets, setTicket] = useState<ListProps | null>(null);
-    const [activeTripCode, setActiveTripCode] = useState<number | null>(null);
+    const [type, setType] = useState<string>("");
+    const [tickets, setTickets] = useState<ListProps | null>(null);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const { setData } = useInfoTicket();
     const router = useRouter();
 
     // Khi click cabin
-    const handleCabin = useCallback((type: string, code: number, index: number) => {
-        setActiveTripCode(index);
+    const handleCabinEconomy = useCallback((code: string, index: number) => {
+
         setActiveIndex(null);
 
-        axios.get(`/api/ticket?code=${code}&type=${type}`)
+        setType("economy");
+
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/fare-options?flightInstanceId=${code}&cabinType=economy`)
             .then((res) => {
-                setTicket(res.data[0]);
+                console.log(res);
+                setTickets(res.data);
+
+                // ❗ FIX 2: slideDown đúng panel + đóng panel khác
+                setTimeout(() => {
+                    itemRefs.current.forEach((el, i) => {
+                        if (!el) return;
+
+                        if (i === index) {
+                            $(el).stop(true, true).slideDown(300);
+                        } else {
+                            $(el).stop(true, true).slideUp(300);
+                        }
+                    });
+                }, 50);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, []);
+
+    const handleCabinBusiness = useCallback((code: string, index: number) => {
+
+        setActiveIndex(null);
+        setType("business");
+
+
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/fare-options?flightInstanceId=${code}&cabinType=business`)
+            .then((res) => {
+                setTickets(res.data);
 
                 // ❗ FIX 2: slideDown đúng panel + đóng panel khác
                 setTimeout(() => {
@@ -87,16 +118,18 @@ const TripList = ({ trips }: TripListProps) => {
         router.push("/inforticket");
     };
 
+    console.log(tickets)
+
     return (
         <ul className="border-[var(--cl-third)] border-[0.1rem] rounded-[1rem] overflow-hidden">
             <li className="flex gap-x-[1.2rem] items-center p-[1.6rem] bg-[var(--cl-pri)]">
                 <div className="w-[5%]">
                     <p className="text-white font-bold text-base uppercase">Logo</p>
                 </div>
-                <div className="w-[10%]">
+                <div className="w-[20%]">
                     <p className="text-white font-bold text-base uppercase">Time & Brand</p>
                 </div>
-                <div className="w-[25%]">
+                <div className="w-[20%]">
                     <p className="text-white font-bold text-base uppercase">Information</p>
                 </div>
                 <div className="w-[15%]">
@@ -110,7 +143,9 @@ const TripList = ({ trips }: TripListProps) => {
                 </div>
             </li>
 
-            {trips.map((trip, index) => {
+            {trips?.outbound?.map((trip, index) => {
+                console.log(trips);
+
                 return (
                     <li
                         key={index}
@@ -118,62 +153,76 @@ const TripList = ({ trips }: TripListProps) => {
                     >
                         <div className="flex gap-x-[1.2rem] items-center p-[1.6rem] w-full">
                             <div className="w-[5%]">
-                                <Image src={trip.icon} alt="logoBrand" width={40} height={40} unoptimized priority />
+                                {/* <Image src="/logoBrand.png" alt="logoBrand" width={40} height={40} unoptimized priority /> */}
+                                <span className="loading"></span>
                             </div>
 
-                            <div className="w-[10%]">
-                                <div className="flex flex-col gap-y-[0.2rem]">
-                                    <p className="text-[var(--cl-four)] font-bold text-base">{trip.totalTime}</p>
-                                    <p className="text-[var(--cl-third)] text-base">{trip.airline}</p>
-                                </div>
+                            <div className="w-[20%]">
+                                <span className="loading"></span>
+
+                                {/* <div className="flex flex-col gap-y-[0.2rem]">
+                                    <p className="text-[var(--cl-five)] font-bold text-base">{convertToLocalTime(trip.departureLocal)}AM - {convertToLocalTime(trip.arrivalLocal)}PM</p>
+                                    <p className="text-[var(--cl-third)] text-base">Bamboo</p>
+                                </div> */}
                             </div>
 
-                            <div className="w-[25%]">
-                                <div className="flex flex-col gap-y-[0.2rem]">
-                                    <p className="text-[var(--cl-four)] font-bold text-base">Time: {trip.duration}</p>
-                                    <p className="text-[var(--cl-third)] text-mn">Location: {trip.durationLocation}</p>
-                                    {trip.startDate && <p className="text-[var(--cl-third)] text-mn">Start date: {trip.startDate}</p>}
-                                    {trip.endDate && <p className="text-[var(--cl-third)] text-mn">Start date: {trip.endDate}</p>}
-                                </div>
+                            <div className="w-[20%]">
+                                <span className="loading"></span>
+
+                                {/* <div className="flex flex-col gap-y-[0.2rem]">
+                                    <p className="text-[var(--cl-five)] font-bold text-base">{trip.origin.iata} - {trip.destination.iata}</p>
+                                    {trip.departureLocal && <p className="text-[var(--cl-third)] text-mn">Start date: {convertToDMY(trip.departureLocal)}</p>}
+                                    {trip.arrivalLocal && <p className="text-[var(--cl-third)] text-mn">end date: {convertToDMY(trip.arrivalLocal)}</p>}
+                                </div> */}
                             </div>
 
                             <div className="w-[15%]">
-                                <div className="flex flex-col gap-y-[0.2rem]">
-                                    <p className="text-[var(--cl-four)] font-bold text-base">{trip.stopCount}</p>
-                                    <p className="text-[var(--cl-third)] text-base">{trip.stopDuration}</p>
-                                </div>
+                                <span className="loading"></span>
+                                {/* <div className="flex flex-col gap-y-[0.2rem]">
+                                    <p className="text-[var(--cl-five)] font-bold text-base">{trip.stopCount || 0}</p>
+                                    <p className="text-[var(--cl-third)] text-base">{trip.stopDuration || "None"}</p>
+                                </div> */}
                             </div>
 
                             <div className="w-[10%]">
-                                <p className="text-[var(--cl-four)] font-bold text-base">{trip.service}</p>
+                                {/* <p className="text-[var(--cl-five)] font-bold text-base">{trips.tripType}</p> */}
+                                <span className="loading"></span>
                             </div>
 
                             <div className="w-full flex-1">
-                                <div className="flex gap-x-[1rem] items-center">
-                                    {trip.cabin.map((cabin, index2) => {
-                                        return (
-                                            <div
-                                                key={index2}
-                                                className={`${cabin.type === "economy"
-                                                    ? "bg-[var(--cl-four)] hover:bg-[var(--cl-five)]"
-                                                    : "bg-[var(--cl-pri)] hover:bg-blue-950"
-                                                    } flex flex-col items-center p-[1.2rem] w-[50%] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
-                                                onClick={() => {
-                                                    handleCabin(cabin.type, trip.code, index);
-                                                }}
-                                            >
-                                                <p className="text-base text-white font-bold text-center">
-                                                    {cabin.title} ({cabin.quantity} slot)
-                                                </p>
-                                                <span className="text-sm cl-white text-center">From</span>
-                                                <p className="text-base text-white font-bold text-center">
-                                                    {FormatPrice(Number(cabin.price))}
-                                                </p>
-                                                <ChevronDown className="w-[1.2=4rem] h-[1.4rem] text-white" />
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                <span className="loading"></span>
+
+                                {/* <div className="flex gap-x-[1rem] items-center">
+                                    <div
+
+                                        className={`bg-[var(--cl-five)] hover:bg-green-700 flex flex-col items-center p-[1.2rem] w-[50%] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
+                                        onClick={() => {
+                                            handleCabinEconomy(trip.flightInstanceId, index);
+                                        }}
+                                    >
+                                        <p className="text-base text-white font-bold text-center">
+                                            Economy
+                                        </p>
+                                        <span className="text-sm cl-white text-center">{trip.availableSeats}</span>
+
+                                        <ChevronDown className="w-[1.2=4rem] h-[1.4rem] text-white" />
+                                    </div>
+
+                                    <div
+
+                                        className={`bg-[var(--cl-pri)] hover:bg-blue-950 flex flex-col items-center p-[1.2rem] w-[50%] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
+                                        onClick={() => {
+                                            handleCabinBusiness(trip.flightInstanceId, index);
+                                        }}
+                                    >
+                                        <p className="text-base text-white font-bold text-center">
+                                            Business
+                                        </p>
+                                        <span className="text-sm cl-white text-center">{trip.availableSeats}</span>
+
+                                        <ChevronDown className="w-[1.2=4rem] h-[1.4rem] text-white" />
+                                    </div>
+                                </div> */}
                             </div>
                         </div>
 
@@ -184,40 +233,40 @@ const TripList = ({ trips }: TripListProps) => {
                             style={{ display: "none" }}
                         >
                             <div className="flex flex-col justify-center items-center gap-y-[1.2rem] p-[1.6rem] w-full border-t-[0.1rem] border-[var(--cl-third)]">
-                                <p className={`${tickets?.type === "economy"
-                                        ? "text-[var(--cl-four)]"
-                                        : "text-[var(--cl-pri)]"
+                                <p className={`${type === "economy"
+                                    ? "text-[var(--cl-five)]"
+                                    : "text-[var(--cl-pri)]"
                                     } uppercase font-bold text-center text-[2.4rem]`}
                                 >
                                     Choose Cabin
                                 </p>
 
-                                {tickets?.list && (
-                                    <ul className="flex justify-center -mx-[1.2rem] w-full">
-                                        {tickets.list.map((ticket, index2) => {
-                                            return (
-                                                <li key={index2} className="w-[calc(100%/3)] block px-[1.2rem]">
-                                                    <Ticket
-                                                        type={tickets.type}
-                                                        tickets={ticket}
-                                                        index={index2}
-                                                        onChoose={() => {
-                                                            handleChoose(index2, ticket, trip, tickets.type);
-                                                        }}
-                                                        active={activeIndex === index2}
-                                                    />
-                                                </li>
-                                            );
-                                        })}
-                                    </ul>
-                                )}
+
+                                <ul className="flex justify-center -mx-[1.2rem] w-full">
+                                    {tickets?.map((ticket, index2) => {
+                                        return (
+                                            <li key={index2} className="w-[calc(100%/3)] block px-[1.2rem]">
+                                                <Ticket
+                                                    type={type}
+                                                    tickets={ticket}
+                                                    index={index2}
+                                                    onChoose={() => {
+                                                        handleChoose(index2, ticket, trip, tickets.type);
+                                                    }}
+                                                    active={activeIndex === index2}
+                                                />
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+
 
                                 {activeIndex !== null && (
                                     <Button
                                         onClick={handleAccept}
-                                        className={`${tickets?.type === "economy"
-                                                ? "bg-[var(--cl-four)] hover:bg-[var(--cl-pri)]"
-                                                : "bg-[var(--cl-pri)] hover:bg-[var(--cl-four)]"
+                                        className={`${type === "economy"
+                                            ? "bg-[var(--cl-five)] hover:bg-green-700"
+                                            : "bg-[var(--cl-pri)] hover:bg-blue-900"
                                             } w-fit h-[4.4rem] text-[1.6rem] px-[2rem] uppercase`}
                                     >
                                         Accept
