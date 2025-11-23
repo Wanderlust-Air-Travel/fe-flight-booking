@@ -4,17 +4,20 @@ export interface InfoTicketType {
   code: number;
   airline: string;
   startDate: string;
-  duration: string;
-  durationLocation: string;
-  service: string;
   endDate: string;
+  startCode: trip.origin.iata,
+  endCode: trip.origin.iata,
+  start:string,
+  end:string,
+  service: string;
   totalPerson: number;
   stopCount: number;
   stopDuration: string;
-  totalTime: string;
-  typeTicket: string;
   price: number;
   type:string,
+  timeStart:string,
+  timeEnd:string,
+  typeTicket:string,
   desc: {
     text: string;
     status: boolean;

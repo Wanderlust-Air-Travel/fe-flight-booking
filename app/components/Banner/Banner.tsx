@@ -1,5 +1,4 @@
 "use client";
-import useIsActiveStore from "@/app/zustand/storeHeader";
 import axios from "axios";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -13,7 +12,6 @@ interface bannerApi {
 }
 
 const BannerHome = () => {
-    const { isActive } = useIsActiveStore();
     const [data, setData] = useState<bannerApi | null>(null)
 
 
@@ -30,7 +28,7 @@ const BannerHome = () => {
     console.log(data)
 
     return (
-        <div className={`${isActive ? "h-[calc(100vh-(var(--hd)-var(--hdt)))]" : "h-[calc(100vh-var(--hd))]"} relative `}>
+        <div className={`h-[calc(100vh-var(--hd))] relative `}>
             {
                 data &&
                 (
@@ -44,7 +42,7 @@ const BannerHome = () => {
                     {
                         data && <h1 className="text-center text-white text-[8rem] uppercase font-medium" data-aos="fade-up">{data.title}</h1>
                     }
-                    <div className="w-full" data-aos="fade-up" data-aos-delay="500" >
+                    <div className="w-full search-bn p-2 rounded-md" data-aos="fade-up" data-aos-delay="500" >
                         <FlightSearchBar />
                     </div>
                 </div>

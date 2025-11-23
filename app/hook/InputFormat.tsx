@@ -13,6 +13,8 @@ export const InputFormat = ({
     placeholder,
     type = "text",
     formatDob = false,
+    formatPhone = false,
+    formatName = false,
     password = false,
 }: InputProps) => {
     const { field, error, isError } = useFormikInput(name);
@@ -33,6 +35,15 @@ export const InputFormat = ({
 
             // Giới hạn 10 ký tự (DD/MM/YYYY)
             if (value.length > 10) value = value.slice(0, 10);
+        }
+
+        if (formatPhone) {
+            value = value.replace(/\D/g, ""); // xoá hết cái gì không phải số
+        }
+
+        // 👤 Name: chỉ cho nhập chữ (có dấu) + khoảng trắng
+        if (formatName) {
+            value = value.replace(/[^A-Za-zÀ-ỹ\s]/g, ""); // xoá số, ký tự đặc biệt
         }
 
         field.onChange({

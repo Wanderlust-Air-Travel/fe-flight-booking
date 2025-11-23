@@ -110,11 +110,14 @@ const FlightSearchBar = () => {
 
   const handleSearch = () => {
     const startDateFormat = convertToYMD(data.startDate);
+    const endDateFormat = data.endDate ? convertToYMD(data.endDate) : "";
+
     router.push(
       `/search/flights?origin=${data.from}` +
       `&destination=${data.to}` +
       `&departDate=${startDateFormat}` +
-      `&tripType=one_way&adults=${data.adult}&minors=${data.minor}`
+      `&returnDate=${endDateFormat}` +
+      `&tripType=${data.service}&adults=${data.adult}&minors=${data.minor}`
     );
 
     console.log(startDateFormat);

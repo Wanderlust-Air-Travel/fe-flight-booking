@@ -77,7 +77,7 @@ const ChooseCabin = () => {
 
 
     return (
-        <main className={`flex flex-col gap-y-[var(--rowY)]`} >
+        <main className={`flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]`} >
             <InfoTicketBox />
 
             <section className="">

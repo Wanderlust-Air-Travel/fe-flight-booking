@@ -30,13 +30,13 @@ export function SelectComponent({ placeholder, icon, data,value,onChange }: Sele
     return (
         <Select value={value} onValueChange={onChange}>
             <SelectTrigger className="w-full border-none outline-none text-start !h-[4.8rem] shadow-none text-[1.4rem] !text-[var(--cl-pri)] px-[1rem] select-none">
-                <div className="flex gap-x-[0.8rem] items-center">
+                <div className="flex gap-x-[0.8rem] w-full items-center custom-sl">
                     <Image className="flex-shrink-0" src={icon} alt="icon" width={32} height={32} priority />
-                    <SelectValue className="w-full" placeholder={placeholder} />
+                    <SelectValue className="!w-full" placeholder={placeholder} />
                 </div>
 
             </SelectTrigger>
-            <SelectContent className="shadow2 !border-none overflow-hidden" >
+            <SelectContent className="shadow2 top- !border-none overflow-hidden" >
                 <SelectGroup className="max-h-[15rem] ">
                     {
                         data?.map((item, index) => {
@@ -47,7 +47,7 @@ export function SelectComponent({ placeholder, icon, data,value,onChange }: Sele
                                             <p className="text-[1.4rem] text-[var(--cl-pri)] group-hover:!text-white">
                                                 {item.name}
                                             </p>
-                                            <span className="text-[1.2rem] text-[var(--cl-pri)] group-hover:!text-white line-clamp-1 whitespace-wrap">
+                                            <span className="text-[1rem] text-[var(--cl-pri)] group-hover:!text-white line-clamp-1 whitespace-wrap">
                                                 {item.des}
                                             </span>
                                         </div>

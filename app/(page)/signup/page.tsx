@@ -91,13 +91,13 @@ const SignUp = () => {
                                                 <div className="flex flex-col gap-y-[3.2rem]">
                                                     <div className="flex flex-wrap gap-y-[1.2rem] -mx-[0.6rem]">
                                                         <div className="w-full px-[0.6rem]">
-                                                            <InputFormat name="fullname" placeholder="Enter fullname" label="Fullname" />
+                                                            <InputFormat name="fullname" placeholder="Enter fullname" label="Fullname" formatName />
                                                         </div>
                                                         <div className="w-[50%] px-[0.6rem]">
                                                             <InputFormat name="email" placeholder="Enter email" label="Email" />
                                                         </div>
                                                         <div className="w-[50%] px-[0.6rem]">
-                                                            <InputFormat name="phone" placeholder="Enter phone" label="Phone" />
+                                                            <InputFormat name="phone" placeholder="Enter phone" label="Phone" formatPhone />
                                                         </div>
                                                         <div className="w-[50%] px-[0.6rem]">
                                                             <InputFormat password={true} name="password" placeholder="Enter password" label="Password" />

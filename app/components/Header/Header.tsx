@@ -37,15 +37,7 @@ const menuLists: menuListsInterface[] = [
     {
         title: "About",
         path: "/about"
-    },
-    // {
-    //     title: "Sign in",
-    //     path: "/signin"
-    // },
-    // {
-    //     title: "Sign up",
-    //     path: "/signup"
-    // },
+    }
 ];
 
 
@@ -110,7 +102,7 @@ const Header = () => {
                                         {menuList.child &&
                                             menuList.child?.length > 0 && (
                                                 <ul
-                                                    className="absolute top-[100%] l-0 min-w-[16rem] shadow-bg-dark-900 shadow-lg bg-white opacity-0 pointer-events-none transition translate-y-[5%] group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-[0%]"
+                                                    className="absolute top-[100%] left-0 min-w-[16rem] shadow-bg-dark-900 shadow-lg bg-white opacity-0 pointer-events-none transition translate-y-[5%] group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-[0%]"
                                                 >
                                                     {menuList.child.map(
                                                         (child, index) => {
@@ -148,7 +140,7 @@ const Header = () => {
                                             </span>
                                         </div>
                                         <ul
-                                            className="absolute top-[100%] l-0 w-full min-w-[16rem] shadow-bg-dark-900 shadow-lg bg-white opacity-0 pointer-events-none transition translate-y-[5%] group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-[0%]"
+                                            className="absolute top-[100%] right-0 w-full min-w-[16rem] shadow-bg-dark-900 shadow-lg bg-white opacity-0 pointer-events-none transition translate-y-[5%] group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-[0%]"
                                         >
                                             <li>
                                                 <Link

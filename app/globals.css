@@ -352,3 +352,12 @@ main {
     transform: translateX(100%);
   }
 }
+
+.custom-sl > img ~ span{
+  width: 100%;
+}
+
+
+.search-bn{
+  background: linear-gradient(180deg, #0072b3 0%, #78c96a 100%);
+}
