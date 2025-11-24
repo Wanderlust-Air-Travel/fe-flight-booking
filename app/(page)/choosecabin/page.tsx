@@ -1,4 +1,5 @@
 "use client"
+import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { SeatGroup, SeatItem } from "@/types/seat-type";
@@ -78,20 +79,21 @@ const ChooseCabin = () => {
 
     return (
         <main className={`flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]`} >
+            <Breadcrumb />
             <InfoTicketBox />
 
             <section className="">
                 <div className="container">
                     <div className="flex flex-wrap -mx-[1.2rem]">
                         <div className="px-[1.2rem] w-[70%]">
-                            <div className="pt-[calc(100%*6000/1800)] w-full relative overflow-hidden block">
-                                <Image src="/plane2.png" alt="plane" width={100} height={100} className="w-full h-full absolute inset-0 object-cover " priority unoptimized />
+                            <div className="pt-[calc(100%*6000/2000)] w-full relative overflow-hidden block">
+                                <Image src="/plane.png" alt="plane" width={100} height={100} className="w-full h-full absolute inset-0 object-cover " priority unoptimized />
 
-                                <div className="absolute h-[55%] w-[25%] top-[18.5%] left-1/2 z-10 -translate-x-1/2 flex flex-col gap-y-[2rem]">
+                                <div className="absolute h-[55%] w-[24%] top-[16%] left-1/2 z-10 -translate-x-1/2 flex flex-col gap-y-[2rem]">
 
                                     <div className={` w-full bg-[#F5F7FA] rounded-md ${data.type === "business" ? "" : "opacity-50 pointer-events-none cursor-not-allowed"} `}>
                                         <div className="flex gap-[1rem] flex-wrap py-[0.6rem] px-[0.6rem] justify-between">
-                                            <div className="w-[45%]">
+                                            <div className="w-[47%]">
                                                 <div className="flex flex-wrap gap-y-[1rem]  -mx-[0.15rem]">
                                                     {
                                                         seatBusiness && (
@@ -99,7 +101,7 @@ const ChooseCabin = () => {
                                                                 return (
                                                                     <label htmlFor={seatItem.idCabin} key={seatItem.idCabin} className={`w-[calc(100%/2)] block  flex-shrink-0 px-[0.15rem] cursor-pointer ${seatItem.buyed && "pointer-events-none"}`}>
                                                                         <input name="chooseBusiness" onChange={(e) => { handleChooseBusiness(e, seatItem.idCabin) }} hidden id={seatItem.idCabin} type="checkbox" />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[6rem] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear ${seatBusiness.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"}  ${chooseBusiness.includes(seatItem.idCabin) && "!bg-[var(--cl-pri)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-pri)] !text-white"} `}>
+                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear ${seatBusiness.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"}  ${chooseBusiness.includes(seatItem.idCabin) && "!bg-[var(--cl-pri)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-pri)] !text-white"} `}>
                                                                             <span>{seatItem.title}</span>
                                                                             <span className="text-[1rem] font-medium">{seatItem.note}</span>
                                                                         </span>
@@ -115,7 +117,7 @@ const ChooseCabin = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="w-[45%]">
+                                            <div className="w-[47%]">
                                                 <div className="flex flex-wrap gap-y-[1rem]  -mx-[0.15rem]">
                                                     {
                                                         seatBusiness && (
@@ -123,7 +125,7 @@ const ChooseCabin = () => {
                                                                 return (
                                                                     <label htmlFor={seatItem.idCabin} key={seatItem.idCabin} className={`w-[calc(100%/2)] block  flex-shrink-0 px-[0.15rem] cursor-pointer ${seatItem.buyed && "pointer-events-none"}`}>
                                                                         <input name="chooseBusiness" onChange={(e) => { handleChooseBusiness(e, seatItem.idCabin) }} hidden id={seatItem.idCabin} type="checkbox" />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[6rem] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear ${seatBusiness.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"}  ${chooseBusiness.includes(seatItem.idCabin) && "!bg-[var(--cl-pri)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-pri)] !text-white"} `}>
+                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear ${seatBusiness.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"}  ${chooseBusiness.includes(seatItem.idCabin) && "!bg-[var(--cl-pri)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-pri)] !text-white"} `}>
                                                                             <span>{seatItem.title}</span>
                                                                             <span className="text-[1rem] font-medium">{seatItem.note}</span>
                                                                         </span>
@@ -145,7 +147,7 @@ const ChooseCabin = () => {
 
                                     <div className={`w-full bg-[#F5F7FA] rounded-md ${data.type === "economy" ? "" : "opacity-60 pointer-events-none cursor-not-allowed"}`}>
                                         <div className="flex gap-[1rem] flex-wrap py-[0.6rem] px-[0.6rem] justify-between">
-                                            <div className="w-[45%]">
+                                            <div className="w-[47%]">
                                                 <div className="flex flex-wrap gap-y-[1rem]  -mx-[0.15rem]">
                                                     {
                                                         seatEconomy && (
@@ -153,7 +155,7 @@ const ChooseCabin = () => {
                                                                 return (
                                                                     <label htmlFor={seatItem.idCabin} key={seatItem.idCabin} className={`w-[calc(100%/3)] block  flex-shrink-0 px-[0.15rem] cursor-pointer ${seatItem.buyed && "pointer-events-none"}`}>
                                                                         <input name="chooseEconomy" onChange={(e) => { handleChooseEconomy(e, seatItem.idCabin) }} hidden id={seatItem.idCabin} type="checkbox" />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[5rem] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear ${seatEconomy.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"}  ${chooseEconomy.includes(seatItem.idCabin) && "!bg-[var(--cl-four)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-four)] !text-white"} `}>
+                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear ${seatEconomy.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"}  ${chooseEconomy.includes(seatItem.idCabin) && "!bg-[var(--cl-four)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-four)] !text-white"} `}>
                                                                             <span>{seatItem.title}</span>
                                                                             <span className="text-[1rem] font-medium">{seatItem.note}</span>
                                                                         </span>
@@ -165,7 +167,7 @@ const ChooseCabin = () => {
 
                                                 </div>
                                             </div>
-                                            <div className="w-[45%]">
+                                            <div className="w-[47%]">
                                                 <div className="flex flex-wrap gap-y-[1rem]  -mx-[0.15rem]">
                                                     {
                                                         seatEconomy && (
@@ -173,7 +175,7 @@ const ChooseCabin = () => {
                                                                 return (
                                                                     <label htmlFor={seatItem.idCabin} key={seatItem.idCabin} className={`w-[calc(100%/3)] block  flex-shrink-0 px-[0.15rem] cursor-pointer ${seatItem.buyed && "pointer-events-none"}`}>
                                                                         <input name="chooseEconomy" onChange={(e) => { handleChooseEconomy(e, seatItem.idCabin) }} hidden id={seatItem.idCabin} type="checkbox" />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[5rem] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear ${seatEconomy.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"}  ${chooseEconomy.includes(seatItem.idCabin) && "!bg-[var(--cl-four)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-four)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-four)] !text-white"}`}>
+                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear ${seatEconomy.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"}  ${chooseEconomy.includes(seatItem.idCabin) && "!bg-[var(--cl-four)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-four)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-four)] !text-white"}`}>
                                                                             <span>{seatItem.title}</span>
                                                                             <span className="text-[1rem] font-medium">{seatItem.note}</span>
                                                                         </span>

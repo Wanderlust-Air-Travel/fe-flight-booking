@@ -33,6 +33,7 @@ const SignIn = () => {
     const [error, setError] = useState<string>("")
     const router = useRouter();
 
+    console.log(process.env.NEXT_PUBLIC_API_URL)
 
 
     const handleSubmit = (value: valueType, setSubmitting: (isSubmitting: boolean) => void) => {
@@ -58,7 +59,7 @@ const SignIn = () => {
                 setSubmitting(false);
                 console.log(err)
                 console.log(err.response.data.message)
-                setError(err.response.data.message)
+                setError(err.response.data.message || err.message)
 
             })
             .finally(() => {

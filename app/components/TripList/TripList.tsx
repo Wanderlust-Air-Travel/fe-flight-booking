@@ -189,7 +189,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                     )
                     :
                     (
-                        trips?.outbound.length <= 0
+                        trips?.outbound?.length <= 0 || trips.length <= 0
                             ?
                             (
 

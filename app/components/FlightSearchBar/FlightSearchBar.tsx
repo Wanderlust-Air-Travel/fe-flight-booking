@@ -98,12 +98,15 @@ const FlightSearchBar = () => {
 
   const router = useRouter();
 
-  useEffect(() => {
-   
-      setFrom(data.from || "");
-      setTo(data.to || "");
+//   useEffect(() => {
+//     if (from !== data.from) {
+//         setFrom(data.from || "");
+//     }
+//     if (to !== data.to) {
+//         setTo(data.to || "");
+//     }
+// }, [data.from, data.to]);
 
-  }, [data.from,data.to]);
   console.log(data);
 
 
@@ -123,18 +126,18 @@ const FlightSearchBar = () => {
     console.log(startDateFormat);
   };
 
-  const handleChangeForm = (value:string) =>{
+  const handleChangeForm = (value: string) => {
     setFrom(value);
-    setData({from:value})
+    setData({ from: value })
   }
 
-  const handleChangeTo = (value:string) =>{
+  const handleChangeTo = (value: string) => {
     setTo(value);
-    setData({to:value});
+    setData({ to: value });
   }
 
-  console.log("from",from);
-  console.log("to",to);
+  console.log("from", from);
+  console.log("to", to);
 
 
   return (

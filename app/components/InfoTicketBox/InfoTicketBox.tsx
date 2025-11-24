@@ -21,7 +21,7 @@ const InfoTicketBox = () => {
 
     return (
 
-        <section className="w-full pt-[var(--rowY)]">
+        <section className="w-full">
             <div className="container">
                 <ul className="border-[var(--cl-third)] border-[0.1rem] rounded-[1rem] overflow-hidden">
                     <li className="flex gap-x-[1.2rem] items-center p-[1.6rem] bg-[var(--cl-pri)]">
@@ -49,13 +49,13 @@ const InfoTicketBox = () => {
                         isHydrated
                             ?
                             (
-                                data.id !== 0
+                                data.flightInstanceId !== ""
                                     ?
                                     (
                                         <li className="flex flex-col w-full">
                                             <div className="flex gap-x-[1.2rem] items-center p-[1.6rem]  w-full" >
                                                 <div className="w-[5%]">
-                                                    <Image src={data.icon} alt="logoBrand" width={40} height={40} unoptimized priority />
+                                                    <Image src="/logoBrand.png" alt="logoBrand" width={40} height={40} unoptimized priority />
                                                 </div>
                                                 <div className="w-[15%]">
                                                     <div className="flex flex-col gap-y-[0.2rem]">
@@ -64,7 +64,7 @@ const InfoTicketBox = () => {
                                                 </div>
                                                 <div className="w-[25%]">
                                                     <div className="flex flex-col gap-y-[0.2rem]">
-                                                        <p className="text-[var(--cl-third)] text-mn font-bold">Location: {data.durationLocation}</p>
+                                                        <p className="text-[var(--cl-third)] text-mn font-bold">Location: {data.start} - {data.end}</p>
                                                         {
                                                             data.startDate && (<p className="text-[var(--cl-five)] text-mn">Start date: {data.startDate}</p>)
                                                         }
@@ -135,11 +135,11 @@ const InfoTicketBox = () => {
                                                                 <div className="flex gap-x-[2rem] justify-between items-center">
                                                                     <div className="flex flex-col flex-shrink-0 items-center">
                                                                         <p className={`text-md ${data.typeTicket.includes("Economy") ? "text-[var(--cl-five)]" : "text-[var(--cl-pri)]"} font-bold`}>
-                                                                            {start}
+                                                                            {data.startCode}
                                                                         </p>
 
                                                                         <p className={`text-base ${data.typeTicket.includes("Economy") ? "text-[var(--cl-five)]" : "text-[var(--cl-pri)]"} text-nowrap text-nowrap`}>
-                                                                            {end}
+                                                                            {data.start}
                                                                         </p>
                                                                     </div>
 
@@ -164,10 +164,10 @@ const InfoTicketBox = () => {
 
                                                                     <div className="flex flex flex-col flex-shrink-0 items-center">
                                                                         <p className={`text-md ${data.typeTicket.includes("Economy") ? "text-[var(--cl-five)]" : "text-[var(--cl-pri)]"} text-center font-bold`}>
-                                                                            {end}
+                                                                            {data.endCode}
                                                                         </p>
                                                                         <p className={`text-base ${data.typeTicket.includes("Economy") ? "text-[var(--cl-five)]" : "text-[var(--cl-pri)]"} text-nowrap text-center`}>
-                                                                            {end}
+                                                                            {data.end}
                                                                         </p>
                                                                     </div>
                                                                 </div>

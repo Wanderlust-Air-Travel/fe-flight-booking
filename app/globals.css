@@ -361,3 +361,47 @@ main {
 .search-bn{
   background: linear-gradient(180deg, #0072b3 0%, #78c96a 100%);
 }
+
+
+.breadcrumb-list{
+  display: flex;
+  align-items: center;
+  margin: 0 -0.8rem;
+}
+
+
+.breadcrumb-item{
+  padding:0 0.8rem;
+  position: relative;
+}
+
+
+.breadcrumb-item:not(:first-child)::before{
+  content: "/";
+  color: var(--cl-pri);
+  font-size: 1.5rem;
+  top: 48%;
+  left: -0.2rem;
+  transform: translate(0%,-50%);
+  position: absolute;
+}
+
+.breadcrumb-item:last-child .breadcrumb-link{
+  font-weight: 700;
+  color: var(--cl-five);
+  pointer-events: none;
+}
+
+.breadcrumb-link{
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--cl-pri);
+  transition: 0.3s linear;
+}
+
+@media screen and (min-width:1200px) {
+  .breadcrumb-link:hover{
+    color: var(--cl-five);
+  }
+}

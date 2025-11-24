@@ -1,11 +1,11 @@
 "use client";
+import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import FlightSearchBar from "@/app/components/FlightSearchBar/FlightSearchBar";
 import TripList from "@/app/components/TripList/TripList";
 import { TripListType } from "@/types/trip-list-type";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
 
 const ServiceDetailsResultSearch = () => {
   const [trips, setTrips] = useState<TripListType[]>([]);
@@ -54,7 +54,8 @@ const ServiceDetailsResultSearch = () => {
 
   return (
     <main className={`pt-[var(--hd)] flex flex-col gap-y-[var(--rowY)]`}>
-      <section className="pt-[var(--rowY)] w-full">
+      <Breadcrumb />
+      <section className="w-full">
         <div className="container">
           <FlightSearchBar />
         </div>
