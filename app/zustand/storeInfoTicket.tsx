@@ -9,23 +9,25 @@ const useInfoTicket = create<InfoTicketTypeState>()(
   persist(
     (set) => ({
       data: {
-        id: 0,
-        code: 0,
+        id: "",
         icon: "",
         airline: "",
         startDate: "",
-        duration: "",
-        type:"",
-        durationLocation: "",
-        service: "",
         endDate: "",
-        totalPerson: 1,
+        startCode: "",
+        endCode: "",
+        start: "",
+        end: "",
+        service: "",
         stopCount: 0,
-        stopDuration: "",
-        totalTime: "",
-        typeTicket: "",
+        stopDuration: "none",
+        type: "",
         price: 0,
         desc: [],
+        typeTicket: "",
+        timeStart: "",
+        timeEnd: "",
+        fareClassCode:""
       },
 
       // 👇 thêm field này

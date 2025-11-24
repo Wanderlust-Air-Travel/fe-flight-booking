@@ -14,6 +14,7 @@ import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { useRouter } from "next/navigation";
 import { convertToDMY, convertToLocalTime } from "../FormatDate/FormatDate";
 import useStoreFightInfo from "@/app/zustand/storeFightInfo";
+import useUserStore from "@/app/zustand/storeUser";
 
 type TripListPropsType = {
     trips: TripListProps[];
@@ -28,10 +29,10 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
     const [type, setType] = useState<string>("");
     const [tickets, setTickets] = useState<ListProps | null>(null);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
-    const { setData } = useInfoTicket();
+    const { setData, data } = useInfoTicket();
     const router = useRouter();
+    const { accessToken } = useUserStore()
     const [loadingChild, setLoadingChild] = useState(false);
-    const {setData:setDataFightInfo} = useStoreFightInfo();
 
     // Khi click cabin
     const handleCabinEconomy = useCallback((code: string, index: number) => {
@@ -104,7 +105,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
             desc: { text: string; status: boolean }[];
         },
         trip: TripListType,
-        trips:any,
+        trips: any,
         type: string
     ) => {
         setActiveIndex(index2);
@@ -117,29 +118,45 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
             endDate: convertToDMY(trip.arrivalLocal),
             startCode: trip.origin.iata,
             endCode: trip.destination.iata,
-            start: trip.origin.iata,
-            end: trip.destination.iata,
+            start: trip.origin.city,
+            end: trip.destination.city,
             service: trips.tripType,
             stopCount: 0,
             stopDuration: "none",
             type: type,
             price: ticket.price,
             desc: ticket.desc,
-            typeTicket:ticket.typeTicket,
+            typeTicket: ticket.typeTicket,
             timeStart: convertToLocalTime(trip.departureLocal),
             timeEnd: convertToLocalTime(trip.arrivalLocal),
-
+            fareClassCode: ticket.fareClassCode,
         });
     };
 
-    const handleAccept = (flightInstanceId:string) => {
-        router.push("/choosecabin");
-        setDataFightInfo({
-            flightInstanceId:flightInstanceId,
-            cabinType:type
-        })
-        
-        
+    const handleAccept = (flightInstanceId: string) => {
+
+
+
+        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking-state/cabin`, {
+            flightInstanceId: flightInstanceId,
+            cabinType: type,
+            fareClassCode: data.fareClassCode
+        },
+            {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        )
+            .then((res) => {
+                console.log(res.data)
+                router.push(`/choosecabin/${flightInstanceId}/${type}`)
+
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+
     };
 
     console.log(trips)
@@ -201,6 +218,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                             :
                             (
                                 trips?.outbound?.map((trip, index: number) => {
+                                    console.log(trip)
                                     return (
                                         <li
                                             key={index}
@@ -290,8 +308,8 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
                                                     <ul className="flex justify-center -mx-[1.2rem] w-full">
                                                         {tickets?.map((ticket, index2) => {
-                                                            console.log("trip",trip)
-                                                            console.log("ticket",ticket);
+                                                            console.log("trip", trip)
+                                                            console.log("ticket", ticket);
                                                             return (
                                                                 <li key={index2} className="w-[calc(100%/3)] block px-[1.2rem]">
                                                                     <Ticket
@@ -311,7 +329,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
                                                     {activeIndex !== null && (
                                                         <Button
-                                                            onClick={()=>{handleAccept(trip.flightInstanceId)}}
+                                                            onClick={() => { handleAccept(trip.flightInstanceId) }}
                                                             className={`${type === "economy"
                                                                 ? "bg-[var(--cl-five)] hover:bg-green-700"
                                                                 : "bg-[var(--cl-pri)] hover:bg-blue-900"

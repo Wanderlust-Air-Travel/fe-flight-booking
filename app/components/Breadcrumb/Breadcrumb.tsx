@@ -7,7 +7,7 @@ const Breadcrumb = () => {
 
     const pathname = usePathname();
     console.log(pathname)
-    const lists = pathname.split("/").filter(Boolean);
+    const lists = pathname.split("/").filter(Boolean)[0];
     console.log(lists)
 
     return (
@@ -19,20 +19,13 @@ const Breadcrumb = () => {
                             Home
                         </Link>
                     </li>
-                    {
-                        lists.map((list, index) => {
-                            return (
-                                <li key={index} className="breadcrumb-item">
+                    <li  className="breadcrumb-item">
 
-                                    <Link className="breadcrumb-link" href={`/${list}`}>
-                                        {
-                                            Number(list) ? "Details" : list
-                                        }
-                                    </Link>
-                                </li>
-                            )
-                        })
-                    }
+                        <Link className="breadcrumb-link" href={`/${lists}`}>
+                            {lists}
+                        </Link>
+                    </li>
+                   
                 </ul>
             </div>
         </div>

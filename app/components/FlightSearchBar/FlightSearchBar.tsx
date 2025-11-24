@@ -98,14 +98,14 @@ const FlightSearchBar = () => {
 
   const router = useRouter();
 
-//   useEffect(() => {
-//     if (from !== data.from) {
-//         setFrom(data.from || "");
-//     }
-//     if (to !== data.to) {
-//         setTo(data.to || "");
-//     }
-// }, [data.from, data.to]);
+  useEffect(() => {
+    if (from !== data.from) {
+      setFrom(data.from || "");
+    }
+    if (to !== data.to) {
+      setTo(data.to || "");
+    }
+  }, [data.from, data.to]);
 
   console.log(data);
 

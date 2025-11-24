@@ -6,10 +6,10 @@ const ServiceHome = () => {
     const [services, setServices] = useState<ItemServiceProp[]>([])
 
     useEffect(() => {
-        axios.get("/api/service")
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/services/deals`)
             .then((res) => {
                 console.log(res.data)
-                setServices(res.data);
+                setServices(res.data.deals);
             })
             .catch((err) => {
                 console.log(err)

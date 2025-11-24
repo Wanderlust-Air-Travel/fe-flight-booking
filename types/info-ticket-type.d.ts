@@ -1,12 +1,12 @@
 export interface InfoTicketType {
-  id: number;
+  id: string;
   icon:string;
   code: number;
   airline: string;
   startDate: string;
   endDate: string;
-  startCode: trip.origin.iata,
-  endCode: trip.origin.iata,
+  startCode:string,
+  endCode:string,
   start:string,
   end:string,
   service: string;
@@ -18,6 +18,7 @@ export interface InfoTicketType {
   timeStart:string,
   timeEnd:string,
   typeTicket:string,
+  fareClassCode:string,
   desc: {
     text: string;
     status: boolean;

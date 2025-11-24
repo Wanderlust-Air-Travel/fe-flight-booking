@@ -19,6 +19,8 @@ const InfoTicketBox = () => {
         setIsOpen(!isOpen)
     }
 
+    console.log(data)
+
     return (
 
         <section className="w-full">

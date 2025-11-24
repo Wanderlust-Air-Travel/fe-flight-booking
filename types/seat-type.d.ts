@@ -10,7 +10,7 @@ export interface SeatItem {
 }
 
 export interface SeatGroup {
-  id: "business" | "economy";
+  cabinType: "business" | "economy";
   list: SeatItem[];
 }
 

@@ -20,7 +20,7 @@ const ItemService = ({ image, title, link, startDate, endDate, service, price }:
     return (
         <div className="group flex flex-col shadow2 rounded-[1rem] overflow-hidden h-full">
             <div className="pt-[calc(100%*192/262)] relative block w-full overflow-hidden">
-                <Image src={image} alt="" width={100} height={100} unoptimized className="w-full h-full absolute inset-0 object-cover transiton ease-linear duration-300 group-hover:scale-[1.05]" />
+                <Image src={`${process.env.NEXT_PUBLIC_API_URL}${image}`} alt="" width={100} height={100} unoptimized className="w-full h-full absolute inset-0 object-cover transiton ease-linear duration-300 group-hover:scale-[1.05]" />
             </div>
             <div className="p-[1.2rem] flex flex-col gap-y-[0.8rem]">
                 <div className="flex flex-col gap-y-[0.2rem]">
