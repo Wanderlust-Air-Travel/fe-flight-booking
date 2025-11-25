@@ -1,6 +1,7 @@
 "use client";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import FlightSearchBar from "@/app/components/FlightSearchBar/FlightSearchBar";
+import ServiceSlide from "@/app/components/Services/ServiceSlide";
 import TripList from "@/app/components/TripList/TripList";
 import { TripListType } from "@/types/trip-list-type";
 import axios from "axios";
@@ -70,6 +71,8 @@ const ServiceDetailsResultSearch = () => {
           </div>
         </div>
       </section>
+
+      <ServiceSlide />
     </main>
   );
 };

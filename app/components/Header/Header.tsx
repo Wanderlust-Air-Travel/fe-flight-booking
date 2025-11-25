@@ -20,23 +20,27 @@ const menuLists: menuListsInterface[] = [
         title: "Home",
         path: "/"
     },
-    {
-        title: "Booking",
-        path: "/booking",
-        child: [
-            {
-                title: "Demo 1",
-                path: "/",
-            },
-            {
-                title: "Demo 2",
-                path: "/",
-            }
-        ]
-    },
+    // {
+    //     title: "Booking",
+    //     path: "/booking",
+    //     child: [
+    //         {
+    //             title: "Demo 1",
+    //             path: "/",
+    //         },
+    //         {
+    //             title: "Demo 2",
+    //             path: "/",
+    //         }
+    //     ]
+    // },
     {
         title: "About",
         path: "/about"
+    },
+    {
+        title: "Service",
+        path: "/service"
     }
 ];
 

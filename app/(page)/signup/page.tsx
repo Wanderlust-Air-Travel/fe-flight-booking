@@ -29,7 +29,7 @@ const initialValues = {
 
 
 
-const SignUp = () => {
+const SignUpPage = () => {
     const { login } = useUserStore();
     const [error, setError] = useState<string>("")
     const router = useRouter();
@@ -139,4 +139,4 @@ const SignUp = () => {
     )
 }
 
-export default SignUp
+export default SignUpPage

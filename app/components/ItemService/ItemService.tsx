@@ -40,7 +40,7 @@ const ItemService = ({ image, title, link, startDate, endDate, service, price }:
                 </div>
 
                 <div className="flex gap-x-[0.8rem] justify-between items-end">
-                    <div className="flex flex-col gap-y-[0.2rem]">
+                    <div className="flex flex-col gap-y-[0.2rem] w-full flex-1">
                         <p className="text-[var(--cl-gray)] text-sm">chỉ từ <span className="text-[var(--cl-pri)]">(VND)</span></p>
 
                         <div className="flex flex-col">

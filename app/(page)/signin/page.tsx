@@ -27,7 +27,7 @@ const initialValues = {
 
 
 
-const SignIn = () => {
+const SignInPage = () => {
 
     const { login } = useUserStore();
     const [error, setError] = useState<string>("")
@@ -143,4 +143,4 @@ const SignIn = () => {
     )
 }
 
-export default SignIn
+export default SignInPage

@@ -405,3 +405,8 @@ main {
     color: var(--cl-five);
   }
 }
+
+
+.rdrSelected, .rdrInRange, .rdrStartEdge, .rdrEndEdge{
+  background: var(--cl-pri) !important;
+}

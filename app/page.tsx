@@ -16,19 +16,19 @@ import useFightSearchBarStore from "./zustand/storeFightSearchBar";
 export default function Home() {
 
   const pathName = usePathname();
-  const {setData} = useFightSearchBarStore()
-  useEffect(()=>{
-    if(pathName === "/"){
+  const { setData } = useFightSearchBarStore()
+  useEffect(() => {
+    if (pathName === "/") {
       setData({
-        adult:1,
-        startDate:"",
-        endDate:"",
-        from:"",
-        to:"",
-        
+        adult: 1,
+        startDate: "",
+        endDate: "",
+        from: "",
+        to: "",
+
       })
     }
-  },[pathName])
+  }, [pathName])
 
 
 
