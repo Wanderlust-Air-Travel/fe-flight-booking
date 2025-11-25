@@ -1,5 +1,6 @@
 "use client";
 
+// @ts-ignore - jquery is installed but types may not be available
 import $ from "jquery";
 import { TripListProps, TripListType } from "@/types/trip-list-type";
 import Image from "next/image";
@@ -8,7 +9,7 @@ import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Ticket from "../Ticket/Ticket";
 import { useCallback, useRef, useState } from "react";
-import { ListProps } from "@/types/ticket-list-type";
+import { ListProps, FareOption } from "@/types/ticket-list-type";
 import axios from "axios";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { useRouter } from "next/navigation";
@@ -17,7 +18,7 @@ import useStoreFightInfo from "@/app/zustand/storeFightInfo";
 import useUserStore from "@/app/zustand/storeUser";
 
 type TripListPropsType = {
-    trips: TripListProps[];
+    trips: TripListProps; // Backend returns SearchFlightsResponseDto (object with outbound/inbound arrays)
     loading: boolean;
 };
 
@@ -25,10 +26,11 @@ type TripListPropsType = {
 const TripList = ({ trips, loading }: TripListPropsType) => {
 
     // ❗ FIX 1: Nhiều panel => phải dùng mảng ref
-    const itemRefs = useRef<HTMLDivElement[]>([]);
+    const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [type, setType] = useState<string>("");
-    const [tickets, setTickets] = useState<ListProps | null>(null);
+    const [tickets, setTickets] = useState<FareOption[] | null>(null);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
     const { setData, data } = useInfoTicket();
     const router = useRouter();
     const { accessToken } = useUserStore()
@@ -42,7 +44,8 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
         axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/fare-options?flightInstanceId=${code}&cabinType=economy`)
             .then((res) => {
                 console.log(res);
-                setTickets(res.data);
+                // Backend returns FareOptionsResponseDto with fareOptions array
+                setTickets(res.data?.fareOptions || res.data || []);
 
                 // ❗ FIX 2: slideDown đúng panel + đóng panel khác
                 setTimeout(() => {
@@ -77,7 +80,8 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
         axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/fare-options?flightInstanceId=${code}&cabinType=business`)
             .then((res) => {
-                setTickets(res.data);
+                // Backend returns FareOptionsResponseDto with fareOptions array
+                setTickets(res.data?.fareOptions || res.data || []);
 
                 // ❗ FIX 2: slideDown đúng panel + đóng panel khác
                 setTimeout(() => {
@@ -103,6 +107,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
             typeTicket: string;
             price: number;
             desc: { text: string; status: boolean }[];
+            fareClassCode?: string;
         },
         trip: TripListType,
         trips: any,
@@ -129,34 +134,57 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
             typeTicket: ticket.typeTicket,
             timeStart: convertToLocalTime(trip.departureLocal),
             timeEnd: convertToLocalTime(trip.arrivalLocal),
-            fareClassCode: ticket.fareClassCode,
+            fareClassCode: ticket.fareClassCode || "",
         });
     };
 
-    const handleAccept = (flightInstanceId: string) => {
+    // Bước 3: Save Cabin Selection và Navigate - với error handling và loading state
+    const handleAccept = async (flightInstanceId: string) => {
+        if (!data.fareClassCode) {
+            alert('Please select a fare class first.');
+            return;
+        }
 
+        if (!accessToken) {
+            alert('Please login to continue.');
+            router.push('/signin');
+            return;
+        }
 
+        setIsSaving(true);
 
-        axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking-state/cabin`, {
-            flightInstanceId: flightInstanceId,
-            cabinType: type,
-            fareClassCode: data.fareClassCode
-        },
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
+        try {
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking-state/cabin`,
+                {
+                    flightInstanceId: flightInstanceId,
+                    cabinType: type,
+                    fareClassCode: data.fareClassCode
                 },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            if (response.status === 200 || response.status === 201) {
+                console.log('Cabin selection saved:', response.data);
+                // Navigate đến seat map page
+                router.push(`/choosecabin/${flightInstanceId}/${type}`);
+            } else {
+                throw new Error('Failed to save cabin selection');
             }
-        )
-            .then((res) => {
-                console.log(res.data)
-                router.push(`/choosecabin/${flightInstanceId}/${type}`)
-
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-
+        } catch (err: any) {
+            console.error('Error saving cabin selection:', err);
+            const errorMessage = err.response?.data?.message || 
+                                err.message || 
+                                'Failed to save cabin selection. Please try again.';
+            alert(errorMessage);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     console.log(trips)
@@ -206,7 +234,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                     )
                     :
                     (
-                        trips?.outbound?.length <= 0 || trips.length <= 0
+                        !trips?.outbound || trips.outbound.length <= 0
                             ?
                             (
 
@@ -217,7 +245,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                             )
                             :
                             (
-                                trips?.outbound?.map((trip, index: number) => {
+                                trips.outbound.map((trip: TripListType, index: number) => {
                                     console.log(trip)
                                     return (
                                         <li
@@ -292,7 +320,9 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
                                             {/* FIX 3 — panel đúng ref — không hidden, dùng display:none */}
                                             <div
-                                                ref={(el) => (itemRefs.current[index] = el!)}
+                                                ref={(el) => {
+                                                    itemRefs.current[index] = el;
+                                                }}
                                                 className="w-full"
                                                 style={{ display: "none" }}
                                             >
@@ -330,12 +360,13 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                     {activeIndex !== null && (
                                                         <Button
                                                             onClick={() => { handleAccept(trip.flightInstanceId) }}
+                                                            disabled={isSaving}
                                                             className={`${type === "economy"
                                                                 ? "bg-[var(--cl-five)] hover:bg-green-700"
                                                                 : "bg-[var(--cl-pri)] hover:bg-blue-900"
-                                                                } w-fit h-[4.4rem] text-[1.6rem] px-[2rem] uppercase`}
+                                                                } w-fit h-[4.4rem] text-[1.6rem] px-[2rem] uppercase disabled:opacity-50 disabled:cursor-not-allowed`}
                                                         >
-                                                            Accept
+                                                            {isSaving ? 'Saving...' : 'Accept'}
                                                         </Button>
                                                     )}
                                                 </div>
