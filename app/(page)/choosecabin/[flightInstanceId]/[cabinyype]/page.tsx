@@ -89,24 +89,37 @@ const ChooseCabin = () => {
         //         console.log(err)
         //     })
 
+        // Bước 2: Gọi API Get Seat Map (KHÔNG CẦN truyền cabinType - backend tự lấy từ Redis)
+        // Nhưng nếu muốn explicit, có thể truyền cabinType
         axios
             .get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/seats`, {
                 params: {
                     flightInstanceId,
-                    cabinType
+                    // cabinType is optional - backend will auto-fetch from Redis if not provided
+                    ...(cabinType && { cabinType })
                 },
             })
             .then((res) => {
-                console.log(res.data);
+                console.log('Seat map response:', res.data);
 
-                const economy = res.data?.seats.find((seat: SeatGroup) => {
-                    return seat.id === "economy"
-                });
-                setSeatEconomy(economy);
+                // Backend response format: { seats: [{ id: 'business', list: [...] }, { id: 'economy', list: [...] }] }
+                if (res.data?.seats && Array.isArray(res.data.seats)) {
+                    const business = res.data.seats.find((seat: SeatGroup) => {
+                        return seat.id === "business";
+                    });
+                    const economy = res.data.seats.find((seat: SeatGroup) => {
+                        return seat.id === "economy";
+                    });
 
+                    setSeatBusiness(business || null);
+                    setSeatEconomy(economy || null);
+                } else {
+                    console.error('Invalid seat map data format:', res.data);
+                }
             })
             .catch((err) => {
-                console.log(err.response?.data || err.message);
+                console.error('Error fetching seat map:', err);
+                console.error('Error details:', err.response?.data || err.message);
             });
 
     }, [])
@@ -137,13 +150,38 @@ const ChooseCabin = () => {
                                                 <div className="flex flex-wrap gap-y-[1rem]  -mx-[0.15rem]">
                                                     {
                                                         seatBusiness && (
-                                                            seatBusiness?.list?.filter((list: SeatItem) => list.pos === "left").map((seatItem: SeatItem, index) => {
+                                                            seatBusiness?.list?.filter((list: SeatItem) => list.position === "left").map((seatItem: SeatItem, index) => {
+                                                                // Backend format: use isSelectable to determine if seat can be selected
+                                                                const isSelectable = seatItem.isSelectable !== false && seatItem.isAvailable;
+                                                                const seatId = seatItem.flightSeatId || seatItem.idCabin || `business-${index}`;
+                                                                
                                                                 return (
-                                                                    <label htmlFor={seatItem.idCabin} key={seatItem.idCabin} className={`w-[calc(100%/2)] block  flex-shrink-0 px-[0.15rem] cursor-pointer ${seatItem.buyed && "pointer-events-none"}`}>
-                                                                        <input name="chooseBusiness" onChange={(e) => { handleChooseBusiness(e, seatItem.idCabin) }} hidden id={seatItem.idCabin} type="checkbox" />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear ${seatBusiness.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"}  ${chooseBusiness.includes(seatItem.idCabin) && "!bg-[var(--cl-pri)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-pri)] !text-white"} `}>
-                                                                            <span>{seatItem.title}</span>
-                                                                            <span className="text-[1rem] font-medium">{seatItem.note}</span>
+                                                                    <label 
+                                                                        htmlFor={seatId} 
+                                                                        key={seatId} 
+                                                                        className={`w-[calc(100%/2)] block flex-shrink-0 px-[0.15rem] ${
+                                                                            isSelectable ? "cursor-pointer" : "pointer-events-none opacity-50"
+                                                                        }`}
+                                                                    >
+                                                                        <input 
+                                                                            name="chooseBusiness" 
+                                                                            onChange={(e) => { handleChooseBusiness(e, seatId) }} 
+                                                                            hidden 
+                                                                            id={seatId} 
+                                                                            type="checkbox"
+                                                                            disabled={!isSelectable}
+                                                                        />
+                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase hover:text-[var(--cl-white)] transition ease-linear ${
+                                                                            seatBusiness.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"
+                                                                        } ${
+                                                                            chooseBusiness.includes(seatId) && "!bg-[var(--cl-pri)] !text-white"
+                                                                        } ${
+                                                                            !seatItem.isAvailable && "!bg-[var(--cl-pri)] !text-white opacity-75"
+                                                                        } ${
+                                                                            !isSelectable && "opacity-50"
+                                                                        }`}>
+                                                                            <span>{seatItem.seatNumber || seatItem.title}</span>
+                                                                            <span className="text-[1rem] font-medium">{seatItem.note || ""}</span>
                                                                         </span>
                                                                     </label>
                                                                 )
@@ -161,13 +199,37 @@ const ChooseCabin = () => {
                                                 <div className="flex flex-wrap gap-y-[1rem]  -mx-[0.15rem]">
                                                     {
                                                         seatBusiness && (
-                                                            seatBusiness?.list?.filter((list: SeatItem) => list.pos === "right").map((seatItem: SeatItem, index) => {
+                                                            seatBusiness?.list?.filter((list: SeatItem) => list.position === "right").map((seatItem: SeatItem, index) => {
+                                                                const isSelectable = seatItem.isSelectable !== false && seatItem.isAvailable;
+                                                                const seatId = seatItem.flightSeatId || seatItem.idCabin || `business-right-${index}`;
+                                                                
                                                                 return (
-                                                                    <label htmlFor={seatItem.idCabin} key={seatItem.idCabin} className={`w-[calc(100%/2)] block  flex-shrink-0 px-[0.15rem] cursor-pointer ${seatItem.buyed && "pointer-events-none"}`}>
-                                                                        <input name="chooseBusiness" onChange={(e) => { handleChooseBusiness(e, seatItem.idCabin) }} hidden id={seatItem.idCabin} type="checkbox" />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear ${seatBusiness.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"}  ${chooseBusiness.includes(seatItem.idCabin) && "!bg-[var(--cl-pri)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-pri)] !text-white"} `}>
-                                                                            <span>{seatItem.title}</span>
-                                                                            <span className="text-[1rem] font-medium">{seatItem.note}</span>
+                                                                    <label 
+                                                                        htmlFor={seatId} 
+                                                                        key={seatId} 
+                                                                        className={`w-[calc(100%/2)] block flex-shrink-0 px-[0.15rem] ${
+                                                                            isSelectable ? "cursor-pointer" : "pointer-events-none opacity-50"
+                                                                        }`}
+                                                                    >
+                                                                        <input 
+                                                                            name="chooseBusiness" 
+                                                                            onChange={(e) => { handleChooseBusiness(e, seatId) }} 
+                                                                            hidden 
+                                                                            id={seatId} 
+                                                                            type="checkbox"
+                                                                            disabled={!isSelectable}
+                                                                        />
+                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase hover:text-[var(--cl-white)] transition ease-linear ${
+                                                                            seatBusiness.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"
+                                                                        } ${
+                                                                            chooseBusiness.includes(seatId) && "!bg-[var(--cl-pri)] !text-white"
+                                                                        } ${
+                                                                            !seatItem.isAvailable && "!bg-[var(--cl-pri)] !text-white opacity-75"
+                                                                        } ${
+                                                                            !isSelectable && "opacity-50"
+                                                                        }`}>
+                                                                            <span>{seatItem.seatNumber || seatItem.title}</span>
+                                                                            <span className="text-[1rem] font-medium">{seatItem.note || ""}</span>
                                                                         </span>
                                                                     </label>
                                                                 )
@@ -192,12 +254,36 @@ const ChooseCabin = () => {
                                                     {
                                                         seatEconomy && (
                                                             seatEconomy?.list?.filter((list) => list.position === "left").map((seatItem, index) => {
+                                                                const isSelectable = seatItem.isSelectable !== false && seatItem.isAvailable;
+                                                                const seatId = seatItem.flightSeatId || seatItem.idCabin || `economy-left-${index}`;
+                                                                
                                                                 return (
-                                                                    <label htmlFor={seatItem.flightSeatId} key={seatItem.flightSeatId} className={`w-[calc(100%/3)] block  flex-shrink-0 px-[0.15rem] cursor-pointer ${seatItem.buyed && "pointer-events-none"}`}>
-                                                                        <input name="chooseEconomy" onChange={(e) => { handleChooseEconomy(e, seatItem.flightSeatId) }} hidden id={seatItem.flightSeatId} type="checkbox" />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear text-[var(--cl-five)] hover:bg-[var(--cl-five)] ${seatItem.isAvailable && "!bg-[var(--cl-five)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-four)] !text-white"} ${chooseEconomy.includes(seatItem.flightSeatId) && "!bg-[var(--cl-five)] !text-white"}`}>
+                                                                    <label 
+                                                                        htmlFor={seatId} 
+                                                                        key={seatId} 
+                                                                        className={`w-[calc(100%/3)] block flex-shrink-0 px-[0.15rem] ${
+                                                                            isSelectable ? "cursor-pointer" : "pointer-events-none opacity-50"
+                                                                        }`}
+                                                                    >
+                                                                        <input 
+                                                                            name="chooseEconomy" 
+                                                                            onChange={(e) => { handleChooseEconomy(e, seatId) }} 
+                                                                            hidden 
+                                                                            id={seatId} 
+                                                                            type="checkbox"
+                                                                            disabled={!isSelectable}
+                                                                        />
+                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase hover:text-[var(--cl-white)] transition ease-linear text-[var(--cl-five)] hover:bg-[var(--cl-five)] ${
+                                                                            seatItem.isAvailable && isSelectable && "hover:bg-[var(--cl-five)]"
+                                                                        } ${
+                                                                            chooseEconomy.includes(seatId) && "!bg-[var(--cl-five)] !text-white"
+                                                                        } ${
+                                                                            !seatItem.isAvailable && "!bg-gray-400 !text-white opacity-75"
+                                                                        } ${
+                                                                            !isSelectable && "opacity-50"
+                                                                        }`}>
                                                                             <span>{seatItem.seatNumber}</span>
-                                                                            <span className="text-[1rem] font-medium">{seatItem.note}</span>
+                                                                            <span className="text-[1rem] font-medium">{seatItem.note || ""}</span>
                                                                         </span>
                                                                     </label>
                                                                 )
@@ -212,12 +298,36 @@ const ChooseCabin = () => {
                                                     {
                                                         seatEconomy && (
                                                             seatEconomy?.list?.filter((list) => list.position === "right").map((seatItem, index) => {
+                                                                const isSelectable = seatItem.isSelectable !== false && seatItem.isAvailable;
+                                                                const seatId = seatItem.flightSeatId || seatItem.idCabin || `economy-right-${index}`;
+                                                                
                                                                 return (
-                                                                    <label htmlFor={seatItem.flightSeatId} key={seatItem.flightSeatId} className={`w-[calc(100%/3)] block  flex-shrink-0 px-[0.15rem] cursor-pointer ${seatItem.buyed && "pointer-events-none"}`}>
-                                                                        <input name="chooseEconomy" onChange={(e) => { handleChooseEconomy(e, seatItem.flightSeatId) }} hidden id={seatItem.flightSeatId} type="checkbox" />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase  hover:text-[var(--cl-white)] transition ease-linear text-[var(--cl-five)] hover:bg-[var(--cl-five)] ${seatItem.isAvailable && "!bg-[var(--cl-five)] !text-white"} ${seatItem.buyed && "!bg-[var(--cl-four)] !text-white"} ${chooseEconomy.includes(seatItem.flightSeatId) && "!bg-[var(--cl-five)] !text-white"}`}>
+                                                                    <label 
+                                                                        htmlFor={seatId} 
+                                                                        key={seatId} 
+                                                                        className={`w-[calc(100%/3)] block flex-shrink-0 px-[0.15rem] ${
+                                                                            isSelectable ? "cursor-pointer" : "pointer-events-none opacity-50"
+                                                                        }`}
+                                                                    >
+                                                                        <input 
+                                                                            name="chooseEconomy" 
+                                                                            onChange={(e) => { handleChooseEconomy(e, seatId) }} 
+                                                                            hidden 
+                                                                            id={seatId} 
+                                                                            type="checkbox"
+                                                                            disabled={!isSelectable}
+                                                                        />
+                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase hover:text-[var(--cl-white)] transition ease-linear text-[var(--cl-five)] hover:bg-[var(--cl-five)] ${
+                                                                            seatItem.isAvailable && isSelectable && "hover:bg-[var(--cl-five)]"
+                                                                        } ${
+                                                                            chooseEconomy.includes(seatId) && "!bg-[var(--cl-five)] !text-white"
+                                                                        } ${
+                                                                            !seatItem.isAvailable && "!bg-gray-400 !text-white opacity-75"
+                                                                        } ${
+                                                                            !isSelectable && "opacity-50"
+                                                                        }`}>
                                                                             <span>{seatItem.seatNumber}</span>
-                                                                            <span className="text-[1rem] font-medium">{seatItem.note}</span>
+                                                                            <span className="text-[1rem] font-medium">{seatItem.note || ""}</span>
                                                                         </span>
                                                                     </label>
                                                                 )

@@ -15,6 +15,25 @@ export interface TicketListType {
 
 
 
+// Backend API Response Format (matching FareOptionDto from backend)
+export interface FareOption {
+    typeTicket: string;
+    price: number;
+    desc: {
+        text: string;
+        status: boolean;
+    }[];
+    fareClassCode: string;
+}
+
+// Backend API Response Format (matching FareOptionsResponseDto from backend)
+export interface FareOptionsResponse {
+    flightInstanceId: string;
+    cabinType: string;
+    fareOptions: FareOption[];
+}
+
+// Legacy type for backward compatibility
 export interface ListProps {
     type: string,
     list: {
@@ -23,7 +42,8 @@ export interface ListProps {
         desc: {
             text: string,
             status: boolean
-        }[]
+        }[],
+        fareClassCode?: string;
     }[]
 }
 

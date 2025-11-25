@@ -1,7 +1,5 @@
 "use client";
 
-// @ts-ignore - jquery is installed but types may not be available
-import $ from "jquery";
 import { TripListProps, TripListType } from "@/types/trip-list-type";
 import Image from "next/image";
 import FormatPrice from "../FormatPrice/FormatPrice";
@@ -31,6 +29,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
     const [tickets, setTickets] = useState<FareOption[] | null>(null);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [openPanelIndex, setOpenPanelIndex] = useState<number | null>(null); // Track which panel is open
     const { setData, data } = useInfoTicket();
     const router = useRouter();
     const { accessToken } = useUserStore()
@@ -47,18 +46,8 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                 // Backend returns FareOptionsResponseDto with fareOptions array
                 setTickets(res.data?.fareOptions || res.data || []);
 
-                // ❗ FIX 2: slideDown đúng panel + đóng panel khác
-                setTimeout(() => {
-                    itemRefs.current.forEach((el, i) => {
-                        if (!el) return;
-
-                        if (i === index) {
-                            $(el).stop(true, true).slideDown(300);
-                        } else {
-                            $(el).stop(true, true).slideUp(300);
-                        }
-                    });
-                }, 50);
+                // Open the clicked panel and close others
+                setOpenPanelIndex(index);
 
 
 
@@ -83,18 +72,8 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                 // Backend returns FareOptionsResponseDto with fareOptions array
                 setTickets(res.data?.fareOptions || res.data || []);
 
-                // ❗ FIX 2: slideDown đúng panel + đóng panel khác
-                setTimeout(() => {
-                    itemRefs.current.forEach((el, i) => {
-                        if (!el) return;
-
-                        if (i === index) {
-                            $(el).stop(true, true).slideDown(300);
-                        } else {
-                            $(el).stop(true, true).slideUp(300);
-                        }
-                    });
-                }, 50);
+                // Open the clicked panel and close others
+                setOpenPanelIndex(index);
             })
             .catch((err) => {
                 console.log(err);
@@ -318,13 +297,16 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                 </div>
                                             </div>
 
-                                            {/* FIX 3 — panel đúng ref — không hidden, dùng display:none */}
+                                            {/* Panel with CSS transition instead of jQuery */}
                                             <div
                                                 ref={(el) => {
                                                     itemRefs.current[index] = el;
                                                 }}
-                                                className="w-full"
-                                                style={{ display: "none" }}
+                                                className={`w-full overflow-hidden transition-all duration-300 ease-in-out ${
+                                                    openPanelIndex === index 
+                                                        ? 'max-h-[2000px] opacity-100' 
+                                                        : 'max-h-0 opacity-0'
+                                                }`}
                                             >
                                                 <div className="flex flex-col justify-center items-center gap-y-[1.2rem] p-[1.6rem] w-full border-t-[0.1rem] border-[var(--cl-third)]">
                                                     <p className={`${type === "economy"

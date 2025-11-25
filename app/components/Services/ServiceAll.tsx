@@ -1,26 +1,9 @@
 "use client"
-import axios from "axios"
-import { useEffect, useState } from "react"
-import ItemService, { ItemServiceProp } from "../ItemService/ItemService"
+import ItemService from "../ItemService/ItemService"
+import { useDeals } from "@/app/hooks/useDeals"
 
 const ServiceAll = () => {
-    const [services, setServices] = useState<ItemServiceProp[]>([])
-    const [loading, setLoading] = useState<boolean>(true)
-    console.log("re render")
-
-    useEffect(() => {
-        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/services/deals`)
-            .then((res) => {
-                console.log(res.data)
-                setServices(res.data.deals);
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-            .finally(() => {
-                setLoading(false);
-            })
-    }, [services])
+    const { services, loading } = useDeals()
 
     return (
         <ul className="flex flex-wrap gap-y-[2.4rem] -mx-[1.2rem] pb-1">
@@ -64,16 +47,12 @@ const ServiceAll = () => {
 
                     :
                     (
-                        services.map((service, index) => {
-                            
-                                return (
-
-                                    <li className="w-[calc(100%/4)] px-[1.2rem]" key={index} data-aos="fade-up">
-                                        <ItemService image={service.image} title={service.title} service={service.service} startDate={service.startDate} endDate={service.endDate} price={service.price} link={service.link} />
-                                    </li>
-                                )
-                            
-
+                        services.map((service) => {
+                            return (
+                                <li className="w-[calc(100%/4)] px-[1.2rem]" key={service.link} data-aos="fade-up">
+                                    <ItemService image={service.image} title={service.title} service={service.service} startDate={service.startDate} endDate={service.endDate} price={service.price} link={service.link} />
+                                </li>
+                            )
                         })
                     )
 
