@@ -3,10 +3,10 @@ import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { SeatGroup, SeatItem } from "@/types/seat-type";
-import axios from "axios";
+import axiosInstance from "@/lib/axios-instance";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import CabinSection from "@/app/components/SeatMap/CabinSection";
 import SectionNavigation from "@/app/components/SeatMap/SectionNavigation";
 import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils";
@@ -24,6 +24,7 @@ const ChooseCabin = () => {
     const [saveError, setSaveError] = useState<string | null>(null);
     const pathname = usePathname();
     const router = useRouter();
+    const hasFetchedRef = useRef<boolean>(false);
 
     const { data } = useInfoTicket();
     const { accessToken } = useUserStore();
@@ -122,34 +123,26 @@ const ChooseCabin = () => {
 
 
     useEffect(() => {
-        // axios.get("/api/seats/VN123")
-        //     .then((res) => {
+        // Prevent multiple fetches - only fetch once on mount
+        if (hasFetchedRef.current) {
+            return;
+        }
 
-        //         const business = res.data?.seats.find((seat: SeatGroup) => {
-        //             return seat.id === "business"
-        //         });
-        //         setSeatBusiness(business);
+        if (!flightInstanceId) {
+            return;
+        }
 
-        //         const economy = res.data?.seats.find((seat: SeatGroup) => {
-        //             return seat.id === "economy"
-        //         });
-        //         setSeatEconomy(economy);
-        //     })
-        //     .catch((err) => {
-        //         console.log(err)
-        //     })
+        hasFetchedRef.current = true;
 
         // Bước 2: Gọi API Get Seat Map (KHÔNG CẦN truyền cabinType - backend tự lấy từ Redis)
         // Nhưng nếu muốn explicit, có thể truyền cabinType
-        const authHeader = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
-        axios
+        axiosInstance
             .get("/api/search/seats", {
                 params: {
                     flightInstanceId,
                     // cabinType is optional - backend will auto-fetch from Redis if not provided
                     ...(cabinType && { cabinType })
                 },
-                headers: authHeader,
             })
             .then((res) => {
                 console.log('Seat map response:', res.data);
@@ -172,6 +165,8 @@ const ChooseCabin = () => {
             .catch((err) => {
                 console.error('Error fetching seat map:', err);
                 console.error('Error details:', err.response?.data || err.message);
+                // Reset ref on error so user can retry
+                hasFetchedRef.current = false;
             });
 
     }, [flightInstanceId, cabinType, accessToken])
@@ -196,17 +191,12 @@ const ChooseCabin = () => {
 
         try {
             // Save seat selection to booking state
-            const response = await axios.post(
+            const response = await axiosInstance.post(
                 '/api/booking-state/seat',
                 {
                     flightInstanceId,
                     flightSeatId: selectedSeatInfo.flightSeatId,
                     seatNumber: selectedSeatInfo.seatNumber,
-                },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                    },
                 }
             );
 
@@ -226,7 +216,7 @@ const ChooseCabin = () => {
         } finally {
             setIsSaving(false);
         }
-    }, [accessToken, data.type, chooseBusiness, chooseEconomy, selectedSeatInfo, flightInstanceId, router]);
+    }, [data.type, chooseBusiness, chooseEconomy, selectedSeatInfo, flightInstanceId, router]);
 
 
 

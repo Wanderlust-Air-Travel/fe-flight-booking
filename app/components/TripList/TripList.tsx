@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import Ticket from "../Ticket/Ticket";
 import { useCallback, useRef, useState } from "react";
 import { ListProps, FareOption } from "@/types/ticket-list-type";
-import axios from "axios";
+import axiosInstance from "@/lib/axios-instance";
+import { axiosPublic } from "@/lib/axios-instance";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { useRouter } from "next/navigation";
 import { convertToDMY, convertToLocalTime } from "../FormatDate/FormatDate";
@@ -37,7 +38,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
         setActiveIndex(null);
         setType("economy");
 
-        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/fare-options?flightInstanceId=${code}&cabinType=economy`)
+        axiosPublic.get(`/api/search/fare-options?flightInstanceId=${code}&cabinType=economy`)
             .then((res) => {
                 console.log(res);
                 // Backend returns FareOptionsResponseDto with fareOptions array
@@ -64,7 +65,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
         setType("business");
 
 
-        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/fare-options?flightInstanceId=${code}&cabinType=business`)
+        axiosPublic.get(`/api/search/fare-options?flightInstanceId=${code}&cabinType=business`)
             .then((res) => {
                 // Backend returns FareOptionsResponseDto with fareOptions array
                 setTickets(res.data?.fareOptions || res.data || []);
@@ -130,25 +131,20 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
         setIsSaving(true);
 
         try {
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking-state/cabin`,
+            // Use axiosInstance which automatically adds token and handles refresh
+            const response = await axiosInstance.post(
+                '/api/booking-state/cabin',
                 {
                     flightInstanceId: flightInstanceId,
                     cabinType: type,
                     fareClassCode: data.fareClassCode
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json',
-                    },
                 }
             );
 
             if (response.status === 200 || response.status === 201) {
                 console.log('Cabin selection saved:', response.data);
-                // Navigate đến seat map page
-                router.push(`/choosecabin/${flightInstanceId}/${type}`);
+                // Navigate đến seat map page với query params (theo docs BE)
+                router.push(`/booking/seat-map?flightInstanceId=${flightInstanceId}`);
             } else {
                 throw new Error('Failed to save cabin selection');
             }

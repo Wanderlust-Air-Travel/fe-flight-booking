@@ -20,6 +20,8 @@ export interface AuthState {
 
   logout: () => void;
 
+  refreshAccessToken: (refreshToken: string, userId: string) => Promise<string>;
+
   // ⭐ THÊM DÒNG NÀY
   hydrated: boolean;
 }

@@ -31,6 +31,49 @@ const useUserStore = create<AuthState>()(
                     isLoggedIn: false,
                 });
             },
+
+            refreshAccessToken: async (refreshToken: string, userId: string) => {
+                try {
+                    const response = await fetch('/api/auth/refresh', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userId,
+                            refresh_token: refreshToken,
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.access_token) {
+                        set({
+                            accessToken: data.access_token,
+                            refreshToken: data.refresh_token || refreshToken,
+                        });
+                        return data.access_token;
+                    } else {
+                        // Refresh token cũng hết hạn, logout
+                        set({
+                            user: null,
+                            accessToken: null,
+                            refreshToken: null,
+                            isLoggedIn: false,
+                        });
+                        throw new Error('Refresh token expired');
+                    }
+                } catch (error) {
+                    // Refresh failed, logout
+                    set({
+                        user: null,
+                        accessToken: null,
+                        refreshToken: null,
+                        isLoggedIn: false,
+                    });
+                    throw error;
+                }
+            },
         }),
 
         {

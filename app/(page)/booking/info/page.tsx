@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import axios from "axios";
+import axiosInstance from "@/lib/axios-instance";
 import { Button } from "@/components/ui/button";
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -34,7 +34,7 @@ const bookingSchema = Yup.object().shape({
 const BookingInfo = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { accessToken, user } = useUserStore();
+    const { accessToken, refreshToken, user, refreshAccessToken } = useUserStore();
     const { data: ticketData } = useInfoTicket();
 
     const flightInstanceId = searchParams.get("flightInstanceId");
@@ -43,20 +43,28 @@ const BookingInfo = () => {
     const [isCreatingBooking, setIsCreatingBooking] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [reservationData, setReservationData] = useState<any>(null);
+    const hasCreatedReservationRef = useRef<boolean>(false);
 
     // Create reservation when component mounts
     useEffect(() => {
+        // Prevent multiple fetches - only fetch once on mount
+        if (hasCreatedReservationRef.current) {
+            return;
+        }
+
         if (!accessToken || !flightInstanceId) {
             setError("Please login and select a flight");
             return;
         }
+
+        hasCreatedReservationRef.current = true;
 
         const createReservation = async () => {
             setIsCreatingReservation(true);
             setError(null);
 
             try {
-                const response = await axios.post(
+                const response = await axiosInstance.post(
                     "/api/reservations",
                     {
                         segments: [
@@ -80,6 +88,8 @@ const BookingInfo = () => {
                     setReservationData(response.data);
                 } else {
                     setError("Failed to create reservation");
+                    // Reset ref on error so user can retry
+                    hasCreatedReservationRef.current = false;
                 }
             } catch (err: any) {
                 console.error("Error creating reservation:", err);
@@ -88,6 +98,8 @@ const BookingInfo = () => {
                         err.message ||
                         "Failed to create reservation"
                 );
+                // Reset ref on error so user can retry
+                hasCreatedReservationRef.current = false;
             } finally {
                 setIsCreatingReservation(false);
             }
@@ -107,7 +119,7 @@ const BookingInfo = () => {
             setError(null);
 
             try {
-                const response = await axios.post(
+                const response = await axiosInstance.post(
                     `/api/bookings?reservationId=${reservationId}`,
                     {
                         passengers: values.passengers.map((p) => ({
@@ -122,11 +134,6 @@ const BookingInfo = () => {
                         contactEmail: values.contactEmail,
                         contactPhone: values.contactPhone,
                         channel: "web",
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
                     }
                 );
 
@@ -147,7 +154,7 @@ const BookingInfo = () => {
                 setIsCreatingBooking(false);
             }
         },
-        [reservationId, accessToken, router]
+        [reservationId, router]
     );
 
     const initialValues: BookingFormData = {
