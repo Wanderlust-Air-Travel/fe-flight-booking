@@ -2,14 +2,14 @@
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
-import { SeatGroup, SeatItem } from "@/types/seat-type";
+import { SeatGroup } from "@/types/seat-type";
 import axios from "axios";
 import Image from "next/image";
-import { usePathname, useSearchParams } from "next/navigation";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
-
-
-
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import CabinSection from "@/app/components/SeatMap/CabinSection";
+import SectionNavigation from "@/app/components/SeatMap/SectionNavigation";
+import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils";
 
 const ChooseCabin = () => {
     const [seatBusiness, setSeatBusiness] = useState<SeatGroup | null>(null)
@@ -37,38 +37,55 @@ const ChooseCabin = () => {
 
 
 
-    const handleChooseBusiness = (e: ChangeEvent<HTMLInputElement>, id: string) => {
-        console.log("id",id);
-        console.log(e.target.checked);
-        if (e.target.checked) {
-            setChooseBusiness((prev) => {
-                return [...prev, id]
-            })
-        } else {
-            setChooseBusiness((prev) => {
-                return prev.filter((prev) => {
-                    return prev !== id
-                })
-            })
-        }
-    }
+    // Optimized seat toggle handlers with useCallback
+    const handleSeatToggle = useCallback(
+        (cabinType: "business" | "economy") => (seatId: string, checked: boolean) => {
+            if (cabinType === "business") {
+                setChooseBusiness((prev) =>
+                    checked ? [...prev, seatId] : prev.filter((id) => id !== seatId)
+                );
+            } else {
+                setChooseEconomy((prev) =>
+                    checked ? [...prev, seatId] : prev.filter((id) => id !== seatId)
+                );
+            }
+        },
+        []
+    );
 
-    const handleChooseEconomy = (e: ChangeEvent<HTMLInputElement>, id: string) => {
-        console.log(e.target.checked);
-        if (e.target.checked) {
-            setChooseEconomy((prev) => {
-                return [...prev, id]
-            })
-        } else {
-            setChooseEconomy((prev) => {
-                return prev.filter((prev) => {
-                    return prev !== id
-                })
-            })
-        }
-    }
+    const handleBusinessSeatToggle = handleSeatToggle("business");
+    const handleEconomySeatToggle = handleSeatToggle("economy");
 
-    console.log(chooseBusiness)
+    // Navigation handler for smooth scrolling
+    const handleSectionNavigate = useCallback((sectionId: string) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }, []);
+
+    // Generate navigation sections
+    const businessSections = useMemo(() => {
+        if (!seatBusiness?.list) return [];
+        const rows = groupSeatsByRow(seatBusiness.list);
+        const sections = divideRowsIntoSections(rows);
+        return sections.map((section) => ({
+            name: section.name,
+            id: `business-${section.name}`,
+            label: `${section.name.charAt(0).toUpperCase() + section.name.slice(1)} (Rows ${section.startRow}-${section.endRow})`,
+        }));
+    }, [seatBusiness]);
+
+    const economySections = useMemo(() => {
+        if (!seatEconomy?.list) return [];
+        const rows = groupSeatsByRow(seatEconomy.list);
+        const sections = divideRowsIntoSections(rows);
+        return sections.map((section) => ({
+            name: section.name,
+            id: `economy-${section.name}`,
+            label: `${section.name.charAt(0).toUpperCase() + section.name.slice(1)} (Rows ${section.startRow}-${section.endRow})`,
+        }));
+    }, [seatEconomy]);
 
 
     useEffect(() => {
@@ -142,204 +159,24 @@ const ChooseCabin = () => {
                             <div className="pt-[calc(100%*6000/2000)] w-full relative overflow-hidden block">
                                 <Image src="/plane.png" alt="plane" width={100} height={100} className="w-full h-full absolute inset-0 object-cover " priority unoptimized />
 
-                                <div className="absolute h-[55%] w-[24%] top-[16%] left-1/2 z-10 -translate-x-1/2 flex flex-col gap-y-[2rem]">
+                                <div className="absolute h-[55%] w-[24%] top-[16%] left-1/2 z-10 -translate-x-1/2 flex flex-col gap-y-[2rem] overflow-y-auto max-h-full">
+                                    {/* Business Section */}
+                                    <CabinSection
+                                        seatGroup={seatBusiness}
+                                        cabinType="business"
+                                        selectedSeats={chooseBusiness}
+                                        onSeatToggle={handleBusinessSeatToggle}
+                                        isSelectable={data.type === "business"}
+                                    />
 
-                                    <div className={` w-full bg-[#F5F7FA] rounded-md ${data.type === "business" ? "" : "opacity-50 pointer-events-none cursor-not-allowed"} `}>
-                                        <div className="flex gap-[1rem] flex-wrap py-[0.6rem] px-[0.6rem] justify-between">
-                                            <div className="w-[47%]">
-                                                <div className="flex flex-wrap gap-y-[1rem]  -mx-[0.15rem]">
-                                                    {
-                                                        seatBusiness && (
-                                                            seatBusiness?.list?.filter((list: SeatItem) => list.position === "left").map((seatItem: SeatItem, index) => {
-                                                                // Backend format: use isSelectable to determine if seat can be selected
-                                                                const isSelectable = seatItem.isSelectable !== false && seatItem.isAvailable;
-                                                                const seatId = seatItem.flightSeatId || seatItem.idCabin || `business-${index}`;
-                                                                
-                                                                return (
-                                                                    <label 
-                                                                        htmlFor={seatId} 
-                                                                        key={seatId} 
-                                                                        className={`w-[calc(100%/2)] block flex-shrink-0 px-[0.15rem] ${
-                                                                            isSelectable ? "cursor-pointer" : "pointer-events-none opacity-50"
-                                                                        }`}
-                                                                    >
-                                                                        <input 
-                                                                            name="chooseBusiness" 
-                                                                            onChange={(e) => { handleChooseBusiness(e, seatId) }} 
-                                                                            hidden 
-                                                                            id={seatId} 
-                                                                            type="checkbox"
-                                                                            disabled={!isSelectable}
-                                                                        />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase hover:text-[var(--cl-white)] transition ease-linear ${
-                                                                            seatBusiness.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"
-                                                                        } ${
-                                                                            chooseBusiness.includes(seatId) && "!bg-[var(--cl-pri)] !text-white"
-                                                                        } ${
-                                                                            !seatItem.isAvailable && "!bg-[var(--cl-pri)] !text-white opacity-75"
-                                                                        } ${
-                                                                            !isSelectable && "opacity-50"
-                                                                        }`}>
-                                                                            <span>{seatItem.seatNumber || seatItem.title}</span>
-                                                                            <span className="text-[1rem] font-medium">{seatItem.note || ""}</span>
-                                                                        </span>
-                                                                    </label>
-                                                                )
-                                                            })
-                                                        )
-                                                    }
-
-
-
-
-                                                </div>
-                                            </div>
-
-                                            <div className="w-[47%]">
-                                                <div className="flex flex-wrap gap-y-[1rem]  -mx-[0.15rem]">
-                                                    {
-                                                        seatBusiness && (
-                                                            seatBusiness?.list?.filter((list: SeatItem) => list.position === "right").map((seatItem: SeatItem, index) => {
-                                                                const isSelectable = seatItem.isSelectable !== false && seatItem.isAvailable;
-                                                                const seatId = seatItem.flightSeatId || seatItem.idCabin || `business-right-${index}`;
-                                                                
-                                                                return (
-                                                                    <label 
-                                                                        htmlFor={seatId} 
-                                                                        key={seatId} 
-                                                                        className={`w-[calc(100%/2)] block flex-shrink-0 px-[0.15rem] ${
-                                                                            isSelectable ? "cursor-pointer" : "pointer-events-none opacity-50"
-                                                                        }`}
-                                                                    >
-                                                                        <input 
-                                                                            name="chooseBusiness" 
-                                                                            onChange={(e) => { handleChooseBusiness(e, seatId) }} 
-                                                                            hidden 
-                                                                            id={seatId} 
-                                                                            type="checkbox"
-                                                                            disabled={!isSelectable}
-                                                                        />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase hover:text-[var(--cl-white)] transition ease-linear ${
-                                                                            seatBusiness.id === "business" ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]" : "text-[var(--cl-four)] hover:bg-[var(--cl-four)]"
-                                                                        } ${
-                                                                            chooseBusiness.includes(seatId) && "!bg-[var(--cl-pri)] !text-white"
-                                                                        } ${
-                                                                            !seatItem.isAvailable && "!bg-[var(--cl-pri)] !text-white opacity-75"
-                                                                        } ${
-                                                                            !isSelectable && "opacity-50"
-                                                                        }`}>
-                                                                            <span>{seatItem.seatNumber || seatItem.title}</span>
-                                                                            <span className="text-[1rem] font-medium">{seatItem.note || ""}</span>
-                                                                        </span>
-                                                                    </label>
-                                                                )
-                                                            })
-                                                        )
-                                                    }
-
-
-
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                    </div>
-
-                                    <div className={`w-full bg-[#F5F7FA] rounded-md ${data.type === "economy" ? "" : "opacity-60 pointer-events-none cursor-not-allowed"}`}>
-                                        <div className="flex gap-[1rem] flex-wrap py-[0.6rem] px-[0.6rem] justify-between">
-                                            <div className="w-[47%]">
-                                                <div className="flex flex-wrap gap-y-[1rem]  -mx-[0.15rem]">
-                                                    {
-                                                        seatEconomy && (
-                                                            seatEconomy?.list?.filter((list) => list.position === "left").map((seatItem, index) => {
-                                                                const isSelectable = seatItem.isSelectable !== false && seatItem.isAvailable;
-                                                                const seatId = seatItem.flightSeatId || seatItem.idCabin || `economy-left-${index}`;
-                                                                
-                                                                return (
-                                                                    <label 
-                                                                        htmlFor={seatId} 
-                                                                        key={seatId} 
-                                                                        className={`w-[calc(100%/3)] block flex-shrink-0 px-[0.15rem] ${
-                                                                            isSelectable ? "cursor-pointer" : "pointer-events-none opacity-50"
-                                                                        }`}
-                                                                    >
-                                                                        <input 
-                                                                            name="chooseEconomy" 
-                                                                            onChange={(e) => { handleChooseEconomy(e, seatId) }} 
-                                                                            hidden 
-                                                                            id={seatId} 
-                                                                            type="checkbox"
-                                                                            disabled={!isSelectable}
-                                                                        />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase hover:text-[var(--cl-white)] transition ease-linear text-[var(--cl-five)] hover:bg-[var(--cl-five)] ${
-                                                                            seatItem.isAvailable && isSelectable && "hover:bg-[var(--cl-five)]"
-                                                                        } ${
-                                                                            chooseEconomy.includes(seatId) && "!bg-[var(--cl-five)] !text-white"
-                                                                        } ${
-                                                                            !seatItem.isAvailable && "!bg-gray-400 !text-white opacity-75"
-                                                                        } ${
-                                                                            !isSelectable && "opacity-50"
-                                                                        }`}>
-                                                                            <span>{seatItem.seatNumber}</span>
-                                                                            <span className="text-[1rem] font-medium">{seatItem.note || ""}</span>
-                                                                        </span>
-                                                                    </label>
-                                                                )
-                                                            })
-                                                        )
-                                                    }
-
-                                                </div>
-                                            </div>
-                                            <div className="w-[47%]">
-                                                <div className="flex flex-wrap gap-y-[1rem]  -mx-[0.15rem]">
-                                                    {
-                                                        seatEconomy && (
-                                                            seatEconomy?.list?.filter((list) => list.position === "right").map((seatItem, index) => {
-                                                                const isSelectable = seatItem.isSelectable !== false && seatItem.isAvailable;
-                                                                const seatId = seatItem.flightSeatId || seatItem.idCabin || `economy-right-${index}`;
-                                                                
-                                                                return (
-                                                                    <label 
-                                                                        htmlFor={seatId} 
-                                                                        key={seatId} 
-                                                                        className={`w-[calc(100%/3)] block flex-shrink-0 px-[0.15rem] ${
-                                                                            isSelectable ? "cursor-pointer" : "pointer-events-none opacity-50"
-                                                                        }`}
-                                                                    >
-                                                                        <input 
-                                                                            name="chooseEconomy" 
-                                                                            onChange={(e) => { handleChooseEconomy(e, seatId) }} 
-                                                                            hidden 
-                                                                            id={seatId} 
-                                                                            type="checkbox"
-                                                                            disabled={!isSelectable}
-                                                                        />
-                                                                        <span className={`rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full h-[100%] bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase hover:text-[var(--cl-white)] transition ease-linear text-[var(--cl-five)] hover:bg-[var(--cl-five)] ${
-                                                                            seatItem.isAvailable && isSelectable && "hover:bg-[var(--cl-five)]"
-                                                                        } ${
-                                                                            chooseEconomy.includes(seatId) && "!bg-[var(--cl-five)] !text-white"
-                                                                        } ${
-                                                                            !seatItem.isAvailable && "!bg-gray-400 !text-white opacity-75"
-                                                                        } ${
-                                                                            !isSelectable && "opacity-50"
-                                                                        }`}>
-                                                                            <span>{seatItem.seatNumber}</span>
-                                                                            <span className="text-[1rem] font-medium">{seatItem.note || ""}</span>
-                                                                        </span>
-                                                                    </label>
-                                                                )
-                                                            })
-                                                        )
-                                                    }
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
+                                    {/* Economy Section */}
+                                    <CabinSection
+                                        seatGroup={seatEconomy}
+                                        cabinType="economy"
+                                        selectedSeats={chooseEconomy}
+                                        onSeatToggle={handleEconomySeatToggle}
+                                        isSelectable={data.type === "economy"}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -349,9 +186,21 @@ const ChooseCabin = () => {
                                     Choose Position
                                 </h2>
 
-                                <ul className="flex">
-
-                                </ul>
+                                {/* Section Navigation */}
+                                {data.type === "business" && businessSections.length > 0 && (
+                                    <SectionNavigation
+                                        sections={businessSections}
+                                        onNavigate={handleSectionNavigate}
+                                        cabinType="business"
+                                    />
+                                )}
+                                {data.type === "economy" && economySections.length > 0 && (
+                                    <SectionNavigation
+                                        sections={economySections}
+                                        onNavigate={handleSectionNavigate}
+                                        cabinType="economy"
+                                    />
+                                )}
 
                                 <div className="flex flex-col gap-y-[0.8rem]">
                                     <p className="text-mn text-[var(--cl-red)] font-medium">
