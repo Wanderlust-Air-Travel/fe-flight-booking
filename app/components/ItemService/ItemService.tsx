@@ -2,17 +2,7 @@ import { ArrowRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { getApiUrl } from "@/lib/api-config"
-
-
-export interface ItemServiceProp {
-    image: string,
-    title: string,
-    link: string,
-    startDate: string,
-    endDate: string,
-    service: string,
-    price: string
-}
+import { ItemServiceProp } from "@/types/item-service-type"
 
 
 const ItemService = ({ image, title, link, startDate, endDate, service, price }: ItemServiceProp) => {

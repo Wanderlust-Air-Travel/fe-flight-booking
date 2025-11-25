@@ -1,18 +1,10 @@
 "use client";
 
 import { memo, useRef, useEffect } from "react";
-import { SeatSection as SeatSectionType } from "@/app/utils/seat-utils";
+import { SeatSection as SeatSectionType } from "@/types/seat-utils-type";
+import { SeatSectionProps } from "@/types/seat-map-component-type";
 import SeatRow from "./SeatRow";
 import { SeatItem } from "@/types/seat-type";
-
-interface SeatSectionProps {
-  section: SeatSectionType;
-  cabinType: "business" | "economy";
-  selectedSeats: string[];
-  onSeatToggle: (seatId: string, checked: boolean) => void;
-  isSelectable: boolean;
-  sectionId: string;
-}
 
 /**
  * Memoized SeatSection component that renders a group of rows

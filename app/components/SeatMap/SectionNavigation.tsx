@@ -2,12 +2,7 @@
 
 import { memo } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
-
-interface SectionNavigationProps {
-  sections: Array<{ name: string; id: string; label: string }>;
-  onNavigate: (sectionId: string) => void;
-  cabinType: "business" | "economy";
-}
+import { SectionNavigationProps } from "@/types/seat-map-component-type";
 
 /**
  * Navigation component for scrolling between seat sections

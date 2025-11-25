@@ -5,17 +5,11 @@ import { ChevronDown, CircleUserRound, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-
-interface menuListsInterface {
-    title: string,
-    path: string,
-    child?: menuListsInterface[]
-}
+import { MenuListsInterface } from "@/types/header-type"
 
 
 
-const menuLists: menuListsInterface[] = [
+const menuLists: MenuListsInterface[] = [
     {
         title: "Home",
         path: "/"

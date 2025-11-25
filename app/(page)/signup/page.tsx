@@ -9,17 +9,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { RegisterSchema } from "./register.schema";
+import { SignupFormValue } from "@/types/auth-form-type";
 
-
-
-interface valueType {
-    email: string,
-    password: string | number,
-    fullname: string,
-    phone: number | null
-}
-
-const initialValues = {
+const initialValues: SignupFormValue = {
     email: "",
     phone: null,
     password: "",
@@ -36,7 +28,7 @@ const SignUpPage = () => {
 
 
 
-    const handleSubmit = (value: valueType, setSubmitting: (isSubmitting: boolean) => void) => {
+    const handleSubmit = (value: SignupFormValue, setSubmitting: (isSubmitting: boolean) => void) => {
         axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/register`, {
             email: value.email,
             password: value.password,

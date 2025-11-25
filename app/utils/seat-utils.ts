@@ -1,4 +1,5 @@
 import { SeatItem } from "@/types/seat-type";
+import { SeatRow, SeatSection } from "@/types/seat-utils-type";
 
 /**
  * Extract row number from seat number (e.g., "10A" -> 10, "21B" -> 21)
@@ -19,12 +20,6 @@ export function extractSeatLetter(seatNumber: string): string {
 /**
  * Group seats by row number for efficient rendering
  */
-export interface SeatRow {
-  rowNumber: number;
-  seats: SeatItem[];
-  leftSeats: SeatItem[];
-  rightSeats: SeatItem[];
-}
 
 export function groupSeatsByRow(seats: SeatItem[]): SeatRow[] {
   // Group by row number
@@ -67,12 +62,6 @@ export function groupSeatsByRow(seats: SeatItem[]): SeatRow[] {
 /**
  * Divide rows into sections (front, middle, back) for better UX
  */
-export interface SeatSection {
-  name: "front" | "middle" | "back";
-  rows: SeatRow[];
-  startRow: number;
-  endRow: number;
-}
 
 export function divideRowsIntoSections(rows: SeatRow[]): SeatSection[] {
   if (rows.length === 0) return [];

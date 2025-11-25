@@ -5,17 +5,10 @@ import { SeatGroup } from "@/types/seat-type";
 import {
   groupSeatsByRow,
   divideRowsIntoSections,
-  SeatSection as SeatSectionType,
 } from "@/app/utils/seat-utils";
+import { SeatSection as SeatSectionType } from "@/types/seat-utils-type";
+import { CabinSectionProps } from "@/types/seat-map-component-type";
 import SeatSection from "./SeatSection";
-
-interface CabinSectionProps {
-  seatGroup: SeatGroup | null;
-  cabinType: "business" | "economy";
-  selectedSeats: string[];
-  onSeatToggle: (seatId: string, checked: boolean) => void;
-  isSelectable: boolean;
-}
 
 /**
  * Memoized CabinSection component that handles a full cabin (business or economy)

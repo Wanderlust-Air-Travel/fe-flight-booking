@@ -10,15 +10,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LoginSchema } from "./login.schema";
+import { SigninFormValue } from "@/types/auth-form-type";
 
-
-interface valueType {
-    identifier: string | number,
-    password: string | number,
-    remember: boolean
-}
-
-const initialValues = {
+const initialValues: SigninFormValue = {
     identifier: "",
     password: "",
     remember: false,
@@ -36,7 +30,7 @@ const SignInPage = () => {
     console.log(process.env.NEXT_PUBLIC_API_URL)
 
 
-    const handleSubmit = (value: valueType, setSubmitting: (isSubmitting: boolean) => void) => {
+    const handleSubmit = (value: SigninFormValue, setSubmitting: (isSubmitting: boolean) => void) => {
         axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`, {
             email: value.identifier,
             password: value.password

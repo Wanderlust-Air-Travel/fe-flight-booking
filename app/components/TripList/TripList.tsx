@@ -15,10 +15,7 @@ import { convertToDMY, convertToLocalTime } from "../FormatDate/FormatDate";
 import useStoreFightInfo from "@/app/zustand/storeFightInfo";
 import useUserStore from "@/app/zustand/storeUser";
 
-type TripListPropsType = {
-    trips: TripListProps; // Backend returns SearchFlightsResponseDto (object with outbound/inbound arrays)
-    loading: boolean;
-};
+import { TripListPropsType } from '@/types/trip-list-component-type';
 
 
 const TripList = ({ trips, loading }: TripListPropsType) => {

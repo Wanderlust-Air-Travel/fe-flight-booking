@@ -1,5 +1,5 @@
-
-export interface IsActiveState {
-    isActive: boolean;
-    handleIsActive: () => void;
+export interface MenuListsInterface {
+    title: string;
+    path: string;
+    child?: MenuListsInterface[];
 }

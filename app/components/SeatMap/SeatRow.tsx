@@ -2,15 +2,8 @@
 
 import { memo } from "react";
 import { SeatItem } from "@/types/seat-type";
-import { SeatRow as SeatRowType } from "@/app/utils/seat-utils";
-
-interface SeatRowProps {
-  row: SeatRowType;
-  cabinType: "business" | "economy";
-  selectedSeats: string[];
-  onSeatToggle: (seatId: string, checked: boolean) => void;
-  isSelectable: boolean;
-}
+import { SeatRow as SeatRowType } from "@/types/seat-utils-type";
+import { SeatRowProps } from "@/types/seat-map-component-type";
 
 /**
  * Memoized SeatRow component for optimal rendering performance

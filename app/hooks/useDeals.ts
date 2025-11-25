@@ -1,12 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { ItemServiceProp } from '@/app/components/ItemService/ItemService';
-
-interface UseDealsResult {
-	services: ItemServiceProp[];
-	loading: boolean;
-	error: string | null;
-}
+import { ItemServiceProp } from '@/types/item-service-type';
+import { UseDealsResult } from '@/types/use-deals-type';
 
 /**
  * Custom hook to fetch deals from API

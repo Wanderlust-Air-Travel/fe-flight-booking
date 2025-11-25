@@ -9,19 +9,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import Image from "next/image"
-
-interface SelectComponentProp {
-    placeholder: string,
-    icon: string,
-    value:string,
-    onChange:(val: string) => void,
-    data: {
-        name: string,
-        des: string,
-        value: string,
-        code: string
-    }[]
-}
+import { SelectComponentProp } from "@/types/select-component-type"
 
 export function SelectComponent({ placeholder, icon, data,value,onChange }: SelectComponentProp) {
 

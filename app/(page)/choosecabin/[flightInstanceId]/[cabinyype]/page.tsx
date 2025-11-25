@@ -2,25 +2,31 @@
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
-import { SeatGroup } from "@/types/seat-type";
+import { SeatGroup, SeatItem } from "@/types/seat-type";
 import axios from "axios";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import CabinSection from "@/app/components/SeatMap/CabinSection";
 import SectionNavigation from "@/app/components/SeatMap/SectionNavigation";
 import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils";
+import useUserStore from "@/app/zustand/storeUser";
+import { Button } from "@/components/ui/button";
 
 const ChooseCabin = () => {
     const [seatBusiness, setSeatBusiness] = useState<SeatGroup | null>(null)
     const [seatEconomy, setSeatEconomy] = useState<SeatGroup | null>(null)
 
-
     const [chooseBusiness, setChooseBusiness] = useState<string[]>([]);
     const [chooseEconomy, setChooseEconomy] = useState<string[]>([]);
+    const [selectedSeatInfo, setSelectedSeatInfo] = useState<{ flightSeatId: string; seatNumber: string } | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
     const pathname = usePathname();
+    const router = useRouter();
 
     const { data } = useInfoTicket();
+    const { accessToken } = useUserStore();
 
     const flightInstanceId = useMemo(() => {
         const pathNameFlightInstanceId = pathname.split("/").filter(Boolean)[1];
@@ -37,9 +43,36 @@ const ChooseCabin = () => {
 
 
 
+    // Helper function to find seat by seatId (which can be flightSeatId or generated ID)
+    const findSeatBySeatId = useCallback((seatId: string): SeatItem | null => {
+        const allSeats = [
+            ...(seatBusiness?.list || []),
+            ...(seatEconomy?.list || [])
+        ];
+        // Try to find by flightSeatId first, then by generated ID pattern
+        return allSeats.find(seat => 
+            seat.flightSeatId === seatId || 
+            `${seat.seatNumber}-left` === seatId || 
+            `${seat.seatNumber}-right` === seatId
+        ) || null;
+    }, [seatBusiness, seatEconomy]);
+
     // Optimized seat toggle handlers with useCallback
     const handleSeatToggle = useCallback(
         (cabinType: "business" | "economy") => (seatId: string, checked: boolean) => {
+            // Find the actual seat to get flightSeatId and seatNumber
+            const seat = findSeatBySeatId(seatId);
+            
+            if (checked && seat) {
+                // Store the actual seat info
+                setSelectedSeatInfo({
+                    flightSeatId: seat.flightSeatId,
+                    seatNumber: seat.seatNumber,
+                });
+            } else {
+                setSelectedSeatInfo(null);
+            }
+
             if (cabinType === "business") {
                 setChooseBusiness((prev) =>
                     checked ? [...prev, seatId] : prev.filter((id) => id !== seatId)
@@ -50,7 +83,7 @@ const ChooseCabin = () => {
                 );
             }
         },
-        []
+        [findSeatBySeatId]
     );
 
     const handleBusinessSeatToggle = handleSeatToggle("business");
@@ -108,13 +141,15 @@ const ChooseCabin = () => {
 
         // Bước 2: Gọi API Get Seat Map (KHÔNG CẦN truyền cabinType - backend tự lấy từ Redis)
         // Nhưng nếu muốn explicit, có thể truyền cabinType
+        const authHeader = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
         axios
-            .get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/seats`, {
+            .get("/api/search/seats", {
                 params: {
                     flightInstanceId,
                     // cabinType is optional - backend will auto-fetch from Redis if not provided
                     ...(cabinType && { cabinType })
                 },
+                headers: authHeader,
             })
             .then((res) => {
                 console.log('Seat map response:', res.data);
@@ -139,10 +174,59 @@ const ChooseCabin = () => {
                 console.error('Error details:', err.response?.data || err.message);
             });
 
-    }, [])
+    }, [flightInstanceId, cabinType, accessToken])
 
+    // Handle save seat selection and continue
+    const handleContinue = useCallback(async () => {
+        if (!accessToken) {
+            setSaveError('Please login to continue');
+            return;
+        }
 
+        // Get selected seat based on cabin type
+        const selectedSeats = data.type === "business" ? chooseBusiness : chooseEconomy;
+        
+        if (selectedSeats.length === 0 || !selectedSeatInfo) {
+            setSaveError('Please select a seat');
+            return;
+        }
 
+        setIsSaving(true);
+        setSaveError(null);
+
+        try {
+            // Save seat selection to booking state
+            const response = await axios.post(
+                '/api/booking-state/seat',
+                {
+                    flightInstanceId,
+                    flightSeatId: selectedSeatInfo.flightSeatId,
+                    seatNumber: selectedSeatInfo.seatNumber,
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                    },
+                }
+            );
+
+            if (response.data.success) {
+                // Navigate to booking information page
+                router.push(`/booking/info?flightInstanceId=${flightInstanceId}`);
+            } else {
+                setSaveError(response.data.message || 'Failed to save seat selection');
+            }
+        } catch (error: any) {
+            console.error('Error saving seat selection:', error);
+            setSaveError(
+                error.response?.data?.message || 
+                error.message || 
+                'Failed to save seat selection'
+            );
+        } finally {
+            setIsSaving(false);
+        }
+    }, [accessToken, data.type, chooseBusiness, chooseEconomy, selectedSeatInfo, flightInstanceId, router]);
 
 
 
@@ -242,6 +326,19 @@ const ChooseCabin = () => {
                                         </ul>
                                     </div>
 
+                                    {/* Continue Button */}
+                                    <div className="flex flex-col gap-y-[1rem]">
+                                        {saveError && (
+                                            <p className="text-sm text-red-500">{saveError}</p>
+                                        )}
+                                        <Button
+                                            onClick={handleContinue}
+                                            disabled={isSaving || (data.type === "business" ? chooseBusiness.length === 0 : chooseEconomy.length === 0)}
+                                            className="w-full"
+                                        >
+                                            {isSaving ? 'Saving...' : 'Continue'}
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
