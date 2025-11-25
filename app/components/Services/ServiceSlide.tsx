@@ -3,6 +3,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useDeals } from "@/app/hooks/useDeals"
+import { generateServiceKey } from "@/app/utils/key-utils"
 
 const ServiceSlide = () => {
     const { services, loading } = useDeals()
@@ -72,9 +73,9 @@ const ServiceSlide = () => {
                                         <CarouselContent className="-mx-[1.2rem]">
 
                                             {
-                                                services.map((service) => {
+                                                services.map((service, index) => {
                                                     return (
-                                                        <CarouselItem key={service.link} className="w-[calc(100%/4)] px-[1.2rem]">
+                                                        <CarouselItem key={generateServiceKey(service.link, index)} className="w-[calc(100%/4)] px-[1.2rem]">
                                                             <ItemService image={service.image} title={service.title} service={service.service} startDate={service.startDate} endDate={service.endDate} price={service.price} link={service.link} />
                                                         </CarouselItem>
                                                     )

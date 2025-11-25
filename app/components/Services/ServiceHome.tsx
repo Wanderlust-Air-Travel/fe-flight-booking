@@ -1,6 +1,7 @@
 import { memo } from "react"
 import ItemService from "../ItemService/ItemService"
 import { useDeals } from "@/app/hooks/useDeals"
+import { generateServiceKey } from "@/app/utils/key-utils"
 
 const ServiceHome = () => {
     const { services, loading } = useDeals()
@@ -44,9 +45,9 @@ const ServiceHome = () => {
                     )
                     :
                     (
-                        services.slice(0, 8).map((service) => {
+                        services.slice(0, 8).map((service, index) => {
                             return (
-                                <li className="w-[calc(100%/4)] px-[1.2rem]" key={service.link} data-aos="fade-up">
+                                <li className="w-[calc(100%/4)] px-[1.2rem]" key={generateServiceKey(service.link, index)} data-aos="fade-up">
                                     <ItemService image={service.image} title={service.title} service={service.service} startDate={service.startDate} endDate={service.endDate} price={service.price} link={service.link} />
                                 </li>
                             )

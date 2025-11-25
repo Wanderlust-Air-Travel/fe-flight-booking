@@ -1,6 +1,7 @@
 "use client"
 import ItemService from "../ItemService/ItemService"
 import { useDeals } from "@/app/hooks/useDeals"
+import { generateServiceKey } from "@/app/utils/key-utils"
 
 const ServiceAll = () => {
     const { services, loading } = useDeals()
@@ -47,9 +48,9 @@ const ServiceAll = () => {
 
                     :
                     (
-                        services.map((service) => {
+                        services.map((service, index) => {
                             return (
-                                <li className="w-[calc(100%/4)] px-[1.2rem]" key={service.link} data-aos="fade-up">
+                                <li className="w-[calc(100%/4)] px-[1.2rem]" key={generateServiceKey(service.link, index)} data-aos="fade-up">
                                     <ItemService image={service.image} title={service.title} service={service.service} startDate={service.startDate} endDate={service.endDate} price={service.price} link={service.link} />
                                 </li>
                             )
