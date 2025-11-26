@@ -138,8 +138,9 @@ const BookingInfo = () => {
                 );
 
                 if (response.data?.bookingId) {
-                    // Navigate to payment page or booking confirmation
-                    router.push(`/booking/confirmation?bookingId=${response.data.bookingId}`);
+                    // Sau khi tạo booking thành công → chuyển sang trang Payment
+                    // Booking ID được truyền qua query param để FE stateless, BE là source of truth
+                    router.push(`/booking/payment?bookingId=${response.data.bookingId}`);
                 } else {
                     setError("Failed to create booking");
                 }

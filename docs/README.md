@@ -72,22 +72,25 @@ import { axiosPublic } from '@/lib/axios-instance';
 axiosPublic.get('/api/search/fare-options?flightInstanceId=xxx');
 ```
 
-### 3. Booking Flow - Complete Implementation
+### 3. Booking Flow - Complete Implementation (kèm Payment)
 
 **Flow hoàn chỉnh**:
 1. Search flights → Chọn flight
 2. Chọn cabin → Save cabin selection → Navigate đến seat map
 3. Chọn seat → Save seat selection → Navigate đến booking info
 4. Nhập thông tin → Tạo reservation → Tạo booking
+5. Sau khi tạo booking thành công → Redirect sang trang payment
 
 **Files mới**:
 - `app/(page)/booking/seat-map/page.tsx` - Trang chọn ghế
 - `app/(page)/booking/info/page.tsx` - Trang nhập thông tin booking
+- `app/(page)/booking/payment/page.tsx` - Trang thanh toán sau khi tạo booking
 - `app/api/booking-state/seat/route.ts` - Proxy cho save seat selection
 - `app/api/reservations/route.ts` - Proxy cho create/list reservations
 - `app/api/bookings/route.ts` - Proxy cho create booking
 - `app/api/auth/refresh/route.ts` - Proxy cho refresh token
 - `app/api/search/fare-options/route.ts` - Proxy cho fare options
+ - `app/api/payments/bookings/[bookingId]/process/route.ts` - Proxy process payment cho booking
 
 **Navigation Flow**:
 ```tsx
@@ -97,8 +100,8 @@ router.push(`/booking/seat-map?flightInstanceId=${flightInstanceId}`);
 // 2. Sau khi chọn seat
 router.push(`/booking/info?flightInstanceId=${flightInstanceId}`);
 
-// 3. Sau khi tạo booking thành công
-router.push(`/booking/confirmation?bookingId=${bookingId}`);
+// 3. Sau khi tạo booking thành công → chuyển sang trang Payment
+router.push(`/booking/payment?bookingId=${bookingId}`);
 ```
 
 ### 4. Fix Double API Calls
