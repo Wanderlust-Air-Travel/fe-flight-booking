@@ -143,9 +143,17 @@ const Header = () => {
                                             <li>
                                                 <Link
                                                     className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
-                                                    href="/"
+                                                    href="/my-tickets"
                                                 >
-                                                    History
+                                                    Vé của tôi
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link
+                                                    className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
+                                                    href="/my-journey"
+                                                >
+                                                    Hành trình của tôi
                                                 </Link>
                                             </li>
                                             <li>
