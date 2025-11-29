@@ -111,7 +111,9 @@ const MyJourneyPage = () => {
         </div>
 
         <div className="grid gap-6">
-          {data.journeys.map((journey) => (
+          {data.journeys
+            .filter((journey) => journey.status !== 'cancelled')
+            .map((journey) => (
             <Card key={journey.journeyId} className="p-6 hover:shadow-lg transition-shadow">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 {/* Left: Journey Info */}
@@ -222,11 +224,6 @@ const MyJourneyPage = () => {
                         </>
                       )}
                     </Button>
-                  )}
-                  {journey.status === 'cancelled' && (
-                    <div className="text-center">
-                      <p className="text-sm text-red-600 font-medium">Đã hủy</p>
-                    </div>
                   )}
                 </div>
               </div>
