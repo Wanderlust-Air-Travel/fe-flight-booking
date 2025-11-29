@@ -13,7 +13,7 @@ import type { BookingDetails, PaymentDetails } from "@/types/confirmation-page-t
 const ConfirmationPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { accessToken, hydrated } = useUserStore();
+  const { accessToken } = useUserStore();
 
   const bookingId = searchParams.get("bookingId");
   const paymentId = searchParams.get("paymentId");
@@ -24,10 +24,6 @@ const ConfirmationPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Đợi store hydrate xong trước khi gọi API để tránh gọi API 2 lần
-    if (!hydrated) {
-      return;
-    }
     const fetchData = async () => {
       if (!bookingId) {
         setError("Booking ID is missing");
@@ -65,7 +61,7 @@ const ConfirmationPage = () => {
     };
 
     fetchData();
-  }, [bookingId, paymentId, hydrated]);
+  }, [bookingId, paymentId, accessToken]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
