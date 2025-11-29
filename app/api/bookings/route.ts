@@ -7,15 +7,10 @@ const BACKEND_API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL |
 
 export async function POST(req: NextRequest) {
   try {
-    // Lấy access token từ header
+    // Lấy access token từ header (optional - for guest bookings)
     const authHeader = req.headers.get('authorization');
     
-    if (!authHeader) {
-      return NextResponse.json(
-        { message: 'Authorization header is required' },
-        { status: 401 }
-      );
-    }
+    // Authorization header is optional - guest bookings are allowed
 
     // Lấy reservationId từ query parameter
     const { searchParams } = new URL(req.url);
@@ -41,14 +36,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Proxy request to backend
+    // Include Authorization header only if provided (for authenticated bookings)
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
     const response = await fetch(
       `${BACKEND_API_URL}/api/v1/bookings?reservationId=${encodeURIComponent(reservationId)}`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': authHeader,
-        },
+        headers,
         body: JSON.stringify({
           passengers,
           contactFullname,

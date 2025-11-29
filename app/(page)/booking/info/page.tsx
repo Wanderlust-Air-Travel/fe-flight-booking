@@ -52,8 +52,8 @@ const BookingInfo = () => {
             return;
         }
 
-        if (!accessToken || !flightInstanceId) {
-            setError("Please login and select a flight");
+        if (!flightInstanceId) {
+            setError("Please select a flight");
             return;
         }
 
@@ -64,6 +64,13 @@ const BookingInfo = () => {
             setError(null);
 
             try {
+                // For guest bookings, don't include Authorization header
+                // For authenticated bookings, include Authorization header
+                const headers: Record<string, string> = {};
+                if (accessToken) {
+                    headers['Authorization'] = `Bearer ${accessToken}`;
+                }
+
                 const response = await axiosInstance.post(
                     "/api/reservations",
                     {
@@ -77,9 +84,7 @@ const BookingInfo = () => {
                         currencyCode: "VND",
                     },
                     {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
+                        headers,
                     }
                 );
 
@@ -110,8 +115,8 @@ const BookingInfo = () => {
 
     const handleSubmit = useCallback(
         async (values: BookingFormData) => {
-            if (!reservationId || !accessToken) {
-                setError("Reservation not found or not logged in");
+            if (!reservationId) {
+                setError("Reservation not found");
                 return;
             }
 
@@ -119,6 +124,13 @@ const BookingInfo = () => {
             setError(null);
 
             try {
+                // For guest bookings, don't include Authorization header
+                // For authenticated bookings, include Authorization header
+                const headers: Record<string, string> = {};
+                if (accessToken) {
+                    headers['Authorization'] = `Bearer ${accessToken}`;
+                }
+
                 const response = await axiosInstance.post(
                     `/api/bookings?reservationId=${reservationId}`,
                     {
@@ -134,6 +146,9 @@ const BookingInfo = () => {
                         contactEmail: values.contactEmail,
                         contactPhone: values.contactPhone,
                         channel: "web",
+                    },
+                    {
+                        headers,
                     }
                 );
 
@@ -155,7 +170,7 @@ const BookingInfo = () => {
                 setIsCreatingBooking(false);
             }
         },
-        [reservationId, router]
+        [reservationId, router, accessToken]
     );
 
     const initialValues: BookingFormData = {
@@ -173,18 +188,7 @@ const BookingInfo = () => {
         ],
     };
 
-    if (!accessToken) {
-        return (
-            <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
-                <Breadcrumb />
-                <div className="container">
-                    <div className="text-center py-[4rem]">
-                        <p className="text-lg text-red-500">Please login to continue</p>
-                    </div>
-                </div>
-            </main>
-        );
-    }
+    // Guest bookings are now allowed - no need to check accessToken
 
     if (isCreatingReservation) {
         return (
