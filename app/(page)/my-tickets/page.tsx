@@ -135,15 +135,15 @@ const MyTicketsPage = () => {
         return
       }
 
-      // Verify OTP
+      // Verify OTP first
       await axiosInstance.post('/api/auth/otp/cancellation/verify', {
         userId,
         bookingId,
         otp: otpValue,
       })
 
-      // If OTP is valid, proceed with cancellation
-      await performCancellation(bookingId, otpValue)
+      // If OTP is valid, proceed with cancellation (without OTP in body)
+      await performCancellation(bookingId)
     } catch (err: any) {
       console.error("Error verifying OTP:", err)
       toast.error(err.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.")
@@ -152,10 +152,10 @@ const MyTicketsPage = () => {
     }
   }
 
-  const performCancellation = async (bookingId: string, otp?: string) => {
+  const performCancellation = async (bookingId: string) => {
     try {
       setCancellingId(bookingId)
-      const response = await axiosInstance.patch(`/api/bookings/${bookingId}/cancel`, otp ? { otp } : {})
+      const response = await axiosInstance.patch(`/api/bookings/${bookingId}/cancel`, {})
       
       // Close OTP dialog if open
       setOtpDialogOpen(null)
