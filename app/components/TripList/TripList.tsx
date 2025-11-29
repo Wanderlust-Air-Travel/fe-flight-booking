@@ -157,9 +157,14 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
             if (response.status === 200 || response.status === 201) {
                 console.log('Cabin selection saved to backend:', response.data);
                 
-                // For guest users, save sessionId from response
-                if (!accessToken && response.data.sessionId) {
-                    sessionStorage.setItem('guest_session_id', response.data.sessionId);
+                // For guest users, save sessionId from response (CRITICAL for seat selection)
+                if (!accessToken) {
+                    if (response.data.sessionId) {
+                        sessionStorage.setItem('guest_session_id', response.data.sessionId);
+                        console.log('[TripList] Saved guest_session_id:', response.data.sessionId);
+                    } else {
+                        console.warn('[TripList] No sessionId in response for guest user');
+                    }
                 }
             } else {
                 throw new Error('Failed to save cabin selection');

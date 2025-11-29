@@ -263,10 +263,13 @@ const SeatMapPage = () => {
             // This ensures backend can fallback to guest session if JWT token is invalid/expired
             // Session ID should have been saved when cabin selection was made in TripList component
             const sessionId = sessionStorage.getItem('guest_session_id');
+            console.log('[SeatMap] Current sessionId from sessionStorage:', sessionId);
+            console.log('[SeatMap] accessToken exists:', !!accessToken);
             
             if (!accessToken) {
                 // For guest users, sessionId is REQUIRED
                 if (!sessionId) {
+                    console.error('[SeatMap] No sessionId found for guest user');
                     setSaveError('Session ID not found. Please select a cabin type first, then try again.');
                     setIsSaving(false);
                     // Redirect to search flights after showing error
@@ -278,11 +281,13 @@ const SeatMapPage = () => {
                 
                 // Add X-Session-Id header for guest users (REQUIRED by backend)
                 headers['X-Session-Id'] = sessionId;
+                console.log('[SeatMap] Sending X-Session-Id header for guest user:', sessionId);
             } else if (sessionId) {
                 // For authenticated users, also send X-Session-Id as fallback
                 // This handles cases where JWT token might be expired/invalid
                 // Backend will prioritize userId from JWT, but can fallback to sessionId if needed
                 headers['X-Session-Id'] = sessionId;
+                console.log('[SeatMap] Sending X-Session-Id header as fallback for authenticated user:', sessionId);
             }
 
             const axiosClient = accessToken ? axiosInstance : axiosPublic;
