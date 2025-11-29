@@ -24,7 +24,6 @@ const PaymentPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [pollingMessage, setPollingMessage] = useState<string | null>(null);
-  const [isCheckingBooking, setIsCheckingBooking] = useState(true);
 
   const pollPaymentStatus = useCallback(
     async (paymentId: string) => {
