@@ -3,7 +3,7 @@ import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { SeatGroup, SeatItem } from "@/types/seat-type";
-import axiosInstance from "@/lib/axios-instance";
+import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
@@ -134,15 +134,23 @@ const ChooseCabin = () => {
 
         hasFetchedRef.current = true;
 
-        // Bước 2: Gọi API Get Seat Map (KHÔNG CẦN truyền cabinType - backend tự lấy từ Redis)
-        // Nhưng nếu muốn explicit, có thể truyền cabinType
-        axiosInstance
+        // For authenticated users, use axiosInstance (with token)
+        // For guest users, use axiosPublic (without token)
+        // Backend will auto-fetch cabinType from booking state if authenticated
+        // For guest users, we can use cabinType from path or from data.type
+        const axiosClient = accessToken ? axiosInstance : axiosPublic;
+        const params: any = { flightInstanceId };
+        
+        // For guest users, use cabinType from path or from data.type
+        if (!accessToken && (cabinType || data.type)) {
+            params.cabinType = cabinType || data.type;
+        } else if (accessToken && cabinType) {
+            params.cabinType = cabinType;
+        }
+
+        axiosClient
             .get("/api/search/seats", {
-                params: {
-                    flightInstanceId,
-                    // cabinType is optional - backend will auto-fetch from Redis if not provided
-                    ...(cabinType && { cabinType })
-                },
+                params,
             })
             .then((res) => {
                 console.log('Seat map response:', res.data);
@@ -173,11 +181,6 @@ const ChooseCabin = () => {
 
     // Handle save seat selection and continue
     const handleContinue = useCallback(async () => {
-        if (!accessToken) {
-            setSaveError('Please login to continue');
-            return;
-        }
-
         // Get selected seat based on cabin type
         const selectedSeats = data.type === "business" ? chooseBusiness : chooseEconomy;
         
@@ -190,22 +193,46 @@ const ChooseCabin = () => {
         setSaveError(null);
 
         try {
-            // Save seat selection to booking state
-            const response = await axiosInstance.post(
+            // Always save to backend Redis (both authenticated and guest users)
+            const headers: Record<string, string> = {};
+            
+            // For guest users, get session ID from sessionStorage
+            if (!accessToken) {
+                const sessionId = sessionStorage.getItem('guest_session_id');
+                if (!sessionId) {
+                    setSaveError('Session ID not found. Please start over from cabin selection.');
+                    return;
+                }
+                headers['X-Session-Id'] = sessionId;
+            }
+
+            const axiosClient = accessToken ? axiosInstance : axiosPublic;
+            const response = await axiosClient.post(
                 '/api/booking-state/seat',
                 {
                     flightInstanceId,
                     flightSeatId: selectedSeatInfo.flightSeatId,
                     seatNumber: selectedSeatInfo.seatNumber,
+                },
+                {
+                    headers
                 }
             );
 
-            if (response.data.success) {
-                // Navigate to booking information page
-                router.push(`/booking/info?flightInstanceId=${flightInstanceId}`);
+            if (response.data.success || response.status === 200 || response.status === 201) {
+                console.log('Seat selection saved to backend:', response.data);
+                
+                // For guest users, update sessionId if returned
+                if (!accessToken && response.data.sessionId) {
+                    sessionStorage.setItem('guest_session_id', response.data.sessionId);
+                }
             } else {
-                setSaveError(response.data.message || 'Failed to save seat selection');
+                setSaveError(response.data?.message || 'Failed to save seat selection');
+                return;
             }
+
+            // Navigate to booking information page
+            router.push(`/booking/info?flightInstanceId=${flightInstanceId}`);
         } catch (error: any) {
             console.error('Error saving seat selection:', error);
             setSaveError(
@@ -216,7 +243,7 @@ const ChooseCabin = () => {
         } finally {
             setIsSaving(false);
         }
-    }, [data.type, chooseBusiness, chooseEconomy, selectedSeatInfo, flightInstanceId, router]);
+    }, [data.type, chooseBusiness, chooseEconomy, selectedSeatInfo, flightInstanceId, router, accessToken]);
 
 
 

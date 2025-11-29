@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import axiosInstance from "@/lib/axios-instance";
+import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import { Button } from "@/components/ui/button";
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -64,14 +64,21 @@ const BookingInfo = () => {
             setError(null);
 
             try {
-                // For guest bookings, don't include Authorization header
+                // For guest bookings, don't include Authorization header but include X-Session-Id
                 // For authenticated bookings, include Authorization header
                 const headers: Record<string, string> = {};
                 if (accessToken) {
                     headers['Authorization'] = `Bearer ${accessToken}`;
+                } else {
+                    // For guest users, get session ID from sessionStorage
+                    const sessionId = sessionStorage.getItem('guest_session_id');
+                    if (sessionId) {
+                        headers['X-Session-Id'] = sessionId;
+                    }
                 }
 
-                const response = await axiosInstance.post(
+                const axiosClient = accessToken ? axiosInstance : axiosPublic;
+                const response = await axiosClient.post(
                     "/api/reservations",
                     {
                         segments: [

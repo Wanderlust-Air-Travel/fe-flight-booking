@@ -7,15 +7,9 @@ const BACKEND_API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL |
 
 export async function POST(req: NextRequest) {
   try {
-    // Lấy access token từ header
+    // Lấy access token từ header (optional - for guest users)
     const authHeader = req.headers.get('authorization');
-    
-    if (!authHeader) {
-      return NextResponse.json(
-        { message: 'Authorization header is required' },
-        { status: 401 }
-      );
-    }
+    const sessionIdHeader = req.headers.get('x-session-id');
 
     // Lấy body từ request
     const body = await req.json();
@@ -29,13 +23,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Build headers for backend request
+    const backendHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Add Authorization header if present (for authenticated users)
+    if (authHeader) {
+      backendHeaders['Authorization'] = authHeader;
+    }
+    
+    // Add X-Session-Id header if present (for guest users)
+    if (sessionIdHeader) {
+      backendHeaders['X-Session-Id'] = sessionIdHeader;
+    }
+
     // Proxy request to backend
     const response = await fetch(`${BACKEND_API_URL}/api/v1/booking-state/cabin`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-      },
+      headers: backendHeaders,
       body: JSON.stringify({
         flightInstanceId,
         cabinType,

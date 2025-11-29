@@ -122,32 +122,51 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
             return;
         }
 
-        if (!accessToken) {
-            alert('Please login to continue.');
-            router.push('/signin');
-            return;
-        }
-
         setIsSaving(true);
 
         try {
-            // Use axiosInstance which automatically adds token and handles refresh
-            const response = await axiosInstance.post(
+            // Always save to backend Redis (both authenticated and guest users)
+            const headers: Record<string, string> = {};
+            
+            // For guest users, get or generate session ID
+            let sessionId: string | null = null;
+            if (!accessToken) {
+                // Check if we have a session ID from previous requests
+                sessionId = sessionStorage.getItem('guest_session_id');
+                if (!sessionId) {
+                    // Generate new session ID (will be returned from backend)
+                    // For now, we'll let backend generate it
+                } else {
+                    headers['X-Session-Id'] = sessionId;
+                }
+            }
+
+            const axiosClient = accessToken ? axiosInstance : axiosPublic;
+            const response = await axiosClient.post(
                 '/api/booking-state/cabin',
                 {
                     flightInstanceId: flightInstanceId,
                     cabinType: type,
                     fareClassCode: data.fareClassCode
+                },
+                {
+                    headers
                 }
             );
 
             if (response.status === 200 || response.status === 201) {
-                console.log('Cabin selection saved:', response.data);
-                // Navigate đến seat map page với query params (theo docs BE)
-                router.push(`/booking/seat-map?flightInstanceId=${flightInstanceId}`);
+                console.log('Cabin selection saved to backend:', response.data);
+                
+                // For guest users, save sessionId from response
+                if (!accessToken && response.data.sessionId) {
+                    sessionStorage.setItem('guest_session_id', response.data.sessionId);
+                }
             } else {
                 throw new Error('Failed to save cabin selection');
             }
+
+            // Navigate đến seat map page với query params
+            router.push(`/booking/seat-map?flightInstanceId=${flightInstanceId}`);
         } catch (err: any) {
             console.error('Error saving cabin selection:', err);
             const errorMessage = err.response?.data?.message || 

@@ -33,11 +33,16 @@ export async function POST(req: NextRequest) {
 
     // Proxy request to backend
     // Include Authorization header only if provided (for authenticated bookings)
+    // Include X-Session-Id header for guest users
+    const sessionIdHeader = req.headers.get('x-session-id');
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
     if (authHeader) {
       headers['Authorization'] = authHeader;
+    }
+    if (sessionIdHeader) {
+      headers['X-Session-Id'] = sessionIdHeader;
     }
     
     const response = await fetch(`${BACKEND_API_URL}/api/v1/reservations`, {
