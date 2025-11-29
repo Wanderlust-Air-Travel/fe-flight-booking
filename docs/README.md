@@ -2,6 +2,49 @@
 
 Tài liệu ngắn gọn cho Frontend developers.
 
+## Thay đổi quan trọng
+
+### Guest Booking Support (2025-11-28)
+
+**Tính năng mới**: Hệ thống hiện hỗ trợ guest bookings (đặt vé không cần đăng nhập)
+
+**Thay đổi:**
+- `POST /api/bookings` - Không còn yêu cầu bắt buộc đăng nhập
+- `POST /api/reservations` - Không còn yêu cầu bắt buộc đăng nhập
+- Contact information là **BẮT BUỘC** cho guest bookings
+- Contact information là **OPTIONAL** cho authenticated bookings (sẽ dùng user info nếu không có)
+- Guest bookings không thể dùng `passengerId` (phải cung cấp đầy đủ passenger info)
+
+**Files đã cập nhật:**
+- `app/api/bookings/route.ts` - Authorization header là optional
+- `app/api/reservations/route.ts` - Authorization header là optional
+- `app/(page)/booking/info/page.tsx` - Bỏ yêu cầu login, hỗ trợ guest booking
+
+**Cách dùng:**
+```tsx
+// Guest booking (không cần token)
+const response = await axiosPublic.post(
+  `/api/bookings?reservationId=${reservationId}`,
+  {
+    passengers: [{ fullname, dob, gender, documentNumber, passengerType }],
+    contactFullname: "...",  // REQUIRED for guest
+    contactEmail: "...",      // REQUIRED for guest
+    contactPhone: "...",      // REQUIRED for guest
+  }
+);
+
+// Authenticated booking (có token - contact info optional)
+const response = await axiosInstance.post(
+  `/api/bookings?reservationId=${reservationId}`,
+  {
+    passengers: [{ passengerId, passengerType }],  // Can reuse passenger
+    // contact info optional - will use user info
+  }
+);
+```
+
+---
+
 ## Thay đổi quan trọng (2025-11-25 đến 2025-11-26)
 
 ### 1. Booking Flow - URL Pattern (QUAN TRỌNG)
