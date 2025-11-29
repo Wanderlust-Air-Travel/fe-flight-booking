@@ -106,8 +106,8 @@ const MyJourneyPage = () => {
       <Breadcrumb />
       <div className="container py-[4rem]">
         <div className="mb-[3rem]">
-          <h1 className="text-3xl font-bold text-[var(--cl-pri)] mb-2">Hành trình của tôi</h1>
-          <p className="text-gray-600">Tổng số hành trình: {data.totalJourneys}</p>
+          <h1 className="text-6xl font-bold text-[var(--cl-pri)] mb-2">Hành trình của tôi</h1>
+          <p className="text-xl text-gray-600">Tổng số hành trình: {data.totalJourneys}</p>
         </div>
 
         <div className="grid gap-6">
@@ -154,7 +154,7 @@ const MyJourneyPage = () => {
 
                     <div className="flex items-center justify-center">
                       <div className="w-full h-px bg-gray-300 relative">
-                        <Plane className="w-5 h-5 text-[var(--cl-pri)] absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white" />
+                        <Plane className="w-6 h-6 text-[var(--cl-pri)] absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-white" />
                       </div>
                     </div>
 

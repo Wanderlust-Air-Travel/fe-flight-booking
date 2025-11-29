@@ -121,8 +121,39 @@ const MyTicketsPage = () => {
       <Breadcrumb />
       <div className="container py-[4rem]">
         <div className="mb-[3rem]">
-          <h1 className="text-3xl font-bold text-[var(--cl-pri)] mb-2">Vé của tôi</h1>
-          <p className="text-gray-600">Tổng số vé: {data.totalItems}</p>
+          <h1 className="text-6xl font-bold text-[var(--cl-pri)] mb-2">Vé của tôi</h1>
+          <p className="text-xl text-gray-600">Tổng số vé: {data.totalItems}</p>
+        </div>
+
+        {/* Cancellation Policy Section */}
+        <div className="mb-8 p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <h2 className="text-2xl font-bold text-[var(--cl-pri)] mb-5">Quy định hủy vé Bamboo Airways</h2>
+          <div className="space-y-4 text-base text-gray-700">
+            <div>
+              <p className="font-semibold text-lg mb-3">Thời gian hủy vé:</p>
+              <ul className="list-disc list-inside space-y-2 ml-2">
+                <li>
+                  <strong>Chặng bay nội địa:</strong> Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng.
+                </li>
+                <li>
+                  <strong>Chặng bay quốc tế:</strong> Thực hiện thủ tục hoàn vé trước giờ khởi hành ít nhất 05 tiếng.
+                </li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold text-lg mb-2">Hạng vé được phép hoàn:</p>
+              <p className="ml-2">Economy Smart, Economy Flex, Premium Smart, Premium Flex, Business Smart, Business Flex.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-lg mb-2">Hạng vé không được hoàn:</p>
+              <p className="ml-2">Economy Saver Max, Economy Saver (Bamboo Eco) - các hạng vé siêu tiết kiệm thông thường không được phép hoàn/hủy vé.</p>
+            </div>
+            <div className="mt-5 p-4 bg-blue-50 rounded border-l-4 border-blue-400">
+              <p className="text-blue-800 text-sm italic">
+                <strong>Lưu ý:</strong> Bạn luôn nên kiểm tra lại Điều kiện giá vé (Fare Rules) cụ thể của vé máy bay bạn đã mua để biết chính xác quy định áp dụng.
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-6">
@@ -157,14 +188,14 @@ const MyTicketsPage = () => {
                         <MapPin className="w-4 h-4 text-[var(--cl-pri)]" />
                         <span className="text-sm text-gray-600">Điểm đi</span>
                       </div>
-                      <p className="font-semibold">{ticket.originCity}</p>
+                      <p className="font-semibold text-lg">{ticket.originCity}</p>
                       <p className="text-sm text-gray-600">{ticket.originAirportName}</p>
                       <p className="text-sm text-gray-500">({ticket.originAirport})</p>
                     </div>
 
                     <div className="flex items-center justify-center">
                       <div className="w-full h-px bg-gray-300 relative">
-                        <Plane className="w-5 h-5 text-[var(--cl-pri)] absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white" />
+                        <Plane className="w-6 h-6 text-[var(--cl-pri)] absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-white" />
                       </div>
                     </div>
 
@@ -173,7 +204,7 @@ const MyTicketsPage = () => {
                         <MapPin className="w-4 h-4 text-[var(--cl-pri)]" />
                         <span className="text-sm text-gray-600">Điểm đến</span>
                       </div>
-                      <p className="font-semibold">{ticket.destinationCity}</p>
+                      <p className="font-semibold text-lg">{ticket.destinationCity}</p>
                       <p className="text-sm text-gray-600">{ticket.destinationAirportName}</p>
                       <p className="text-sm text-gray-500">({ticket.destinationAirport})</p>
                     </div>
@@ -203,43 +234,56 @@ const MyTicketsPage = () => {
 
                 {/* Right: Ticket Details */}
                 <div className="md:w-[20rem] border-l-0 md:border-l md:pl-6 pt-4 md:pt-0">
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Mã vé</p>
-                      <p className="font-mono font-semibold">{ticket.ticketNumber}</p>
+                  <div className="space-y-4">
+                    {/* Ticket Code */}
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Mã vé</p>
+                      <p className="font-mono font-bold text-base text-gray-900">{ticket.ticketNumber}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Hạng vé</p>
-                      <p className="font-semibold">{ticket.fareClassName}</p>
-                      <p className="text-xs text-gray-500">{ticket.cabinClass === 'economy' ? 'Phổ thông' : 'Thương gia'}</p>
+                    
+                    {/* Fare Class */}
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Hạng vé</p>
+                      <p className="font-semibold text-base text-gray-900">{ticket.fareClassName}</p>
+                      <p className="text-xs text-gray-500 mt-1">{ticket.cabinClass === 'economy' ? 'Phổ thông' : 'Thương gia'}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Tổng tiền</p>
+                    
+                    {/* Total Amount */}
+                    <div className="bg-[var(--cl-pri)]/5 p-4 rounded-lg border-2 border-[var(--cl-pri)]/20">
+                      <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Tổng tiền</p>
                       <p className="text-xl font-bold text-[var(--cl-pri)]">{FormatPrice(ticket.totalAmount)}</p>
                     </div>
+                    
                     {/* Cancellation Information */}
-                    <div className="pt-2 border-t">
+                    <div className="pt-4 border-t border-gray-200">
                       {ticket.canCancel ? (
                         <>
-                          <div className="flex items-center gap-2 text-green-600 mb-2">
-                            <CheckCircle className="w-4 h-4" />
-                            <p className="text-sm font-medium">Có thể hủy</p>
+                          <div className="flex items-center gap-2 text-green-700 mb-4 bg-green-50 px-4 py-3 rounded-lg">
+                            <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                            <p className="text-base font-semibold">Có thể hủy</p>
                           </div>
                           {ticket.cancellationDeadline && (
-                            <div className="mb-3">
-                              <p className="text-xs text-gray-600 mb-1">
-                                <strong>Hạn hủy:</strong> {convertToDMY(ticket.cancellationDeadline)} {convertToLocalTime(ticket.cancellationDeadline)}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {ticket.isDomestic 
-                                  ? "Chặng bay nội địa: Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng."
-                                  : "Chặng bay quốc tế: Thực hiện thủ tục hoàn vé trước giờ khởi hành ít nhất 05 tiếng."}
-                              </p>
+                            <div className="mb-4 space-y-3">
+                              <div className="bg-blue-50 px-4 py-3 rounded-lg border-l-4 border-blue-400">
+                                <p className="text-sm font-semibold text-gray-700 mb-2">
+                                  Hạn hủy:
+                                </p>
+                                <p className="text-base font-bold text-gray-900">
+                                  {convertToDMY(ticket.cancellationDeadline)} {convertToLocalTime(ticket.cancellationDeadline)}
+                                </p>
+                              </div>
+                              <div className="bg-gray-50 px-4 py-3 rounded-lg">
+                                <p className="text-sm text-gray-700 leading-relaxed">
+                                  {ticket.isDomestic 
+                                    ? "Chặng bay nội địa: Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng."
+                                    : "Chặng bay quốc tế: Thực hiện thủ tục hoàn vé trước giờ khởi hành ít nhất 05 tiếng."}
+                                </p>
+                              </div>
                             </div>
                           )}
                           <Button
                             variant="destructive"
-                            size="sm"
+                            size="default"
                             onClick={() => handleCancelBooking(ticket.bookingId)}
                             disabled={cancellingId === ticket.bookingId}
                             className="w-full"
@@ -248,7 +292,7 @@ const MyTicketsPage = () => {
                               "Đang hủy..."
                             ) : (
                               <>
-                                <X className="w-4 h-4 mr-2" />
+                                <X className="w-5 h-5 mr-2" />
                                 Hủy đặt chỗ
                               </>
                             )}
@@ -256,37 +300,17 @@ const MyTicketsPage = () => {
                         </>
                       ) : (
                         <>
-                          <div className="flex items-center gap-2 text-red-600 mb-2">
-                            <XCircle className="w-4 h-4" />
-                            <p className="text-sm font-medium">Không thể hủy</p>
+                          <div className="flex items-center gap-2 text-red-700 mb-4 bg-red-50 px-4 py-3 rounded-lg">
+                            <XCircle className="w-5 h-5 flex-shrink-0" />
+                            <p className="text-base font-semibold">Không thể hủy</p>
                           </div>
                           {ticket.cannotCancelReason && (
-                            <p className="text-xs text-gray-600 mb-2">{ticket.cannotCancelReason}</p>
+                            <div className="bg-gray-50 px-4 py-3 rounded-lg border-l-4 border-red-400">
+                              <p className="text-sm text-gray-700 leading-relaxed">{ticket.cannotCancelReason}</p>
+                            </div>
                           )}
                         </>
                       )}
-                      
-                      {/* Cancellation Terms */}
-                      <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
-                        <p className="font-semibold mb-1">Quy định hủy vé Bamboo Airways:</p>
-                        <ul className="list-disc list-inside space-y-1">
-                          <li>
-                            <strong>Chặng bay nội địa:</strong> Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng.
-                          </li>
-                          <li>
-                            <strong>Chặng bay quốc tế:</strong> Thực hiện thủ tục hoàn vé trước giờ khởi hành ít nhất 05 tiếng.
-                          </li>
-                          <li>
-                            <strong>Hạng vé được phép hoàn:</strong> Economy Smart, Economy Flex, Premium Smart, Premium Flex, Business Smart, Business Flex.
-                          </li>
-                          <li>
-                            <strong>Hạng vé không được hoàn:</strong> Economy Saver Max, Economy Saver (Bamboo Eco) - các hạng vé siêu tiết kiệm thông thường không được phép hoàn/hủy vé.
-                          </li>
-                        </ul>
-                        <p className="mt-2 text-gray-500 italic">
-                          Lưu ý: Bạn luôn nên kiểm tra lại Điều kiện giá vé (Fare Rules) cụ thể của vé máy bay bạn đã mua để biết chính xác quy định áp dụng.
-                        </p>
-                      </div>
                     </div>
                   </div>
                 </div>
