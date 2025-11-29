@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 import AOSWrapper from "./components/Aos/AOSWrapper";
+import { Toaster } from "@/components/ui/sonner";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -31,7 +32,8 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
-        <AOSWrapper /> 
+        <AOSWrapper />
+        <Toaster /> 
       </body>
     </html>
   );

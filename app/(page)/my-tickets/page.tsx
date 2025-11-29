@@ -24,15 +24,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
 import type { MyTicketsResponse } from "@/types/my-tickets-type"
+import useUserStore from "@/app/zustand/storeUser"
 
 const MyTicketsPage = () => {
+  const { user } = useUserStore()
   const [data, setData] = useState<MyTicketsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [cancellingId, setCancellingId] = useState<string | null>(null)
   const [cancellationDialogOpen, setCancellationDialogOpen] = useState<string | null>(null)
+  const [otpDialogOpen, setOtpDialogOpen] = useState<string | null>(null)
+  const [otpValue, setOtpValue] = useState<string>("")
+  const [sendingOtp, setSendingOtp] = useState(false)
+  const [verifyingOtp, setVerifyingOtp] = useState(false)
+  const [otpSent, setOtpSent] = useState<string | null>(null)
   const pageSize = 10
 
   const fetchTickets = async (page: number) => {
@@ -58,20 +68,115 @@ const MyTicketsPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  const handleCancelBooking = async (bookingId: string) => {
+  const handleCancelBooking = async (bookingId: string, bookingStatus?: string) => {
     if (!confirm("Bạn có chắc chắn muốn hủy đặt chỗ này không? Hành động này không thể hoàn tác.")) {
       return
     }
 
+    // If booking is paid, require OTP
+    if (bookingStatus === 'paid') {
+      setOtpDialogOpen(bookingId)
+      setOtpValue("")
+      setOtpSent(null)
+      return
+    }
+
+    // For pending/confirmed bookings, proceed directly
+    await performCancellation(bookingId)
+  }
+
+  const handleSendOtp = async (bookingId: string) => {
+    try {
+      setSendingOtp(true)
+      // Get user ID from user store or API
+      let userId = user?.id
+      if (!userId) {
+        const userResponse = await axiosInstance.get('/api/auth/me')
+        userId = userResponse.data.userId || userResponse.data.id
+      }
+
+      if (!userId) {
+        toast.error("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
+        return
+      }
+
+      await axiosInstance.post('/api/auth/otp/cancellation/send', {
+        userId,
+        bookingId,
+      })
+
+      setOtpSent(bookingId)
+      toast.success('Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra email.')
+    } catch (err: any) {
+      console.error("Error sending OTP:", err)
+      toast.error(err.response?.data?.message || "Không thể gửi mã OTP. Vui lòng thử lại sau.")
+    } finally {
+      setSendingOtp(false)
+    }
+  }
+
+  const handleVerifyOtpAndCancel = async (bookingId: string) => {
+    if (!otpValue || otpValue.length !== 6) {
+      toast.error("Vui lòng nhập đầy đủ 6 chữ số OTP")
+      return
+    }
+
+    try {
+      setVerifyingOtp(true)
+      // Get user ID from user store or API
+      let userId = user?.id
+      if (!userId) {
+        const userResponse = await axiosInstance.get('/api/auth/me')
+        userId = userResponse.data.userId || userResponse.data.id
+      }
+
+      if (!userId) {
+        toast.error("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
+        return
+      }
+
+      // Verify OTP
+      await axiosInstance.post('/api/auth/otp/cancellation/verify', {
+        userId,
+        bookingId,
+        otp: otpValue,
+      })
+
+      // If OTP is valid, proceed with cancellation
+      await performCancellation(bookingId, otpValue)
+    } catch (err: any) {
+      console.error("Error verifying OTP:", err)
+      toast.error(err.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.")
+    } finally {
+      setVerifyingOtp(false)
+    }
+  }
+
+  const performCancellation = async (bookingId: string, otp?: string) => {
     try {
       setCancellingId(bookingId)
-      await axiosInstance.patch(`/api/bookings/${bookingId}/cancel`)
-      alert("Hủy đặt chỗ thành công!")
+      const response = await axiosInstance.patch(`/api/bookings/${bookingId}/cancel`, otp ? { otp } : {})
+      
+      // Close OTP dialog if open
+      setOtpDialogOpen(null)
+      setOtpValue("")
+      setOtpSent(null)
+
+      // Show success toast with refund information
+      if (response.data.refundAmount) {
+        toast.success(
+          `Hủy đặt chỗ thành công! Số tiền hoàn lại: ${response.data.refundAmount.toLocaleString('vi-VN')} VND. Số tiền sẽ được chuyển về tài khoản của bạn trong vòng 5-7 ngày làm việc.`,
+          { duration: 6000 }
+        )
+      } else {
+        toast.success("Hủy đặt chỗ thành công!")
+      }
+
       // Refresh the tickets list
       await fetchTickets(currentPage)
     } catch (err: any) {
       console.error("Error cancelling booking:", err)
-      alert(err.response?.data?.message || "Không thể hủy đặt chỗ. Vui lòng thử lại sau.")
+      toast.error(err.response?.data?.message || "Không thể hủy đặt chỗ. Vui lòng thử lại sau.")
     } finally {
       setCancellingId(null)
     }
@@ -311,7 +416,7 @@ const MyTicketsPage = () => {
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => handleCancelBooking(ticket.bookingId)}
+                            onClick={() => handleCancelBooking(ticket.bookingId, ticket.bookingStatus)}
                             disabled={cancellingId === ticket.bookingId}
                             className="w-full"
                           >
@@ -324,6 +429,81 @@ const MyTicketsPage = () => {
                               </>
                             )}
                           </Button>
+                          
+                          {/* OTP Dialog for paid bookings */}
+                          <Dialog open={otpDialogOpen === ticket.bookingId} onOpenChange={(open) => {
+                            if (!open) {
+                              setOtpDialogOpen(null)
+                              setOtpValue("")
+                              setOtpSent(null)
+                            } else {
+                              setOtpDialogOpen(ticket.bookingId)
+                            }
+                          }}>
+                            <DialogContent className="max-w-md">
+                              <DialogHeader>
+                                <DialogTitle>Xác thực hủy vé</DialogTitle>
+                                <DialogDescription>
+                                  Để hủy vé đã thanh toán, vui lòng nhập mã OTP đã được gửi đến email của bạn.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4 mt-4">
+                                {!otpSent ? (
+                                  <>
+                                    <p className="text-sm text-gray-600">
+                                      Chúng tôi sẽ gửi mã OTP đến email đăng ký của bạn để xác thực việc hủy vé.
+                                    </p>
+                                    <Button
+                                      onClick={() => handleSendOtp(ticket.bookingId)}
+                                      disabled={sendingOtp}
+                                      className="w-full"
+                                    >
+                                      {sendingOtp ? "Đang gửi..." : "Gửi mã OTP"}
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="space-y-2">
+                                      <Label htmlFor="otp">Nhập mã OTP (6 chữ số)</Label>
+                                      <Input
+                                        id="otp"
+                                        type="text"
+                                        maxLength={6}
+                                        value={otpValue}
+                                        onChange={(e) => {
+                                          const value = e.target.value.replace(/\D/g, '')
+                                          if (value.length <= 6) {
+                                            setOtpValue(value)
+                                          }
+                                        }}
+                                        placeholder="000000"
+                                        className="text-center text-2xl tracking-widest font-mono"
+                                      />
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                          setOtpSent(null)
+                                          setOtpValue("")
+                                        }}
+                                        className="flex-1"
+                                      >
+                                        Gửi lại OTP
+                                      </Button>
+                                      <Button
+                                        onClick={() => handleVerifyOtpAndCancel(ticket.bookingId)}
+                                        disabled={verifyingOtp || otpValue.length !== 6}
+                                        className="flex-1"
+                                      >
+                                        {verifyingOtp ? "Đang xác thực..." : "Xác nhận hủy vé"}
+                                      </Button>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
                         </>
                       ) : (
                         <>

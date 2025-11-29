@@ -3,18 +3,14 @@ import axiosInstance from "@/lib/axios-instance";
 
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-export async function PATCH(
-  req: NextRequest,
-  context: { params: Promise<{ bookingId: string }> | { bookingId?: string } }
-) {
+export async function POST(req: NextRequest) {
   try {
-    // Handle both Next.js 13-14 (sync params) and Next.js 15+ (async params)
-    const resolvedParams = await Promise.resolve(context.params);
-    const bookingId = resolvedParams?.bookingId;
+    const body = await req.json();
+    const { userId, bookingId } = body;
 
-    if (!bookingId) {
+    if (!userId || !bookingId) {
       return NextResponse.json(
-        { message: "Booking ID is required" },
+        { message: "userId and bookingId are required" },
         { status: 400 }
       );
     }
@@ -28,19 +24,16 @@ export async function PATCH(
       );
     }
 
-    // Get request body (may contain OTP for paid bookings)
-    const body = await req.json().catch(() => ({}));
-
     // Call backend API
     const response = await fetch(
-      `${BACKEND_API_URL}/api/v1/bookings/${encodeURIComponent(bookingId)}/cancel`,
+      `${BACKEND_API_URL}/api/v1/auth/otp/cancellation/send`,
       {
-        method: "PATCH",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: authHeader,
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ userId, bookingId }),
       }
     );
 
@@ -48,14 +41,14 @@ export async function PATCH(
 
     if (!response.ok) {
       return NextResponse.json(
-        { message: data.message || "Failed to cancel booking" },
+        { message: data.message || "Failed to send OTP" },
         { status: response.status }
       );
     }
 
     return NextResponse.json(data, { status: 200 });
   } catch (error: any) {
-    console.error("Cancel booking error:", error);
+    console.error("Send cancellation OTP error:", error);
     return NextResponse.json(
       { message: error.message || "Internal server error" },
       { status: 500 }
