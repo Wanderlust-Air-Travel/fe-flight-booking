@@ -289,10 +289,17 @@ const MyTicketsPage = () => {
                         ? 'bg-green-100 text-green-800' 
                         : ticket.bookingStatus === 'pending'
                         ? 'bg-yellow-100 text-yellow-800'
+                        : ticket.bookingStatus === 'paid'
+                        ? 'bg-blue-100 text-blue-800'
+                        : ticket.bookingStatus === 'cancelled'
+                        ? 'bg-gray-100 text-gray-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
                       {ticket.bookingStatus === 'confirmed' ? 'Đã xác nhận' : 
-                       ticket.bookingStatus === 'pending' ? 'Đang chờ' : ticket.bookingStatus}
+                       ticket.bookingStatus === 'pending' ? 'Đang chờ' : 
+                       ticket.bookingStatus === 'paid' ? 'Đã thanh toán' :
+                       ticket.bookingStatus === 'cancelled' ? 'Đã hủy' : 
+                       ticket.bookingStatus}
                     </div>
                   </div>
 
@@ -370,7 +377,16 @@ const MyTicketsPage = () => {
                     
                     {/* Cancellation Information */}
                     <div className="pt-3 border-t border-gray-200">
-                      {ticket.canCancel ? (
+                      {ticket.bookingStatus === 'cancelled' ? (
+                        <>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <XCircle className="w-4 h-4 flex-shrink-0" />
+                              <p className="text-sm font-semibold">Đã hủy</p>
+                            </div>
+                          </div>
+                        </>
+                      ) : ticket.canCancel ? (
                         <>
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2 text-green-700">
