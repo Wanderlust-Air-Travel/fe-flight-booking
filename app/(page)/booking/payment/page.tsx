@@ -24,6 +24,12 @@ const PaymentPage = () => {
 
   const pollPaymentStatus = useCallback(
     async (paymentId: string) => {
+      if (!paymentId) {
+        setStatus("failed");
+        setError("Payment ID is missing. Please try again or contact support.");
+        return;
+      }
+
       // Poll tối đa ~2 phút (40 lần, mỗi lần cách nhau 3s)
       const maxAttempts = 40;
       const delayMs = 3000;
@@ -32,6 +38,12 @@ const PaymentPage = () => {
         try {
           const res = await axiosInstance.get(`/api/payments/${paymentId}`);
           const payment = res.data;
+
+          if (!payment) {
+            setStatus("failed");
+            setError("Could not retrieve payment information. Please try again.");
+            return;
+          }
 
           if (payment?.status === "success") {
             setStatus("success");
@@ -112,15 +124,24 @@ const PaymentPage = () => {
 
       if (!payment?.paymentId) {
         setStatus("failed");
-        setError("Payment response is invalid. Please try again.");
+        setError(
+          "Payment was created but we couldn't get the payment ID. Please contact support with your booking ID: " +
+            bookingId
+        );
         return;
       }
 
       setPaymentId(payment.paymentId);
-      // Mở trang thanh toán MoMo (mock/sandbox) trong tab mới để user thao tác
+      
+      // Mở trang thanh toán dev simulator trong tab mới để user thao tác
       if (payment.paymentUrl) {
         window.open(payment.paymentUrl, "_blank");
+      } else {
+        // Fallback: Redirect to dev payment simulator if paymentUrl is not provided
+        const devPaymentUrl = `/payments/dev?paymentId=${payment.paymentId}&bookingId=${bookingId}`;
+        window.open(devPaymentUrl, "_blank");
       }
+      
       // Không tin status ngay lập tức nữa → luôn kiểm tra trong DB qua GET /api/payments/:id
       setPollingMessage("Waiting for payment confirmation from gateway...");
       await pollPaymentStatus(payment.paymentId);

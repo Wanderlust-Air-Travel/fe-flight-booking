@@ -8,14 +8,27 @@ const BACKEND_API_URL =
 
 export async function GET(
   req: NextRequest,
-  context: { params: { paymentId?: string } }
+  context: { params: Promise<{ paymentId?: string }> | { paymentId?: string } }
 ) {
   try {
-    const { paymentId } = context.params || {};
+    // Handle both Next.js 13-14 (sync params) and Next.js 15+ (async params)
+    const params = await Promise.resolve(context.params);
+    let paymentId = params?.paymentId;
+
+    // Fallback: Extract from URL path if params is not available
+    if (!paymentId) {
+      const url = new URL(req.url);
+      const pathParts = url.pathname.split("/");
+      const paymentsIndex = pathParts.findIndex((part) => part === "payments");
+      paymentId = paymentsIndex !== -1 ? pathParts[paymentsIndex + 1] : undefined;
+    }
 
     if (!paymentId) {
       return NextResponse.json(
-        { message: "paymentId path parameter is required" },
+        { 
+          message: "Payment ID is required. Please ensure you have a valid payment ID.",
+          error: "MISSING_PAYMENT_ID"
+        },
         { status: 400 }
       );
     }
