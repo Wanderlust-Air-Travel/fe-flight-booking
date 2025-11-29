@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axios-instance";
+import { axiosPublic } from "@/lib/axios-instance";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import { Button } from "@/components/ui/button";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
+import useUserStore from "@/app/zustand/storeUser";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 
 type PaymentStatus = "idle" | "processing" | "success" | "failed";
@@ -14,6 +16,7 @@ type PaymentStatus = "idle" | "processing" | "success" | "failed";
 const PaymentPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { accessToken } = useUserStore();
 
   const bookingId = searchParams.get("bookingId");
   const { data: ticketData } = useInfoTicket();
@@ -21,6 +24,7 @@ const PaymentPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [pollingMessage, setPollingMessage] = useState<string | null>(null);
+  const [isCheckingBooking, setIsCheckingBooking] = useState(true);
 
   const pollPaymentStatus = useCallback(
     async (paymentId: string) => {
@@ -147,11 +151,32 @@ const PaymentPage = () => {
       await pollPaymentStatus(payment.paymentId);
     } catch (err: any) {
       console.error("Error processing payment:", err);
-      setStatus("failed");
-
+      
       // Ưu tiên sử dụng message business từ BE (400), fallback sang lỗi hệ thống (5xx / network)
       const status = err?.response?.status as number | undefined;
       const serverMessage = err?.response?.data?.message as string | undefined;
+
+      // Check if booking is already paid - redirect to confirmation instead of showing error
+      if (
+        serverMessage &&
+        (serverMessage.toLowerCase().includes("already paid") ||
+          serverMessage.toLowerCase().includes("booking is already paid"))
+      ) {
+        // Booking is already paid - redirect to confirmation page
+        setStatus("success");
+        setError(null);
+        setPollingMessage("This booking has already been paid. Redirecting to confirmation...");
+        
+        // Try to get paymentId from existing payments
+        // Note: This API requires authentication, so we'll just redirect with bookingId
+        // The confirmation page can fetch payment details if needed
+        setTimeout(() => {
+          router.push(`/booking/confirmation?bookingId=${bookingId}`);
+        }, 1500);
+        return;
+      }
+
+      setStatus("failed");
 
       if (status && status >= 500) {
         setError(
