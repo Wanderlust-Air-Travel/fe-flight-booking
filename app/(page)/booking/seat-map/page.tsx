@@ -259,13 +259,13 @@ const SeatMapPage = () => {
             // Always save to backend Redis (both authenticated and guest users)
             const headers: Record<string, string> = {};
             
-            // For guest users, get session ID from sessionStorage
+            // BEST PRACTICE: Always send X-Session-Id if available, regardless of accessToken
+            // This ensures backend can fallback to guest session if JWT token is invalid/expired
             // Session ID should have been saved when cabin selection was made in TripList component
+            const sessionId = sessionStorage.getItem('guest_session_id');
+            
             if (!accessToken) {
-                const sessionId = sessionStorage.getItem('guest_session_id');
-                
-                // If no sessionId, this means user hasn't selected cabin yet or sessionStorage was cleared
-                // Guest users MUST select cabin first to get sessionId
+                // For guest users, sessionId is REQUIRED
                 if (!sessionId) {
                     setSaveError('Session ID not found. Please select a cabin type first, then try again.');
                     setIsSaving(false);
@@ -277,6 +277,11 @@ const SeatMapPage = () => {
                 }
                 
                 // Add X-Session-Id header for guest users (REQUIRED by backend)
+                headers['X-Session-Id'] = sessionId;
+            } else if (sessionId) {
+                // For authenticated users, also send X-Session-Id as fallback
+                // This handles cases where JWT token might be expired/invalid
+                // Backend will prioritize userId from JWT, but can fallback to sessionId if needed
                 headers['X-Session-Id'] = sessionId;
             }
 
@@ -446,7 +451,14 @@ const SeatMapPage = () => {
                                     {/* Continue Button */}
                                     <div className="flex flex-col gap-y-[1rem]">
                                         {saveError && (
-                                            <p className="text-sm text-red-500">{saveError}</p>
+                                            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                                <p className="text-sm text-red-600 font-medium">{saveError}</p>
+                                                {!accessToken && !sessionStorage.getItem('guest_session_id') && (
+                                                    <p className="text-xs text-red-500 mt-1">
+                                                        Vui lòng chọn hạng vé (cabin) trước khi chọn ghế ngồi.
+                                                    </p>
+                                                )}
+                                            </div>
                                         )}
                                         <Button
                                             onClick={handleContinue}
