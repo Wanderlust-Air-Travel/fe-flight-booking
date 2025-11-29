@@ -13,8 +13,9 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from "@/components/ui/pagination"
-import { Plane, Calendar, MapPin, User, Ticket as TicketIcon, XCircle, CheckCircle } from "lucide-react"
+import { Plane, Calendar, MapPin, User, Ticket as TicketIcon, XCircle, CheckCircle, X } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import type { MyTicketsResponse } from "@/types/my-tickets-type"
 
 const MyTicketsPage = () => {
@@ -22,6 +23,7 @@ const MyTicketsPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const [cancellingId, setCancellingId] = useState<string | null>(null)
   const pageSize = 10
 
   const fetchTickets = async (page: number) => {
@@ -45,6 +47,25 @@ const MyTicketsPage = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
     window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!confirm("Bạn có chắc chắn muốn hủy đặt chỗ này không? Hành động này không thể hoàn tác.")) {
+      return
+    }
+
+    try {
+      setCancellingId(bookingId)
+      await axiosInstance.patch(`/api/bookings/${bookingId}/cancel`)
+      alert("Hủy đặt chỗ thành công!")
+      // Refresh the tickets list
+      await fetchTickets(currentPage)
+    } catch (err: any) {
+      console.error("Error cancelling booking:", err)
+      alert(err.response?.data?.message || "Không thể hủy đặt chỗ. Vui lòng thử lại sau.")
+    } finally {
+      setCancellingId(null)
+    }
   }
 
   if (loading && !data) {
@@ -196,29 +217,77 @@ const MyTicketsPage = () => {
                       <p className="text-sm text-gray-600 mb-1">Tổng tiền</p>
                       <p className="text-xl font-bold text-[var(--cl-pri)]">{FormatPrice(ticket.totalAmount)}</p>
                     </div>
-                    {ticket.canCancel ? (
-                      <div className="pt-2 border-t">
-                        <div className="flex items-center gap-2 text-green-600 mb-1">
-                          <CheckCircle className="w-4 h-4" />
-                          <p className="text-sm font-medium">Có thể hủy</p>
-                        </div>
-                        {ticket.cancellationDeadline && (
-                          <p className="text-xs text-gray-500">
-                            Hạn hủy: {convertToDMY(ticket.cancellationDeadline)} {convertToLocalTime(ticket.cancellationDeadline)}
-                          </p>
-                        )}
+                    {/* Cancellation Information */}
+                    <div className="pt-2 border-t">
+                      {ticket.canCancel ? (
+                        <>
+                          <div className="flex items-center gap-2 text-green-600 mb-2">
+                            <CheckCircle className="w-4 h-4" />
+                            <p className="text-sm font-medium">Có thể hủy</p>
+                          </div>
+                          {ticket.cancellationDeadline && (
+                            <div className="mb-3">
+                              <p className="text-xs text-gray-600 mb-1">
+                                <strong>Hạn hủy:</strong> {convertToDMY(ticket.cancellationDeadline)} {convertToLocalTime(ticket.cancellationDeadline)}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {ticket.isDomestic 
+                                  ? "Chặng bay nội địa: Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng."
+                                  : "Chặng bay quốc tế: Thực hiện thủ tục hoàn vé trước giờ khởi hành ít nhất 05 tiếng."}
+                              </p>
+                            </div>
+                          )}
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleCancelBooking(ticket.bookingId)}
+                            disabled={cancellingId === ticket.bookingId}
+                            className="w-full"
+                          >
+                            {cancellingId === ticket.bookingId ? (
+                              "Đang hủy..."
+                            ) : (
+                              <>
+                                <X className="w-4 h-4 mr-2" />
+                                Hủy đặt chỗ
+                              </>
+                            )}
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2 text-red-600 mb-2">
+                            <XCircle className="w-4 h-4" />
+                            <p className="text-sm font-medium">Không thể hủy</p>
+                          </div>
+                          {ticket.cannotCancelReason && (
+                            <p className="text-xs text-gray-600 mb-2">{ticket.cannotCancelReason}</p>
+                          )}
+                        </>
+                      )}
+                      
+                      {/* Cancellation Terms */}
+                      <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                        <p className="font-semibold mb-1">Quy định hủy vé Bamboo Airways:</p>
+                        <ul className="list-disc list-inside space-y-1">
+                          <li>
+                            <strong>Chặng bay nội địa:</strong> Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng.
+                          </li>
+                          <li>
+                            <strong>Chặng bay quốc tế:</strong> Thực hiện thủ tục hoàn vé trước giờ khởi hành ít nhất 05 tiếng.
+                          </li>
+                          <li>
+                            <strong>Hạng vé được phép hoàn:</strong> Economy Smart, Economy Flex, Premium Smart, Premium Flex, Business Smart, Business Flex.
+                          </li>
+                          <li>
+                            <strong>Hạng vé không được hoàn:</strong> Economy Saver Max, Economy Saver (Bamboo Eco) - các hạng vé siêu tiết kiệm thông thường không được phép hoàn/hủy vé.
+                          </li>
+                        </ul>
+                        <p className="mt-2 text-gray-500 italic">
+                          Lưu ý: Bạn luôn nên kiểm tra lại Điều kiện giá vé (Fare Rules) cụ thể của vé máy bay bạn đã mua để biết chính xác quy định áp dụng.
+                        </p>
                       </div>
-                    ) : (
-                      <div className="pt-2 border-t">
-                        <div className="flex items-center gap-2 text-red-600 mb-1">
-                          <XCircle className="w-4 h-4" />
-                          <p className="text-sm font-medium">Không thể hủy</p>
-                        </div>
-                        {ticket.cannotCancelReason && (
-                          <p className="text-xs text-gray-500">{ticket.cannotCancelReason}</p>
-                        )}
-                      </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               </div>

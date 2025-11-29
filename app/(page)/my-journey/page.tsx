@@ -4,14 +4,16 @@ import { useEffect, useState } from "react"
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb"
 import axiosInstance from "@/lib/axios-instance"
 import { convertToDMY, convertToLocalTime } from "@/app/components/FormatDate/FormatDate"
-import { Plane, Calendar, MapPin, Users, Ticket as TicketIcon, XCircle } from "lucide-react"
+import { Plane, Calendar, MapPin, Users, Ticket as TicketIcon, XCircle, X } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import type { MyJourneyResponse } from "@/types/my-journey-type"
 
 const MyJourneyPage = () => {
   const [data, setData] = useState<MyJourneyResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [cancellingId, setCancellingId] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchJourneys = async () => {
@@ -30,6 +32,26 @@ const MyJourneyPage = () => {
 
     fetchJourneys()
   }, [])
+
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!confirm("Bạn có chắc chắn muốn hủy đặt chỗ này không? Hành động này không thể hoàn tác.")) {
+      return
+    }
+
+    try {
+      setCancellingId(bookingId)
+      await axiosInstance.patch(`/api/bookings/${bookingId}/cancel`)
+      alert("Hủy đặt chỗ thành công!")
+      // Refresh the journeys list
+      const response = await axiosInstance.get("/api/bookings/my-journey")
+      setData(response.data)
+    } catch (err: any) {
+      console.error("Error cancelling booking:", err)
+      alert(err.response?.data?.message || "Không thể hủy đặt chỗ. Vui lòng thử lại sau.")
+    } finally {
+      setCancellingId(null)
+    }
+  }
 
   if (loading) {
     return (
@@ -179,6 +201,33 @@ const MyJourneyPage = () => {
                       <p className="font-semibold">{convertToDMY(journey.bookingDate)}</p>
                     </div>
                   </div>
+                </div>
+
+                {/* Right: Actions */}
+                <div className="md:w-[15rem] border-t md:border-t-0 md:border-l md:pl-6 pt-4 md:pt-0">
+                  {(journey.status === 'confirmed' || journey.status === 'pending') && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleCancelBooking(journey.journeyId)}
+                      disabled={cancellingId === journey.journeyId}
+                      className="w-full"
+                    >
+                      {cancellingId === journey.journeyId ? (
+                        "Đang hủy..."
+                      ) : (
+                        <>
+                          <X className="w-4 h-4 mr-2" />
+                          Hủy đặt chỗ
+                        </>
+                      )}
+                    </Button>
+                  )}
+                  {journey.status === 'cancelled' && (
+                    <div className="text-center">
+                      <p className="text-sm text-red-600 font-medium">Đã hủy</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
