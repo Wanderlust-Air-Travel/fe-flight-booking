@@ -165,8 +165,8 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                 throw new Error('Failed to save cabin selection');
             }
 
-            // Navigate đến seat map page với query params
-            router.push(`/booking/seat-map?flightInstanceId=${flightInstanceId}`);
+            // Navigate đến seat map page với query params (include cabinType for reliability)
+            router.push(`/booking/seat-map?flightInstanceId=${flightInstanceId}&cabinType=${type}`);
         } catch (err: any) {
             console.error('Error saving cabin selection:', err);
             const errorMessage = err.response?.data?.message || 

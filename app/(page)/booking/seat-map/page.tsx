@@ -29,11 +29,12 @@ const SeatMapPage = () => {
     const router = useRouter();
     const hasFetchedRef = useRef<boolean>(false);
 
-    const { data } = useInfoTicket();
+    const { data, isHydrated } = useInfoTicket();
     const { accessToken } = useUserStore();
 
-    // Lấy flightInstanceId từ query params (theo docs BE)
+    // Lấy flightInstanceId và cabinType từ query params (theo docs BE)
     const flightInstanceId = searchParams.get('flightInstanceId');
+    const cabinTypeFromUrl = searchParams.get('cabinType');
 
     // Redirect nếu không có flightInstanceId
     useEffect(() => {
@@ -120,7 +121,7 @@ const SeatMapPage = () => {
         }));
     }, [seatEconomy]);
 
-    // Bước 2: Gọi API Get Seat Map (KHÔNG CẦN truyền cabinType - backend tự lấy từ Redis)
+    // Bước 2: Gọi API Get Seat Map
     useEffect(() => {
         // Prevent multiple fetches - only fetch once on mount
         if (hasFetchedRef.current) {
@@ -131,28 +132,70 @@ const SeatMapPage = () => {
             return;
         }
 
-        hasFetchedRef.current = true;
-        setLoading(true);
-        setError(null);
+        const fetchSeatMap = async () => {
+            hasFetchedRef.current = true;
+            setLoading(true);
+            setError(null);
 
-        // For authenticated users, use axiosInstance (with token)
-        // For guest users, use axiosPublic (without token)
-        // Backend will auto-fetch cabinType from booking state if authenticated
-        // For guest users, we need to pass cabinType explicitly or get from booking state
-        const axiosClient = accessToken ? axiosInstance : axiosPublic;
-        const params: any = { flightInstanceId };
-        
-        // For guest users, we can get cabinType from booking state API
-        // But for simplicity, we'll get it from the info ticket store (which has the cabin type)
-        if (!accessToken && data.type) {
-            params.cabinType = data.type;
-        }
+            const axiosClient = accessToken ? axiosInstance : axiosPublic;
+            const params: any = { flightInstanceId };
+            
+            // Priority 1: Get cabinType from URL query params
+            if (cabinTypeFromUrl) {
+                params.cabinType = cabinTypeFromUrl;
+            }
+            // Priority 2: Get cabinType from Zustand store (info ticket) - wait for hydration
+            else if (isHydrated && data.type) {
+                params.cabinType = data.type;
+            }
+            // Priority 3: For authenticated users, try to get from booking state API
+            else if (accessToken) {
+                try {
+                    const bookingStateResponse = await axiosInstance.get(
+                        `/api/booking-state/${flightInstanceId}`
+                    );
+                    if (bookingStateResponse.data?.cabin?.cabinType) {
+                        params.cabinType = bookingStateResponse.data.cabin.cabinType;
+                    }
+                } catch (bookingStateError) {
+                    console.warn('Could not get cabinType from booking state:', bookingStateError);
+                    // Continue without cabinType - backend will try to get from booking state
+                }
+            }
+            // Priority 4: For guest users, try to get from booking state API with session ID
+            else {
+                const sessionId = sessionStorage.getItem('guest_session_id');
+                if (sessionId) {
+                    try {
+                        const headers: Record<string, string> = {
+                            'X-Session-Id': sessionId
+                        };
+                        const bookingStateResponse = await axiosPublic.get(
+                            `/api/booking-state/${flightInstanceId}`,
+                            { headers }
+                        );
+                        if (bookingStateResponse.data?.cabin?.cabinType) {
+                            params.cabinType = bookingStateResponse.data.cabin.cabinType;
+                        }
+                    } catch (bookingStateError) {
+                        console.warn('Could not get cabinType from booking state:', bookingStateError);
+                        // Continue without cabinType - backend will try to get from booking state
+                    }
+                }
+            }
 
-        axiosClient
-            .get("/api/search/seats", {
-                params,
-            })
-            .then((res) => {
+            // If still no cabinType, show error and redirect
+            if (!params.cabinType) {
+                setError(
+                    'Cabin type is required. Please select a cabin type first or go back to cabin selection.'
+                );
+                setLoading(false);
+                hasFetchedRef.current = false;
+                return;
+            }
+
+            try {
+                const res = await axiosClient.get("/api/search/seats", { params });
                 console.log('Seat map response:', res.data);
 
                 // Backend response format: { seats: [{ id: 'business', list: [...] }, { id: 'economy', list: [...] }] }
@@ -169,9 +212,9 @@ const SeatMapPage = () => {
                 } else {
                     console.error('Invalid seat map data format:', res.data);
                     setError('Invalid seat map data format');
+                    hasFetchedRef.current = false;
                 }
-            })
-            .catch((err) => {
+            } catch (err: any) {
                 console.error('Error fetching seat map:', err);
                 console.error('Error details:', err.response?.data || err.message);
                 setError(
@@ -181,12 +224,23 @@ const SeatMapPage = () => {
                 );
                 // Reset ref on error so user can retry
                 hasFetchedRef.current = false;
-            })
-            .finally(() => {
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
 
-    }, [flightInstanceId, accessToken])
+        // Wait for Zustand store to hydrate before fetching (if no cabinType from URL)
+        if (!isHydrated && !cabinTypeFromUrl) {
+            // Wait a bit for hydration, then fetch
+            const timer = setTimeout(() => {
+                fetchSeatMap();
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+
+        // If hydrated or cabinType from URL, fetch immediately
+        fetchSeatMap();
+    }, [flightInstanceId, accessToken, data.type, isHydrated, cabinTypeFromUrl, searchParams])
 
     // Handle save seat selection and continue
     const handleContinue = useCallback(async () => {
@@ -206,12 +260,23 @@ const SeatMapPage = () => {
             const headers: Record<string, string> = {};
             
             // For guest users, get session ID from sessionStorage
+            // Session ID should have been saved when cabin selection was made in TripList component
             if (!accessToken) {
                 const sessionId = sessionStorage.getItem('guest_session_id');
+                
+                // If no sessionId, this means user hasn't selected cabin yet or sessionStorage was cleared
+                // Guest users MUST select cabin first to get sessionId
                 if (!sessionId) {
-                    setSaveError('Session ID not found. Please start over from cabin selection.');
+                    setSaveError('Session ID not found. Please select a cabin type first, then try again.');
+                    setIsSaving(false);
+                    // Redirect to search flights after showing error
+                    setTimeout(() => {
+                        router.push('/search/flights');
+                    }, 3000);
                     return;
                 }
+                
+                // Add X-Session-Id header for guest users (REQUIRED by backend)
                 headers['X-Session-Id'] = sessionId;
             }
 
