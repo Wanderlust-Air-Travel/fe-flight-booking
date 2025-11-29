@@ -142,8 +142,8 @@ const FlightSearchBar = () => {
 
   return (
     <>
-      <div className="flex w-full items-center bg-white rounded-md border-[#CBD4E6] border-[0.1rem]">
-        <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">
+      <div className="flex flex-col md:flex-row w-full items-stretch bg-white rounded-md border-[#CBD4E6] border-[0.1rem]">
+        <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6]">
           <SelectComponent
             value={from}
             onChange={handleChangeForm}
@@ -152,29 +152,30 @@ const FlightSearchBar = () => {
             data={dataLocation.filter((item) => item.code !== to)}
           />
         </div>
-        <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">
+        <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6]">
           <SelectComponent
             value={to}
             onChange={handleChangeTo}
-            placeholder="From To?"
+            placeholder="To Where?"
             icon="/icTo.svg"
             data={dataLocation.filter((item) => item.code !== from)}
           />
         </div>
-        <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">
+        <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6]">
           <label htmlFor="isOpenId" className="relative w-full block">
-            <div className="h-[4.8rem] flex gap-x-[0.8rem] items-center select-none">
+            <div className="h-[4.8rem] flex gap-x-[0.8rem] items-center select-none px-4">
               <Image
                 src="/icDate.svg"
                 alt="icDate"
-                width={32}
-                height={32}
+                width={24}
+                height={24}
+                className="md:w-8 md:h-8 flex-shrink-0"
                 priority
               />
               <Input
                 placeholder="Choose Schedule"
                 readOnly
-                className="px-0 h-full outline-none shadow-none border-none placeholder:text-[var(--cl-pri)] pointer-events-none text-[var(--cl-pri)]"
+                className="px-0 h-full outline-none shadow-none border-none placeholder:text-[var(--cl-pri)] pointer-events-none text-[var(--cl-pri)] text-sm md:text-base truncate"
                 value={
                   data.startDate
                     ? data.endDate
@@ -196,20 +197,21 @@ const FlightSearchBar = () => {
             </div>
           </label>
         </div>
-        <div className="w-[20%] border-r-[0.1rem] border-[#cbd4e6]">
+        <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6]">
           <label htmlFor="isOpenPerson" className="relative w-full block">
-            <div className="h-[4.8rem] flex gap-x-[0.8rem] items-center select-none">
+            <div className="h-[4.8rem] flex gap-x-[0.8rem] items-center select-none px-4">
               <Image
                 src="/icPerson.svg"
                 alt="icPerson"
-                width={32}
-                height={32}
+                width={24}
+                height={24}
+                className="md:w-8 md:h-8 flex-shrink-0"
                 priority
               />
               <Input
                 placeholder="Choose Quantity"
                 readOnly
-                className="px-0 h-full outline-none shadow-none border-none placeholder:text-[var(--cl-pri)] pointer-events-none text-center text-[var(--cl-pri)]"
+                className="px-0 h-full outline-none shadow-none border-none placeholder:text-[var(--cl-pri)] pointer-events-none text-center md:text-left text-[var(--cl-pri)] text-sm md:text-base"
                 value={data.totalPerson ? data.totalPerson : ""}
               />
             </div>
@@ -220,14 +222,14 @@ const FlightSearchBar = () => {
               className="peer hidden"
             />
             <div className="hidden peer-checked:block fixed inset-0 z-10 w-[100vw] h-[100vh]" />
-            <div className="absolute z-20 top-[calc(100%+0.5rem)] shadow2  left-0 w-full opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto">
+            <div className="absolute z-20 top-[calc(100%+0.5rem)] shadow2 left-0 right-0 md:left-auto md:right-auto md:w-auto w-[calc(100vw-3.2rem)] md:min-w-[18rem] md:max-w-[20rem] opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto bg-white rounded-md">
               <Person />
             </div>
           </label>
         </div>
-        <div className="w-[20%] p-2 flex justify-center ali">
+        <div className="w-full md:w-[20%] p-2 flex justify-center">
           <Button
-            className="w-full h-[4.4rem] bg-[var(--cl-pri)] text-[1.6rem] uppercase hover:bg-[var(--cl-four)]"
+            className="w-full h-[4.4rem] bg-[var(--cl-pri)] text-sm sm:text-base md:text-[1.6rem] uppercase hover:bg-[var(--cl-four)] transition-colors duration-200 font-semibold"
             onClick={handleSearch}
           >
             Search

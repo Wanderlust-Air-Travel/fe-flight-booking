@@ -28,7 +28,7 @@ const BannerHome = () => {
     console.log(data)
 
     return (
-        <div className={`h-[calc(100vh-var(--hd))] relative `}>
+        <div className={`min-h-[60vh] sm:min-h-[70vh] md:h-[calc(100vh-var(--hd))] relative flex items-center`}>
             {
                 data &&
                 (
@@ -37,12 +37,21 @@ const BannerHome = () => {
                     </div>
                 )
             }
-            <div className="container">
-                <div className="flex flex-col items-center justify-center z-10 h-full relative gap-y-[2rem]" >
+            <div className="container w-full py-8 md:py-0">
+                <div className="flex flex-col items-center justify-center z-10 h-full relative gap-y-4 sm:gap-y-6 md:gap-y-8 px-4 sm:px-6 md:px-0" >
                     {
-                        data && <h1 className="text-center text-white text-[8rem] uppercase font-medium" data-aos="fade-up">{data.title}</h1>
+                        data && (
+                            <h1 
+                                className="text-center text-white uppercase font-medium leading-tight px-4
+                                    text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-[8rem]
+                                    drop-shadow-lg" 
+                                data-aos="fade-up"
+                            >
+                                {data.title}
+                            </h1>
+                        )
                     }
-                    <div className="w-full search-bn p-2 rounded-md" data-aos="fade-up" data-aos-delay="500" >
+                    <div className="w-full max-w-7xl search-bn p-2 sm:p-3 md:p-4 rounded-md md:rounded-lg relative z-10" data-aos="fade-up" data-aos-delay="500" >
                         <FlightSearchBar />
                     </div>
                 </div>

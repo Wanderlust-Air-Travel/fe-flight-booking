@@ -7,19 +7,19 @@ const ServiceHome = () => {
     const { services, loading } = useDeals()
 
     return (
-        <ul className="flex flex-wrap gap-y-[2.4rem] -mx-[1.2rem] pb-1">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 pb-1">
             {
                 loading
                     ?
                     (
                         Array.from({ length: 8 }).map((_, i) => {
                             return (
-                                <li key={i} className="w-[calc(100%/4)] px-[1.2rem]" data-aos="fade-up">
-                                    <div className="group flex flex-col shadow2 rounded-[1rem] overflow-hidden h-full">
+                                <li key={i} className="w-full" data-aos="fade-up">
+                                    <div className="group flex flex-col shadow2 rounded-[1rem] overflow-hidden h-full hover:shadow3 transition-shadow duration-300">
                                         <div className="pt-[calc(100%*192/262)] relative block w-full overflow-hidden">
                                             <span className="loading !absolute inset-0 !h-full"></span>
                                         </div>
-                                        <div className="p-[1.2rem] flex flex-col gap-y-[0.8rem]">
+                                        <div className="p-3 sm:p-[1.2rem] flex flex-col gap-y-[0.8rem]">
                                             <div className="flex flex-col gap-y-[0.4rem]">
                                                 <span className="loading"></span>
                                                 <span className="loading !w-[80%] !h-[2.8rem]"></span>
@@ -33,7 +33,7 @@ const ServiceHome = () => {
                                                         <span className="loading !w-[80%] !h-[2.6rem]"></span>
                                                     </div>
                                                 </div>
-                                                <span className="peer arrowLink w-[4rem] h-[4rem] bg-[var(--cl-third)] rounded-md flex justify-center items-center hover:bg-[var(--cl-four)] transition ease-linear pointer-events-none flex-shrink-0">
+                                                <span className="peer arrowLink w-[3.5rem] h-[3.5rem] sm:w-[4rem] sm:h-[4rem] bg-[var(--cl-third)] rounded-md flex justify-center items-center hover:bg-[var(--cl-four)] transition ease-linear pointer-events-none flex-shrink-0">
                                                     <span className="loading"></span>
                                                 </span>
                                             </div>
@@ -47,7 +47,7 @@ const ServiceHome = () => {
                     (
                         services.slice(0, 8).map((service, index) => {
                             return (
-                                <li className="w-[calc(100%/4)] px-[1.2rem]" key={generateServiceKey(service.link, index)} data-aos="fade-up">
+                                <li className="w-full" key={generateServiceKey(service.link, index)} data-aos="fade-up" data-aos-delay={index * 100}>
                                     <ItemService image={service.image} title={service.title} service={service.service} startDate={service.startDate} endDate={service.endDate} price={service.price} link={service.link} />
                                 </li>
                             )

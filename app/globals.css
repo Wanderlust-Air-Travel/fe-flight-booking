@@ -18,7 +18,7 @@
   --cl-white: #ffffff;
   --cl-gray: #667085;
   --cl-red: #D83D32;
-  --hd: 9rem;
+  --hd: 7rem;
   --text-sm: 1.2rem !important;
   --text-mn: 1.4rem !important;
   --text-normal: 1.6rem !important;
@@ -130,6 +130,12 @@ main {
   margin: 0 auto;
   padding: 0 1.6rem;
   height: 100%;
+}
+
+@media screen and (max-width: 640px) {
+  .container {
+    padding: 0 1.2rem;
+  }
 }
 
 .cl-pri {
@@ -360,6 +366,13 @@ main {
 
 .search-bn{
   background: linear-gradient(180deg, #0072b3 0%, #78c96a 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+@media screen and (max-width: 768px) {
+  .search-bn {
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  }
 }
 
 
@@ -398,6 +411,18 @@ main {
   white-space: nowrap;
   color: var(--cl-pri);
   transition: 0.3s linear;
+}
+
+@media screen and (min-width: 768px) {
+  :root {
+    --hd: 8rem;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  :root {
+    --hd: 9rem;
+  }
 }
 
 @media screen and (min-width:1200px) {

@@ -52,28 +52,28 @@ const Person = ({classNameParent,classNameChild}:any) => {
 
 
     return (
-        <div className={`${classNameParent} flex flex-col bg-white gap-y-[0.8rem] p-4 rounded-sm overflow-hidden`}>
-            <div className="flex gap-x-[1rem] justify-between items-center">
-                <p className={`text-[1.6rem] text-[var(--cl-pri)]  ${classNameChild}`}>Adults:</p>
-                <div className="flex items-center gap-x-[0.8rem]">
-                    <button onClick={handleMinusAdult} className="group w-[3.2rem] h-[3.2rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)]">
-                        <Minus className="text-[var(--cl-pri)] group-hover:text-[var(--cl-white)]" strokeWidth={0.8} />
+        <div className={`${classNameParent} flex flex-col bg-white gap-y-[0.6rem] p-3 rounded-sm overflow-hidden`}>
+            <div className="flex gap-x-[0.8rem] justify-between items-center">
+                <p className={`text-[1.4rem] text-[var(--cl-pri)]  ${classNameChild}`}>Adults:</p>
+                <div className="flex items-center gap-x-[0.6rem]">
+                    <button onClick={handleMinusAdult} className="group w-[2.8rem] h-[2.8rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)] rounded">
+                        <Minus className="text-[var(--cl-pri)] group-hover:text-[var(--cl-white)] w-4 h-4" strokeWidth={0.8} />
                     </button>
-                    <p className="w-[3.2rem] h-[3.2rem] flex justify-center items-center text-center text-[var(--cl-pri)] text-[1.6rem] flex-shrink-0 cursor-pointer">{adult}</p>
-                    <button onClick={handlePlusAdult} className="group w-[3.2rem] h-[3.2rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)]">
-                        <Plus className="text-[var(--cl-pri)] group-hover:text-[var(--cl-white)]" strokeWidth={0.8} />
+                    <p className="w-[2.8rem] h-[2.8rem] flex justify-center items-center text-center text-[var(--cl-pri)] text-[1.4rem] flex-shrink-0 cursor-pointer">{adult}</p>
+                    <button onClick={handlePlusAdult} className="group w-[2.8rem] h-[2.8rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)] rounded">
+                        <Plus className="text-[var(--cl-pri)] group-hover:text-[var(--cl-white)] w-4 h-4" strokeWidth={0.8} />
                     </button>
                 </div>
             </div>
-            <div className="flex gap-x-[1rem] justify-between items-center">
-                <p className={`text-[1.6rem] text-[var(--cl-pri)] ${classNameChild}`}>Minors:</p>
-                <div className="flex items-center gap-x-[0.8rem]">
-                    <button onClick={handleMinusMinor} className="group w-[3.2rem] h-[3.2rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)]">
-                        <Minus className="text-[var(--cl-pri)] group-hover:text-[var(--cl-white)]" strokeWidth={0.8} />
+            <div className="flex gap-x-[0.8rem] justify-between items-center">
+                <p className={`text-[1.4rem] text-[var(--cl-pri)] ${classNameChild}`}>Minors:</p>
+                <div className="flex items-center gap-x-[0.6rem]">
+                    <button onClick={handleMinusMinor} className="group w-[2.8rem] h-[2.8rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)] rounded">
+                        <Minus className="text-[var(--cl-pri)] group-hover:text-[var(--cl-white)] w-4 h-4" strokeWidth={0.8} />
                     </button>
-                    <p className="w-[3.2rem] h-[3.2rem] flex justify-center items-center text-center text-[var(--cl-pri)] text-[1.6rem] flex-shrink-0 cursor-pointer">{minor}</p>
-                    <button onClick={handlePlusMinor} className="group w-[3.2rem] h-[3.2rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)]">
-                        <Plus className="text-[var(--cl-pri)] group-hover:text-[var(--cl-white)]" strokeWidth={0.8} />
+                    <p className="w-[2.8rem] h-[2.8rem] flex justify-center items-center text-center text-[var(--cl-pri)] text-[1.4rem] flex-shrink-0 cursor-pointer">{minor}</p>
+                    <button onClick={handlePlusMinor} className="group w-[2.8rem] h-[2.8rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)] rounded">
+                        <Plus className="text-[var(--cl-pri)] group-hover:text-[var(--cl-white)] w-4 h-4" strokeWidth={0.8} />
                     </button>
                 </div>
             </div>
