@@ -131,7 +131,7 @@ const MyTicketsPage = () => {
       }
 
       // Get ticket info to get bookingId
-      const ticketInfoResponse = await axiosInstance.get(`/api/bookings/tickets/${ticketId}/info`)
+      const ticketInfoResponse = await axiosInstance.get(`/api/tickets/${ticketId}/info`)
       const bookingId = ticketInfoResponse.data.bookingId
 
       await axiosInstance.post('/api/auth/otp/cancellation/send', {
@@ -504,23 +504,14 @@ const MyTicketsPage = () => {
                     
                     {/* Cancellation Information */}
                     <div className="pt-3 border-t border-gray-200">
-                      {ticket.status === 'cancelled' || ticket.bookingStatus === 'cancelled' ? (
+                      {ticket.bookingStatus === 'cancelled' ? (
                         <>
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2 text-gray-600">
                               <XCircle className="w-4 h-4 flex-shrink-0" />
-                              <p className="text-sm font-semibold">
-                                {ticket.status === 'cancelled' && ticket.bookingStatus !== 'cancelled' 
-                                  ? 'Vé đã hủy (đặt chỗ vẫn còn vé khác)' 
-                                  : 'Đã hủy'}
-                              </p>
+                              <p className="text-sm font-semibold">Đã hủy</p>
                             </div>
                           </div>
-                          {ticket.status === 'cancelled' && ticket.bookingStatus !== 'cancelled' && (
-                            <p className="text-xs text-gray-500 mt-2">
-                              Vé này đã được hủy riêng. Đặt chỗ vẫn còn các vé khác.
-                            </p>
-                          )}
                         </>
                       ) : ticket.canCancel ? (
                         <>
@@ -570,13 +561,11 @@ const MyTicketsPage = () => {
                               variant="destructive"
                               size="sm"
                               onClick={() => handleCancelTicket(ticket.ticketId, ticket.bookingStatus)}
-                              disabled={cancellingId === ticket.ticketId || ticket.status === 'cancelled'}
+                              disabled={cancellingId === ticket.ticketId}
                               className="w-full"
                             >
                               {cancellingId === ticket.ticketId ? (
                                 "Đang hủy vé..."
-                              ) : ticket.status === 'cancelled' ? (
-                                "Vé đã hủy"
                               ) : (
                                 <>
                                   <X className="w-4 h-4 mr-2" />
@@ -588,13 +577,11 @@ const MyTicketsPage = () => {
                               variant="outline"
                               size="sm"
                               onClick={() => handleCancelBooking(ticket.bookingId, ticket.bookingStatus)}
-                              disabled={cancellingId === ticket.bookingId || ticket.bookingStatus === 'cancelled'}
+                              disabled={cancellingId === ticket.bookingId}
                               className="w-full text-sm"
                             >
                               {cancellingId === ticket.bookingId ? (
                                 "Đang hủy..."
-                              ) : ticket.bookingStatus === 'cancelled' ? (
-                                "Đặt chỗ đã hủy"
                               ) : (
                                 <>
                                   <X className="w-4 h-4 mr-2" />
