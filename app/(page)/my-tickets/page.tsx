@@ -13,9 +13,17 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from "@/components/ui/pagination"
-import { Plane, Calendar, MapPin, User, Ticket as TicketIcon, XCircle, CheckCircle, X } from "lucide-react"
+import { Plane, Calendar, MapPin, User, Ticket as TicketIcon, XCircle, CheckCircle, X, Info } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import type { MyTicketsResponse } from "@/types/my-tickets-type"
 
 const MyTicketsPage = () => {
@@ -24,6 +32,7 @@ const MyTicketsPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [cancellingId, setCancellingId] = useState<string | null>(null)
+  const [cancellationDialogOpen, setCancellationDialogOpen] = useState<string | null>(null)
   const pageSize = 10
 
   const fetchTickets = async (page: number) => {
@@ -255,35 +264,53 @@ const MyTicketsPage = () => {
                     </div>
                     
                     {/* Cancellation Information */}
-                    <div className="pt-4 border-t border-gray-200">
+                    <div className="pt-3 border-t border-gray-200">
                       {ticket.canCancel ? (
                         <>
-                          <div className="flex items-center gap-2 text-green-700 mb-4 bg-green-50 px-4 py-3 rounded-lg">
-                            <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                            <p className="text-base font-semibold">Có thể hủy</p>
-                          </div>
-                          {ticket.cancellationDeadline && (
-                            <div className="mb-4 space-y-3">
-                              <div className="bg-blue-50 px-4 py-3 rounded-lg border-l-4 border-blue-400">
-                                <p className="text-sm font-semibold text-gray-700 mb-2">
-                                  Hạn hủy:
-                                </p>
-                                <p className="text-base font-bold text-gray-900">
-                                  {convertToDMY(ticket.cancellationDeadline)} {convertToLocalTime(ticket.cancellationDeadline)}
-                                </p>
-                              </div>
-                              <div className="bg-gray-50 px-4 py-3 rounded-lg">
-                                <p className="text-sm text-gray-700 leading-relaxed">
-                                  {ticket.isDomestic 
-                                    ? "Chặng bay nội địa: Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng."
-                                    : "Chặng bay quốc tế: Thực hiện thủ tục hoàn vé trước giờ khởi hành ít nhất 05 tiếng."}
-                                </p>
-                              </div>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2 text-green-700">
+                              <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                              <p className="text-sm font-semibold">Có thể hủy</p>
                             </div>
-                          )}
+                            <Dialog open={cancellationDialogOpen === ticket.ticketId} onOpenChange={(open) => setCancellationDialogOpen(open ? ticket.ticketId : null)}>
+                            <DialogTrigger asChild>
+                              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1.5">
+                                <Info className="w-4 h-4" />
+                                Chi tiết
+                              </button>
+                            </DialogTrigger>
+                              <DialogContent className="max-w-md">
+                                <DialogHeader>
+                                  <DialogTitle>Thông tin hủy vé</DialogTitle>
+                                  <DialogDescription>
+                                    Chi tiết về quy định và thời hạn hủy vé cho chuyến bay này
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4 mt-4">
+                                  {ticket.cancellationDeadline && (
+                                    <>
+                                      <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                                        <p className="text-sm font-semibold text-gray-700 mb-2">Hạn hủy:</p>
+                                        <p className="text-lg font-bold text-gray-900">
+                                          {convertToDMY(ticket.cancellationDeadline)} {convertToLocalTime(ticket.cancellationDeadline)}
+                                        </p>
+                                      </div>
+                                      <div className="bg-gray-50 p-4 rounded-lg">
+                                        <p className="text-sm text-gray-700 leading-relaxed">
+                                          {ticket.isDomestic 
+                                            ? "Chặng bay nội địa: Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng."
+                                            : "Chặng bay quốc tế: Thực hiện thủ tục hoàn vé trước giờ khởi hành ít nhất 05 tiếng."}
+                                        </p>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
                           <Button
                             variant="destructive"
-                            size="default"
+                            size="sm"
                             onClick={() => handleCancelBooking(ticket.bookingId)}
                             disabled={cancellingId === ticket.bookingId}
                             className="w-full"
@@ -292,7 +319,7 @@ const MyTicketsPage = () => {
                               "Đang hủy..."
                             ) : (
                               <>
-                                <X className="w-5 h-5 mr-2" />
+                                <X className="w-4 h-4 mr-2" />
                                 Hủy đặt chỗ
                               </>
                             )}
@@ -300,15 +327,35 @@ const MyTicketsPage = () => {
                         </>
                       ) : (
                         <>
-                          <div className="flex items-center gap-2 text-red-700 mb-4 bg-red-50 px-4 py-3 rounded-lg">
-                            <XCircle className="w-5 h-5 flex-shrink-0" />
-                            <p className="text-base font-semibold">Không thể hủy</p>
-                          </div>
-                          {ticket.cannotCancelReason && (
-                            <div className="bg-gray-50 px-4 py-3 rounded-lg border-l-4 border-red-400">
-                              <p className="text-sm text-gray-700 leading-relaxed">{ticket.cannotCancelReason}</p>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2 text-red-700">
+                              <XCircle className="w-4 h-4 flex-shrink-0" />
+                              <p className="text-sm font-semibold">Không thể hủy</p>
                             </div>
-                          )}
+                            {ticket.cannotCancelReason && (
+                              <Dialog open={cancellationDialogOpen === ticket.ticketId} onOpenChange={(open) => setCancellationDialogOpen(open ? ticket.ticketId : null)}>
+                            <DialogTrigger asChild>
+                              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1.5">
+                                <Info className="w-4 h-4" />
+                                Chi tiết
+                              </button>
+                            </DialogTrigger>
+                                <DialogContent className="max-w-md">
+                                  <DialogHeader>
+                                    <DialogTitle>Lý do không thể hủy</DialogTitle>
+                                    <DialogDescription>
+                                      Thông tin về quy định hủy vé cho chuyến bay này
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <div className="mt-4">
+                                    <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
+                                      <p className="text-sm text-gray-700 leading-relaxed">{ticket.cannotCancelReason}</p>
+                                    </div>
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                          </div>
                         </>
                       )}
                     </div>
