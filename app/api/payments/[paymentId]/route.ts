@@ -20,23 +20,24 @@ export async function GET(
       );
     }
 
+    // Authorization header is optional - for guest users
     const authHeader = req.headers.get("authorization");
 
-    if (!authHeader) {
-      return NextResponse.json(
-        { message: "Authorization header is required" },
-        { status: 401 }
-      );
+    // Build headers for backend request
+    const backendHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    
+    // Add Authorization header only if present (for authenticated users)
+    if (authHeader) {
+      backendHeaders["Authorization"] = authHeader;
     }
 
     const response = await fetch(
       `${BACKEND_API_URL}/api/v1/payments/${encodeURIComponent(paymentId)}`,
       {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
+        headers: backendHeaders,
       }
     );
 

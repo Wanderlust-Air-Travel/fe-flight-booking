@@ -10,14 +10,8 @@ const BACKEND_API_URL =
 
 export async function POST(req: NextRequest) {
   try {
+    // Authorization header is optional - for guest users
     const authHeader = req.headers.get("authorization");
-
-    if (!authHeader) {
-      return NextResponse.json(
-        { message: "Authorization header is required" },
-        { status: 401 }
-      );
-    }
 
     // Lấy bookingId từ URL path: /api/payments/bookings/:bookingId/process
     const url = new URL(req.url);
@@ -43,16 +37,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Build headers for backend request
+    const backendHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    
+    // Add Authorization header only if present (for authenticated users)
+    if (authHeader) {
+      backendHeaders["Authorization"] = authHeader;
+    }
+
     const response = await fetch(
       `${BACKEND_API_URL}/api/v1/payments/bookings/${encodeURIComponent(
         bookingId
       )}/process`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
+        headers: backendHeaders,
         body: JSON.stringify({
           paymentMethodCode,
           transactionRef,
