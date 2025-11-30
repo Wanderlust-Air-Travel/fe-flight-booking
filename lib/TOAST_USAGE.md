@@ -67,16 +67,38 @@ try {
 ```
 
 ### 7. `getErrorMessage(error: any, defaultMessage?: string)`
-Trích xuất message từ error object (hỗ trợ axios error).
+Trích xuất message từ error object (hỗ trợ axios error) với professional error messages.
+
+**Professional Error Handling:**
+- **Network Errors**: "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng của bạn và thử lại."
+- **Timeout Errors**: "Yêu cầu bị quá thời gian chờ. Vui lòng kiểm tra kết nối mạng và thử lại."
+- **HTTP Status Codes**: Thông báo rõ ràng cho từng status code:
+  - 400: "Yêu cầu không hợp lệ. Vui lòng kiểm tra lại thông tin đã nhập."
+  - 401: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
+  - 403: "Bạn không có quyền truy cập tài nguyên này."
+  - 404: "Không tìm thấy tài nguyên yêu cầu. Vui lòng thử lại."
+  - 500: "Lỗi máy chủ nội bộ. Vui lòng thử lại sau hoặc liên hệ hỗ trợ."
+  - 502/503/504: Thông báo lỗi máy chủ với hướng dẫn thử lại
+- **Validation Errors**: Hiển thị danh sách lỗi validation một cách rõ ràng
+- **Priority-based**: Ưu tiên message từ backend, sau đó mới dùng message mặc định
 
 ```typescript
 try {
   await axios.post('/api/endpoint');
 } catch (error) {
-  const errorMessage = getErrorMessage(error, 'Đã xảy ra lỗi');
+  const errorMessage = getErrorMessage(error, 'Đã xảy ra lỗi không xác định');
   showError(errorMessage);
 }
 ```
+
+**Error Extraction Priority:**
+1. Custom message từ backend response (`response.data.message`)
+2. Error field từ backend response (`response.data.error`)
+3. Validation errors array (`response.data.errors`)
+4. Professional HTTP status message
+5. Status text từ response
+6. Generic error message (filtered và translated)
+7. Default message
 
 ## Tích hợp với Axios
 
@@ -152,11 +174,12 @@ Các options có sẵn: https://fkhadra.github.io/react-toastify/api/toast
 
 ## Best Practices
 
-1. **Sử dụng `getErrorMessage()`** để trích xuất message từ error một cách nhất quán
-2. **Tích hợp với axios interceptors** - lỗi sẽ tự động hiển thị, chỉ cần thêm success toast
+1. **Sử dụng `getErrorMessage()`** để trích xuất message từ error một cách nhất quán - hàm này tự động xử lý tất cả các loại lỗi và trả về thông báo chuyên nghiệp
+2. **Tích hợp với axios interceptors** - lỗi sẽ tự động hiển thị với professional error messages, chỉ cần thêm success toast
 3. **Sử dụng loading toast** cho các operations dài
-4. **Thông báo rõ ràng** - message phải dễ hiểu cho người dùng
+4. **Thông báo rõ ràng và chuyên nghiệp** - message phải dễ hiểu, thân thiện với người dùng, không có technical jargon
 5. **Tránh spam toast** - không hiển thị quá nhiều toast cùng lúc
+6. **Professional Error Messages** - Tất cả error messages đều được xử lý để hiển thị thông báo chuyên nghiệp, rõ ràng bằng tiếng Việt
 
 ## Vị trí Toast
 
