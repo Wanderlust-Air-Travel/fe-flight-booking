@@ -4,6 +4,80 @@ Tài liệu ngắn gọn cho Frontend developers.
 
 ## Thay đổi quan trọng
 
+### Flight Search Pre-validation với Toast Notifications (2025-11-30)
+
+**Tính năng mới**: Validate flight availability trước khi navigate đến results page
+
+**Thay đổi:**
+- Frontend gọi API search trước khi navigate
+- Hiển thị loading toast: "Đang kiểm tra chuyến bay..."
+- Nếu không có flights: Hiển thị error toast ngay tại landing page, không navigate
+- Nếu có flights: Navigate đến results page
+
+**User Experience:**
+- User được thông báo ngay tại landing page nếu không có flights
+- Không cần chuyển trang rồi mới thấy lỗi
+- Error messages rõ ràng với thông tin cụ thể (origin, destination, date)
+
+**Files đã cập nhật:**
+- `app/components/FlightSearchBar/FlightSearchBar.tsx` - Updated `handleSearch()` với pre-validation
+- `lib/toast.ts` - Sử dụng `showLoading()`, `updateToast()`, `showError()`
+
+**Best Practice**: Fail fast - validate trước khi navigate để cải thiện UX
+
+### Airport Data từ Backend API (2025-11-30)
+
+**Tính năng mới**: Frontend fetch airport data từ backend API thay vì hardcode
+
+**Thay đổi:**
+- Frontend fetch airports từ `/api/search/airports` (Next.js API route proxy)
+- Backend API: `GET /api/v1/search/airports` - Public endpoint, không cần authentication
+- Response format: `{ airports: [{ iata, name, city, value }] }`
+
+**Benefits:**
+- Frontend không cần hardcode airport data
+- Backend là single source of truth cho airport data
+- Dễ dàng update airports mà không cần deploy frontend
+
+**Files đã cập nhật:**
+- `app/components/FlightSearchBar/FlightSearchBar.tsx` - Updated để fetch airports từ API
+- `app/api/search/airports/route.ts` - Next.js API route proxy (new)
+
+### Person Component State Hydration Fix (2025-11-30)
+
+**Issue**: Person component không hydrate state từ store khi mount, gây ra lỗi hiển thị sai số lượng passengers
+
+**Root Cause**: Component khởi tạo với hardcoded values (1 adult, 0 child, 0 infant) và không đọc từ store
+
+**Fix:**
+- Component đọc state từ store khi khởi tạo
+- Thêm hydration logic: đợi store hydrate xong, sau đó sync local state từ store
+- Sử dụng `useRef` để track hydration, tránh overwrite store với giá trị mặc định
+- Chỉ update store sau khi đã hydrate xong
+
+**Files đã cập nhật:**
+- `app/components/Person/Person.tsx` - Added hydration logic
+- `app/zustand/storeFightSearchBar.tsx` - Added `isHydrated` flag và `onRehydrateStorage` callback
+- `types/fight-search-bar.d.ts` - Added `isHydrated` và `setHydrated` to interface
+
+**Impact**: Search bar hiển thị đúng số lượng passengers khi navigate giữa các trang
+
+### Seat Map Page Passenger Count Fix (2025-11-30)
+
+**Issue**: Seat map page chỉ cho phép chọn 1 ghế dù user đã chọn nhiều passengers
+
+**Root Cause**: `passengersNeedingSeats` được tính từ store nhưng store chưa hydrate khi component mount
+
+**Fix:**
+- Đợi store hydrate xong trước khi tính `passengersNeedingSeats`
+- Thêm logging để debug state changes
+- `passengersNeedingSeats` trả về 0 nếu chưa hydrate, tránh tính toán sai
+
+**Files đã cập nhật:**
+- `app/(page)/booking/seat-map/page.tsx` - Updated để đợi hydration và thêm logging
+
+**Impact**: Seat map page hiển thị đúng số lượng ghế cần chọn dựa trên số lượng passengers
+
 ### Guest Booking Support (2025-11-28)
 
 **Tính năng mới**: Hệ thống hiện hỗ trợ guest bookings (đặt vé không cần đăng nhập)
