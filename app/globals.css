@@ -2,10 +2,7 @@
 @import "tw-animate-css";
 @import "aos/dist/aos.css";
 
-
 @custom-variant dark (&:is(.dark *));
-
-
 
 :root {
   --cl-pri: #00558f;
@@ -116,8 +113,6 @@ body {
   line-height: 1.5;
   color: #000000;
 }
-
-
 
 main {
   min-height: 80vh;
@@ -266,8 +261,6 @@ main {
 
 }
 
-
-
 :is(.\*\:\[span\]\:last\:gap-2 > *):is(span):last-child {
   width: 100% !important;
 }
@@ -279,7 +272,6 @@ main {
 /* .ticketCabin:hover {
   box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
 } */
-
 
 .inputError {
   position: absolute;
@@ -324,7 +316,6 @@ main {
   padding: unset !important;
 }
 
-
 .loading {
   position: relative;
   width: 100%;
@@ -349,7 +340,6 @@ main {
   animation: luotQua 1.2s infinite linear;
 }
 
-
 @keyframes luotQua {
   0% {
     transform: translateX(-100%);
@@ -363,7 +353,6 @@ main {
   width: 100%;
 }
 
-
 .search-bn{
   background: linear-gradient(180deg, #0072b3 0%, #78c96a 100%);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -375,19 +364,16 @@ main {
   }
 }
 
-
 .breadcrumb-list{
   display: flex;
   align-items: center;
   margin: 0 -0.8rem;
 }
 
-
 .breadcrumb-item{
   padding:0 0.8rem;
   position: relative;
 }
-
 
 .breadcrumb-item:not(:first-child)::before{
   content: "/";
@@ -431,7 +417,18 @@ main {
   }
 }
 
-
 .rdrSelected, .rdrInRange, .rdrStartEdge, .rdrEndEdge{
   background: var(--cl-pri) !important;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+
+  }
+  body {
+    @apply bg-background text-foreground;
+
+  }
+
 }
