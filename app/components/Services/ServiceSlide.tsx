@@ -14,10 +14,19 @@ const ServiceSlide = () => {
             <div className="container">
                 <div className="flex flex-col gap-y-[2rem]">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-lg text-[var(--cl-pri)] uppercase font-bold" data-aos="fade-right">
+                        <h2 
+                            className="text-lg text-[var(--cl-pri)] uppercase font-bold" 
+                            data-aos="fade-right"
+                            suppressHydrationWarning
+                        >
                             Services
                         </h2>
-                        <Link className="block" href="/" data-aos="fade-left">
+                        <Link 
+                            className="block" 
+                            href="/" 
+                            data-aos="fade-left"
+                            suppressHydrationWarning
+                        >
                             <Button className="w-fit px-[2rem] h-[4.4rem] bg-[var(--cl-pri)] text-[1.6rem] uppercase hover:bg-[var(--cl-four)]" >See More</Button>
                         </Link>
                     </div>
@@ -28,7 +37,12 @@ const ServiceSlide = () => {
                                 (
                                     Array.from({ length: 4 }).map((_, i) => {
                                         return (
-                                            <div key={i} className="w-[calc(100%/4)] px-[1.2rem]" data-aos="fade-up">
+                                            <div 
+                                                key={i} 
+                                                className="w-[calc(100%/4)] px-[1.2rem]" 
+                                                data-aos="fade-up"
+                                                suppressHydrationWarning
+                                            >
                                                 <div className="group flex flex-col shadow2 rounded-[1rem] overflow-hidden h-full">
                                                     <div className="pt-[calc(100%*192/262)] relative block w-full overflow-hidden">
                                                         <span className="loading !absolute inset-0 !h-full"></span>

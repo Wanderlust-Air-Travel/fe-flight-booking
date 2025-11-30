@@ -69,7 +69,12 @@ const ServiceHome = () => {
                     (
                         Array.from({ length: 8 }).map((_, i) => {
                             return (
-                                <li key={i} className="w-[calc(100%/4)] px-[1.2rem]" data-aos="fade-up">
+                                <li 
+                                    key={i} 
+                                    className="w-[calc(100%/4)] px-[1.2rem]" 
+                                    data-aos="fade-up"
+                                    suppressHydrationWarning
+                                >
                                     <LoadingPlaceholder />
                                 </li>
                             )
@@ -86,7 +91,10 @@ const ServiceHome = () => {
                                         once={true}
                                         placeholder={<LoadingPlaceholder />}
                                     >
-                                        <div data-aos="fade-up">
+                                        <div 
+                                            data-aos="fade-up"
+                                            suppressHydrationWarning
+                                        >
                                             <ItemService 
                                                 image={service.image} 
                                                 title={service.title} 

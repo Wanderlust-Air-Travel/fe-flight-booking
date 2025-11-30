@@ -14,7 +14,12 @@ const ServiceAll = () => {
                     (
                         Array.from({ length: 8 }).map((_, i) => {
                             return (
-                                <li key={i} className="w-[calc(100%/4)] px-[1.2rem]" data-aos="fade-up">
+                                <li 
+                                    key={i} 
+                                    className="w-[calc(100%/4)] px-[1.2rem]" 
+                                    data-aos="fade-up"
+                                    suppressHydrationWarning
+                                >
                                     <div className="group flex flex-col shadow2 rounded-[1rem] overflow-hidden h-full">
                                         <div className="pt-[calc(100%*192/262)] relative block w-full overflow-hidden">
                                             <span className="loading !absolute inset-0 !h-full"></span>
@@ -50,7 +55,12 @@ const ServiceAll = () => {
                     (
                         services.map((service, index) => {
                             return (
-                                <li className="w-[calc(100%/4)] px-[1.2rem]" key={generateServiceKey(service.link, index)} data-aos="fade-up">
+                                <li 
+                                    className="w-[calc(100%/4)] px-[1.2rem]" 
+                                    key={generateServiceKey(service.link, index)} 
+                                    data-aos="fade-up"
+                                    suppressHydrationWarning
+                                >
                                     <ItemService image={service.image} title={service.title} service={service.service} startDate={service.startDate} endDate={service.endDate} price={service.price} link={service.link} />
                                 </li>
                             )
