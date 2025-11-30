@@ -1,20 +1,48 @@
 "use client"
 import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 import { Minus, Plus } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useRef } from "react"
 
 const Person = ({classNameParent,classNameChild}:any) => {
-    const { setData } = useFightSearchBarStore();
+    const { data: storeData, setData, isHydrated } = useFightSearchBarStore();
 
-    const [adult, setAdult] = useState<number>(1);
-    const [child, setChild] = useState<number>(0); // Child (2-11 years)
-    const [infant, setInfant] = useState<number>(0); // Infant (<2 years)
+    // Initialize state from store if available, otherwise use defaults
+    const [adult, setAdult] = useState<number>(storeData?.adult || 1);
+    const [child, setChild] = useState<number>(storeData?.child || 0); // Child (2-11 years)
+    const [infant, setInfant] = useState<number>(storeData?.infant || 0); // Infant (<2 years)
 
     const total = useMemo(() => {
         return adult + child + infant;
     }, [adult, child, infant])
 
+    // Track if we've hydrated from store to avoid overwriting on initial mount
+    const hasHydratedRef = useRef(false);
+
+    // Hydrate local state from store when store is hydrated (only once)
     useEffect(() => {
+        if (isHydrated && storeData && !hasHydratedRef.current) {
+            console.log('[Person] Hydrating from store:', storeData);
+            // Update local state from store values
+            if (storeData.adult !== undefined) {
+                setAdult(storeData.adult);
+            }
+            if (storeData.child !== undefined) {
+                setChild(storeData.child);
+            }
+            if (storeData.infant !== undefined) {
+                setInfant(storeData.infant);
+            }
+            hasHydratedRef.current = true;
+        }
+    }, [isHydrated, storeData]); // Only run when hydration status or store data changes
+
+    // Update store when local state changes (but skip if not hydrated yet)
+    useEffect(() => {
+        // Skip if store is not hydrated yet to avoid overwriting with defaults
+        if (!isHydrated || !hasHydratedRef.current) {
+            return;
+        }
+
         const newData = { 
             totalPerson: total, 
             adult: adult,
@@ -24,7 +52,7 @@ const Person = ({classNameParent,classNameChild}:any) => {
         };
         console.log('[Person] Updating store with passenger data:', newData);
         setData(newData);
-    }, [adult, child, infant, total, setData])
+    }, [adult, child, infant, total, setData, isHydrated])
 
 
     const handleMinusAdult = () => {
