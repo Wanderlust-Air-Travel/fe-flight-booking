@@ -8,7 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Form, Formik, Field, ErrorMessage } from "formik";
+import { format } from "date-fns";
 import * as Yup from "yup";
 import useUserStore from "@/app/zustand/storeUser";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
@@ -465,7 +469,7 @@ const BookingInfoContent = () => {
                                                             type="text"
                                                             id="contactFullname"
                                                             name="contactFullname"
-                                                            className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
+                                                            className="h-[5rem] text-[1.8rem] font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                         />
                                                         <ErrorMessage
                                                             name="contactFullname"
@@ -483,7 +487,7 @@ const BookingInfoContent = () => {
                                                             type="email"
                                                             id="contactEmail"
                                                             name="contactEmail"
-                                                            className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
+                                                            className="h-[5rem] text-[1.8rem] font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                         />
                                                         <ErrorMessage
                                                             name="contactEmail"
@@ -501,7 +505,7 @@ const BookingInfoContent = () => {
                                                             type="text"
                                                             id="contactPhone"
                                                             name="contactPhone"
-                                                            className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
+                                                            className="h-[5rem] text-[1.8rem] font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                         />
                                                         <ErrorMessage
                                                             name="contactPhone"
@@ -678,7 +682,7 @@ const BookingInfoContent = () => {
                                                                         id={`passengers.${index}.fullname`}
                                                                         name={`passengers.${index}.fullname`}
                                                                         disabled={passenger.isCurrentUser && user}
-                                                                        className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
+                                                                        className="h-[5rem] text-[1.8rem] font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                                     />
                                                                     {passenger.isCurrentUser && user && (
                                                                         <p className="text-[1.3rem] text-[var(--cl-four)] font-medium">
@@ -696,34 +700,79 @@ const BookingInfoContent = () => {
                                                                     <Label htmlFor={`passengers.${index}.dob`} className="text-[1.6rem] font-semibold text-[var(--cl-pri)]">
                                                                         Date of Birth *
                                                                     </Label>
-                                                                    <Field
-                                                                        as={Input}
-                                                                        type="date"
-                                                                        id={`passengers.${index}.dob`}
-                                                                        name={`passengers.${index}.dob`}
-                                                                        className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
-                                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                                            const dob = e.target.value;
-                                                                            setFieldValue(`passengers.${index}.dob`, dob);
+                                                                    <Field name={`passengers.${index}.dob`}>
+                                                                        {({ field, form }: any) => {
+                                                                            const dobValue = field.value ? new Date(field.value) : undefined;
+                                                                            const flightDate = getFlightDate(ticketData);
                                                                             
-                                                                            // Auto-determine passenger type based on DOB
-                                                                            if (dob) {
-                                                                                const flightDate = getFlightDate(ticketData);
-                                                                                const determinedType = determinePassengerType(dob, flightDate);
-                                                                                
-                                                                                if (determinedType && determinedType !== passenger.passengerType) {
-                                                                                    // Auto-update passenger type if different
-                                                                                    setFieldValue(`passengers.${index}.passengerType`, determinedType);
-                                                                                    
-                                                                                    // Show info message
-                                                                                    const age = calculateAge(dob, flightDate);
-                                                                                    if (age >= 0) {
-                                                                                        console.log(`Auto-determined passenger type: ${determinedType} (Age: ${age} at flight date)`);
-                                                                                    }
-                                                                                }
-                                                                            }
+                                                                            return (
+                                                                                <Popover>
+                                                                                    <PopoverTrigger asChild>
+                                                                                        <Button
+                                                                                            variant="outline"
+                                                                                            className={`w-full h-[5rem] text-[1.8rem] font-semibold justify-start text-left border-2 border-[var(--cl-third)] hover:border-[var(--cl-pri)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] ${
+                                                                                                !dobValue && "text-muted-foreground"
+                                                                                            }`}
+                                                                                        >
+                                                                                            <svg
+                                                                                                className="mr-3 h-5 w-5 text-[var(--cl-pri)]"
+                                                                                                fill="none"
+                                                                                                stroke="currentColor"
+                                                                                                viewBox="0 0 24 24"
+                                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                            >
+                                                                                                <path
+                                                                                                    strokeLinecap="round"
+                                                                                                    strokeLinejoin="round"
+                                                                                                    strokeWidth={2}
+                                                                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                                                                />
+                                                                                            </svg>
+                                                                                            {dobValue ? (
+                                                                                                format(dobValue, "PPP")
+                                                                                            ) : (
+                                                                                                <span>Pick a date</span>
+                                                                                            )}
+                                                                                        </Button>
+                                                                                    </PopoverTrigger>
+                                                                                    <PopoverContent className="w-auto p-0 border-2 border-[var(--cl-pri)] shadow-lg" align="start">
+                                                                                        <Calendar
+                                                                                            mode="single"
+                                                                                            selected={dobValue}
+                                                                                            onSelect={(date) => {
+                                                                                                if (date) {
+                                                                                                    const dobString = format(date, "yyyy-MM-dd");
+                                                                                                    form.setFieldValue(field.name, dobString);
+                                                                                                    
+                                                                                                    // Auto-determine passenger type based on DOB
+                                                                                                    const determinedType = determinePassengerType(dobString, flightDate);
+                                                                                                    
+                                                                                                    if (determinedType && determinedType !== passenger.passengerType) {
+                                                                                                        form.setFieldValue(`passengers.${index}.passengerType`, determinedType);
+                                                                                                        
+                                                                                                        const age = calculateAge(dobString, flightDate);
+                                                                                                        if (age >= 0) {
+                                                                                                            console.log(`Auto-determined passenger type: ${determinedType} (Age: ${age} at flight date)`);
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            }}
+                                                                                            disabled={(date) => date > flightDate}
+                                                                                            initialFocus
+                                                                                            className="rounded-md"
+                                                                                            classNames={{
+                                                                                                day_selected: "bg-[var(--cl-pri)] text-white hover:bg-[var(--cl-pri)] hover:text-white",
+                                                                                                day_today: "bg-[var(--cl-four)]/20 text-[var(--cl-pri)] font-bold",
+                                                                                                button_previous: "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/10",
+                                                                                                button_next: "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/10",
+                                                                                                month_caption: "text-[var(--cl-pri)] font-bold",
+                                                                                            }}
+                                                                                        />
+                                                                                    </PopoverContent>
+                                                                                </Popover>
+                                                                            );
                                                                         }}
-                                                                    />
+                                                                    </Field>
                                                                     <ErrorMessage
                                                                         name={`passengers.${index}.dob`}
                                                                         render={(msg) => (
@@ -756,21 +805,32 @@ const BookingInfoContent = () => {
                                                                     </Label>
                                                                     <Field name={`passengers.${index}.gender`}>
                                                                         {({ field, form }: any) => (
-                                                                            <Select
+                                                                            <RadioGroup
                                                                                 value={field.value || ""}
-                                                                                onValueChange={(value) => {
+                                                                                onValueChange={(value: string) => {
                                                                                     form.setFieldValue(field.name, value);
                                                                                 }}
+                                                                                className="flex flex-row gap-6"
                                                                             >
-                                                                                <SelectTrigger className="w-full h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]">
-                                                                                    <SelectValue placeholder="Select gender" />
-                                                                                </SelectTrigger>
-                                                                                <SelectContent>
-                                                                                    <SelectItem value="MALE">Male</SelectItem>
-                                                                                    <SelectItem value="FEMALE">Female</SelectItem>
-                                                                                    <SelectItem value="OTHER">Other</SelectItem>
-                                                                                </SelectContent>
-                                                                            </Select>
+                                                                                <div className="flex items-center space-x-3">
+                                                                                    <RadioGroupItem value="MALE" id={`gender-male-${index}`} className="size-5 border-2 border-[var(--cl-pri)] data-[state=checked]:bg-[var(--cl-pri)]" />
+                                                                                    <Label htmlFor={`gender-male-${index}`} className="text-[1.8rem] font-semibold text-[var(--cl-pri)] cursor-pointer">
+                                                                                        Male
+                                                                                    </Label>
+                                                                                </div>
+                                                                                <div className="flex items-center space-x-3">
+                                                                                    <RadioGroupItem value="FEMALE" id={`gender-female-${index}`} className="size-5 border-2 border-[var(--cl-pri)] data-[state=checked]:bg-[var(--cl-pri)]" />
+                                                                                    <Label htmlFor={`gender-female-${index}`} className="text-[1.8rem] font-semibold text-[var(--cl-pri)] cursor-pointer">
+                                                                                        Female
+                                                                                    </Label>
+                                                                                </div>
+                                                                                <div className="flex items-center space-x-3">
+                                                                                    <RadioGroupItem value="OTHER" id={`gender-other-${index}`} className="size-5 border-2 border-[var(--cl-pri)] data-[state=checked]:bg-[var(--cl-pri)]" />
+                                                                                    <Label htmlFor={`gender-other-${index}`} className="text-[1.8rem] font-semibold text-[var(--cl-pri)] cursor-pointer">
+                                                                                        Other
+                                                                                    </Label>
+                                                                                </div>
+                                                                            </RadioGroup>
                                                                         )}
                                                                     </Field>
                                                                     <ErrorMessage
@@ -791,7 +851,7 @@ const BookingInfoContent = () => {
                                                                             type="text"
                                                                             id={`passengers.${index}.documentNumber`}
                                                                             name={`passengers.${index}.documentNumber`}
-                                                                            className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
+                                                                            className="h-[5rem] text-[1.8rem] font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                                         />
                                                                         <ErrorMessage
                                                                             name={`passengers.${index}.documentNumber`}
@@ -811,7 +871,7 @@ const BookingInfoContent = () => {
                                                                         type="text"
                                                                         id={`passengers.${index}.loyaltyNumber`}
                                                                         name={`passengers.${index}.loyaltyNumber`}
-                                                                        className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
+                                                                        className="h-[5rem] text-[1.8rem] font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                                     />
                                                                 </div>
                                                         </div>
