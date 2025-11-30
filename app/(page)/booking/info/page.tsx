@@ -4,6 +4,10 @@ import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Form, Formik, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import useUserStore from "@/app/zustand/storeUser";
@@ -13,22 +17,50 @@ import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import { PassengerFormData, BookingFormData } from "@/types/booking-form-type";
+import { determinePassengerType, getFlightDate, calculateAge, isAdult } from "@/lib/passenger-utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
-// Validation schema
-const passengerSchema = Yup.object().shape({
+// Validation schema with DOB-based passenger type validation
+const createPassengerSchema = (flightDate: Date) => Yup.object().shape({
     passengerType: Yup.string().oneOf(["ADT", "CHD", "INF"], "Invalid passenger type").required("Passenger type is required"),
     fullname: Yup.string().required("Full name is required"),
-    dob: Yup.string().required("Date of birth is required"),
+    dob: Yup.string()
+        .required("Date of birth is required")
+        .test("dob-format", "Date of birth must be in YYYY-MM-DD format", function(value) {
+            if (!value) return false;
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            return dateRegex.test(value);
+        })
+        .test("dob-age-validation", "Invalid date of birth for passenger type", function(value) {
+            if (!value) return false;
+            const { passengerType } = this.parent;
+            const dobDate = new Date(value);
+            if (isNaN(dobDate.getTime())) return false;
+            
+            const age = calculateAge(dobDate, flightDate);
+            if (age < 0) return false;
+            
+            if (passengerType === "ADT" && age < 12) {
+                return this.createError({ message: "Adult must be 12 years or older at flight date." });
+            }
+            if (passengerType === "CHD" && (age < 2 || age >= 12)) {
+                return this.createError({ message: "Child must be between 2 and 11 years old at flight date." });
+            }
+            if (passengerType === "INF" && age >= 2) {
+                return this.createError({ message: "Infant must be less than 2 years old at flight date." });
+            }
+            return true;
+        }),
     gender: Yup.string().required("Gender is required"),
     documentNumber: Yup.string().required("Document number is required"),
 });
 
-const bookingSchema = Yup.object().shape({
+const createBookingSchema = (flightDate: Date) => Yup.object().shape({
     contactFullname: Yup.string().required("Contact full name is required"),
     contactEmail: Yup.string().email("Invalid email format").required("Contact email is required"),
     contactPhone: Yup.string().required("Contact phone is required"),
     passengers: Yup.array()
-        .of(passengerSchema)
+        .of(createPassengerSchema(flightDate))
         .min(1, "At least one passenger is required")
         .required("Passengers are required")
         .test("infant-adult-ratio", "Each adult can only accompany maximum 1 infant. Additional infant(s) must be booked as Child (CHD).", function(passengers) {
@@ -43,6 +75,25 @@ const bookingSchema = Yup.object().shape({
             const infants = passengers.filter((p: any) => p.passengerType === "INF").length;
             if (infants > 0 && adults === 0) {
                 return this.createError({ message: "Infants (INF) must be accompanied by at least one adult (ADT)" });
+            }
+            return true;
+        })
+        .test("adult-age-validation", "Adults accompanying infants must be 18 years or older at flight date", function(passengers) {
+            if (!passengers) return true;
+            const infants = passengers.filter((p: any) => p.passengerType === "INF");
+            if (infants.length === 0) return true;
+            
+            const adults = passengers.filter((p: any) => p.passengerType === "ADT");
+            for (const adult of adults) {
+                if (!adult.dob) continue;
+                const dobDate = new Date(adult.dob);
+                if (isNaN(dobDate.getTime())) continue;
+                
+                if (!isAdult(dobDate, flightDate)) {
+                    return this.createError({ 
+                        message: `Adult passenger "${adult.fullname || 'Passenger'}" must be 18 years or older at flight date to accompany an infant.` 
+                    });
+                }
             }
             return true;
         }),
@@ -204,17 +255,14 @@ const BookingInfoContent = () => {
         const passengers: PassengerFormData[] = [];
         
         for (let i = 0; i < numberOfPassengers; i++) {
-            // If user is logged in and this is the first passenger, auto-fill with user info
-            const isFirstPassenger = i === 0;
-            const isCurrentUser = isFirstPassenger && user;
-            
             passengers.push({
                 passengerType: "ADT", // Default to ADT, user can change
-                fullname: isCurrentUser ? (user?.fullname || "") : "",
-                dob: "", // DOB is required, user must enter
+                fullname: "",
+                dob: "",
                 gender: "",
                 documentNumber: "",
                 loyaltyNumber: "",
+                isCurrentUser: false, // Will be set by user selection
             });
         }
         
@@ -226,6 +274,8 @@ const BookingInfoContent = () => {
         contactEmail: user?.email || "",
         contactPhone: user?.phone ? String(user.phone) : "",
         passengers: getInitialPassengers(),
+        isUserTraveling: false, // User must explicitly choose
+        userPassengerIndex: undefined,
     };
 
     // Guest bookings are now allowed - no need to check accessToken
@@ -277,29 +327,31 @@ const BookingInfoContent = () => {
                                 </h2>
 
                                 {error && (
-                                    <div className="mb-[2rem] p-[1rem] bg-red-50 border border-red-200 rounded text-red-600">
-                                        {error}
-                                    </div>
+                                    <Alert variant="destructive" className="mb-[2rem]">
+                                        <AlertDescription>{error}</AlertDescription>
+                                    </Alert>
                                 )}
 
                                 {reservationData && (
-                                    <div className="mb-[2rem] p-[1rem] bg-blue-50 border border-blue-200 rounded text-blue-600">
-                                        <p>
-                                            Reservation Code:{" "}
-                                            <strong>{reservationData.reservationCode}</strong>
-                                        </p>
-                                        <p>
-                                            Expires at:{" "}
-                                            {new Date(
-                                                reservationData.expiresAt
-                                            ).toLocaleString()}
-                                        </p>
-                                    </div>
+                                    <Alert className="mb-[2rem]">
+                                        <AlertDescription>
+                                            <p>
+                                                Reservation Code:{" "}
+                                                <strong>{reservationData.reservationCode}</strong>
+                                            </p>
+                                            <p>
+                                                Expires at:{" "}
+                                                {new Date(
+                                                    reservationData.expiresAt
+                                                ).toLocaleString()}
+                                            </p>
+                                        </AlertDescription>
+                                    </Alert>
                                 )}
 
                                 <Formik
                                     initialValues={initialValues}
-                                    validationSchema={bookingSchema}
+                                    validationSchema={createBookingSchema(getFlightDate(ticketData))}
                                     onSubmit={handleSubmit}
                                 >
                                     {({ values, setFieldValue }) => (
@@ -310,53 +362,128 @@ const BookingInfoContent = () => {
                                                     Contact Information
                                                 </h3>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-[1rem]">
-                                                    <div>
-                                                        <label className="block text-sm font-medium mb-[0.5rem]">
+                                                    <div className="flex flex-col gap-2">
+                                                        <Label htmlFor="contactFullname">
                                                             Full Name *
-                                                        </label>
+                                                        </Label>
                                                         <Field
+                                                            as={Input}
                                                             type="text"
+                                                            id="contactFullname"
                                                             name="contactFullname"
-                                                            className="w-full px-[1rem] py-[0.8rem] border border-[var(--cl-third)] rounded"
                                                         />
                                                         <ErrorMessage
                                                             name="contactFullname"
-                                                            component="div"
-                                                            className="text-red-500 text-sm mt-[0.5rem]"
+                                                            render={(msg) => (
+                                                                <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                            )}
                                                         />
                                                     </div>
-                                                    <div>
-                                                        <label className="block text-sm font-medium mb-[0.5rem]">
+                                                    <div className="flex flex-col gap-2">
+                                                        <Label htmlFor="contactEmail">
                                                             Email *
-                                                        </label>
+                                                        </Label>
                                                         <Field
+                                                            as={Input}
                                                             type="email"
+                                                            id="contactEmail"
                                                             name="contactEmail"
-                                                            className="w-full px-[1rem] py-[0.8rem] border border-[var(--cl-third)] rounded"
                                                         />
                                                         <ErrorMessage
                                                             name="contactEmail"
-                                                            component="div"
-                                                            className="text-red-500 text-sm mt-[0.5rem]"
+                                                            render={(msg) => (
+                                                                <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                            )}
                                                         />
                                                     </div>
-                                                    <div>
-                                                        <label className="block text-sm font-medium mb-[0.5rem]">
+                                                    <div className="flex flex-col gap-2">
+                                                        <Label htmlFor="contactPhone">
                                                             Phone *
-                                                        </label>
+                                                        </Label>
                                                         <Field
+                                                            as={Input}
                                                             type="text"
+                                                            id="contactPhone"
                                                             name="contactPhone"
-                                                            className="w-full px-[1rem] py-[0.8rem] border border-[var(--cl-third)] rounded"
                                                         />
                                                         <ErrorMessage
                                                             name="contactPhone"
-                                                            component="div"
-                                                            className="text-red-500 text-sm mt-[0.5rem]"
+                                                            render={(msg) => (
+                                                                <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                            )}
                                                         />
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {/* User Traveling Selection - Only show if user is logged in */}
+                                            {user && (
+                                                <div className="flex flex-col gap-y-[1rem] p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                                                    <div className="flex items-center gap-3">
+                                                        <Checkbox
+                                                            id="isUserTraveling"
+                                                            checked={values.isUserTraveling}
+                                                            onCheckedChange={(checked) => {
+                                                                setFieldValue("isUserTraveling", checked);
+                                                                if (checked) {
+                                                                    // Auto-select first passenger as user if not set
+                                                                    if (values.userPassengerIndex === undefined) {
+                                                                        setFieldValue("userPassengerIndex", 0);
+                                                                        // Auto-fill first passenger with user info
+                                                                        setFieldValue("passengers.0.fullname", user.fullname || "");
+                                                                        setFieldValue("passengers.0.isCurrentUser", true);
+                                                                    }
+                                                                } else {
+                                                                    // Clear user info from all passengers
+                                                                    setFieldValue("userPassengerIndex", undefined);
+                                                                    values.passengers.forEach((_, idx) => {
+                                                                        if (values.passengers[idx].isCurrentUser) {
+                                                                            setFieldValue(`passengers.${idx}.fullname`, "");
+                                                                            setFieldValue(`passengers.${idx}.isCurrentUser`, false);
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Label htmlFor="isUserTraveling" className="cursor-pointer">
+                                                            Tôi là một trong những hành khách
+                                                        </Label>
+                                                    </div>
+                                                    
+                                                    {values.isUserTraveling && (
+                                                        <div className="ml-7 mt-2">
+                                                            <Label className="mb-2">
+                                                                Chọn hành khách là bạn:
+                                                            </Label>
+                                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                                {values.passengers.map((_, idx) => (
+                                                                    <Button
+                                                                        key={idx}
+                                                                        type="button"
+                                                                        variant={values.userPassengerIndex === idx ? "default" : "outline"}
+                                                                        size="sm"
+                                                                        onClick={() => {
+                                                                            // Clear previous user selection
+                                                                            const prevIndex = values.userPassengerIndex;
+                                                                            if (prevIndex !== undefined) {
+                                                                                setFieldValue(`passengers.${prevIndex}.isCurrentUser`, false);
+                                                                                setFieldValue(`passengers.${prevIndex}.fullname`, "");
+                                                                            }
+                                                                            
+                                                                            // Set new user selection
+                                                                            setFieldValue("userPassengerIndex", idx);
+                                                                            setFieldValue(`passengers.${idx}.isCurrentUser`, true);
+                                                                            setFieldValue(`passengers.${idx}.fullname`, user.fullname || "");
+                                                                        }}
+                                                                    >
+                                                                        Passenger {idx + 1}
+                                                                    </Button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
 
                                             {/* Passengers */}
                                             <div className="flex flex-col gap-y-[1rem]">
@@ -377,121 +504,196 @@ const BookingInfoContent = () => {
                                                             <div className="flex justify-between items-center mb-[1rem]">
                                                                 <h4 className="text-sm font-semibold">
                                                                     Passenger {index + 1}
-                                                                    {index === 0 && user && (
-                                                                        <span className="ml-2 text-xs text-gray-500">
-                                                                            (You)
+                                                                    {passenger.isCurrentUser && user && (
+                                                                        <span className="ml-2 text-xs text-blue-600 font-medium">
+                                                                            (Bạn)
                                                                         </span>
                                                                     )}
                                                                 </h4>
                                                                 <div className="flex items-center gap-2">
-                                                                    <label className="text-sm font-medium">
+                                                                    <Label className="text-sm font-medium">
                                                                         Type:
-                                                                    </label>
-                                                                    <Field
-                                                                        as="select"
-                                                                        name={`passengers.${index}.passengerType`}
-                                                                        className="px-2 py-1 border border-[var(--cl-third)] rounded text-sm"
-                                                                    >
-                                                                        <option value="ADT">Adult (12+)</option>
-                                                                        <option value="CHD">Child (2-11)</option>
-                                                                        <option value="INF">Infant (&lt;2)</option>
+                                                                    </Label>
+                                                                    <Field name={`passengers.${index}.passengerType`}>
+                                                                        {({ field, form }: any) => (
+                                                                            <Select
+                                                                                value={field.value}
+                                                                                onValueChange={(value) => {
+                                                                                    form.setFieldValue(field.name, value);
+                                                                                }}
+                                                                            >
+                                                                                <SelectTrigger className="w-[180px]">
+                                                                                    <SelectValue placeholder="Select type" />
+                                                                                </SelectTrigger>
+                                                                                <SelectContent>
+                                                                                    <SelectItem value="ADT">Adult (12+)</SelectItem>
+                                                                                    <SelectItem value="CHD">Child (2-11)</SelectItem>
+                                                                                    <SelectItem value="INF">Infant (&lt;2)</SelectItem>
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        )}
                                                                     </Field>
                                                                 </div>
                                                             </div>
                                                             
                                                             {isInfant && (
-                                                                <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                                                                    <p className="font-semibold">Infant Requirements:</p>
-                                                                    <ul className="list-disc list-inside mt-1 space-y-1">
-                                                                        <li>Must be accompanied by an adult (18+)</li>
-                                                                        <li>No separate seat (sits on adult's lap)</li>
-                                                                        <li>Maximum 1 infant per adult</li>
-                                                                    </ul>
-                                                                    {infantCount > adultCount && (
-                                                                        <p className="mt-2 font-semibold text-red-600">
-                                                                            Warning: You have {infantCount} infant(s) but only {adultCount} adult(s). 
-                                                                            Each adult can only accompany 1 infant. Additional infant(s) must be booked as Child (CHD).
-                                                                        </p>
-                                                                    )}
-                                                                </div>
+                                                                <Alert className="mb-3">
+                                                                    <AlertDescription>
+                                                                        <p className="font-semibold mb-2">Infant Requirements:</p>
+                                                                        <ul className="list-disc list-inside space-y-1">
+                                                                            <li>Must be accompanied by an adult (18+)</li>
+                                                                            <li>No separate seat (sits on adult's lap)</li>
+                                                                            <li>Maximum 1 infant per adult</li>
+                                                                        </ul>
+                                                                        {infantCount > adultCount && (
+                                                                            <p className="mt-2 font-semibold text-destructive">
+                                                                                Warning: You have {infantCount} infant(s) but only {adultCount} adult(s). 
+                                                                                Each adult can only accompany 1 infant. Additional infant(s) must be booked as Child (CHD).
+                                                                            </p>
+                                                                        )}
+                                                                    </AlertDescription>
+                                                                </Alert>
                                                             )}
                                                             
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-[1rem]">
-                                                                <div>
-                                                                    <label className="block text-sm font-medium mb-[0.5rem]">
+                                                                <div className="flex flex-col gap-2">
+                                                                    <Label htmlFor={`passengers.${index}.fullname`}>
                                                                         Full Name *
-                                                                    </label>
-                                                                <Field
-                                                                    type="text"
-                                                                    name={`passengers.${index}.fullname`}
-                                                                    className="w-full px-[1rem] py-[0.8rem] border border-[var(--cl-third)] rounded"
-                                                                />
-                                                                <ErrorMessage
-                                                                    name={`passengers.${index}.fullname`}
-                                                                    component="div"
-                                                                    className="text-red-500 text-sm mt-[0.5rem]"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-[0.5rem]">
-                                                                    Date of Birth *
-                                                                </label>
-                                                                <Field
-                                                                    type="date"
-                                                                    name={`passengers.${index}.dob`}
-                                                                    className="w-full px-[1rem] py-[0.8rem] border border-[var(--cl-third)] rounded"
-                                                                />
-                                                                <ErrorMessage
-                                                                    name={`passengers.${index}.dob`}
-                                                                    component="div"
-                                                                    className="text-red-500 text-sm mt-[0.5rem]"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-[0.5rem]">
-                                                                    Gender *
-                                                                </label>
-                                                                <Field
-                                                                    as="select"
-                                                                    name={`passengers.${index}.gender`}
-                                                                    className="w-full px-[1rem] py-[0.8rem] border border-[var(--cl-third)] rounded"
-                                                                >
-                                                                    <option value="">Select</option>
-                                                                    <option value="Male">Male</option>
-                                                                    <option value="Female">Female</option>
-                                                                    <option value="Other">Other</option>
-                                                                </Field>
-                                                                <ErrorMessage
-                                                                    name={`passengers.${index}.gender`}
-                                                                    component="div"
-                                                                    className="text-red-500 text-sm mt-[0.5rem]"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-[0.5rem]">
-                                                                    Document Number (CCCD/Passport) *
-                                                                </label>
-                                                                <Field
-                                                                    type="text"
-                                                                    name={`passengers.${index}.documentNumber`}
-                                                                    className="w-full px-[1rem] py-[0.8rem] border border-[var(--cl-third)] rounded"
-                                                                />
-                                                                <ErrorMessage
-                                                                    name={`passengers.${index}.documentNumber`}
-                                                                    component="div"
-                                                                    className="text-red-500 text-sm mt-[0.5rem]"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-[0.5rem]">
-                                                                    Loyalty Number (Optional)
-                                                                </label>
-                                                                <Field
-                                                                    type="text"
-                                                                    name={`passengers.${index}.loyaltyNumber`}
-                                                                    className="w-full px-[1rem] py-[0.8rem] border border-[var(--cl-third)] rounded"
-                                                                />
-                                                            </div>
+                                                                    </Label>
+                                                                    <Field
+                                                                        as={Input}
+                                                                        type="text"
+                                                                        id={`passengers.${index}.fullname`}
+                                                                        name={`passengers.${index}.fullname`}
+                                                                        disabled={passenger.isCurrentUser && user} // Disable if this is the current user
+                                                                    />
+                                                                    {passenger.isCurrentUser && user && (
+                                                                        <p className="text-xs text-muted-foreground">
+                                                                            Thông tin này được tự động điền từ tài khoản của bạn
+                                                                        </p>
+                                                                    )}
+                                                                    <ErrorMessage
+                                                                        name={`passengers.${index}.fullname`}
+                                                                        render={(msg) => (
+                                                                            <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                        )}
+                                                                    />
+                                                                </div>
+                                                                <div className="flex flex-col gap-2">
+                                                                    <Label htmlFor={`passengers.${index}.dob`}>
+                                                                        Date of Birth *
+                                                                    </Label>
+                                                                    <Field
+                                                                        as={Input}
+                                                                        type="date"
+                                                                        id={`passengers.${index}.dob`}
+                                                                        name={`passengers.${index}.dob`}
+                                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                            const dob = e.target.value;
+                                                                            setFieldValue(`passengers.${index}.dob`, dob);
+                                                                            
+                                                                            // Auto-determine passenger type based on DOB
+                                                                            if (dob) {
+                                                                                const flightDate = getFlightDate(ticketData);
+                                                                                const determinedType = determinePassengerType(dob, flightDate);
+                                                                                
+                                                                                if (determinedType && determinedType !== passenger.passengerType) {
+                                                                                    // Auto-update passenger type if different
+                                                                                    setFieldValue(`passengers.${index}.passengerType`, determinedType);
+                                                                                    
+                                                                                    // Show info message
+                                                                                    const age = calculateAge(dob, flightDate);
+                                                                                    if (age >= 0) {
+                                                                                        console.log(`Auto-determined passenger type: ${determinedType} (Age: ${age} at flight date)`);
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    <ErrorMessage
+                                                                        name={`passengers.${index}.dob`}
+                                                                        render={(msg) => (
+                                                                            <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                        )}
+                                                                    />
+                                                                    {passenger.dob && (() => {
+                                                                        const flightDate = getFlightDate(ticketData);
+                                                                        const age = calculateAge(passenger.dob, flightDate);
+                                                                        const determinedType = determinePassengerType(passenger.dob, flightDate);
+                                                                        
+                                                                        if (age >= 0 && determinedType) {
+                                                                            const typeMatches = determinedType === passenger.passengerType;
+                                                                            return (
+                                                                                <p className={`text-xs mt-1 ${typeMatches ? 'text-green-600' : 'text-orange-600'}`}>
+                                                                                    {typeMatches ? (
+                                                                                        <span>Tuổi tại ngày bay: {age} tuổi - Loại hành khách phù hợp: {determinedType}</span>
+                                                                                    ) : (
+                                                                                        <span>Tuổi tại ngày bay: {age} tuổi - Đề xuất loại: {determinedType} (hiện tại: {passenger.passengerType})</span>
+                                                                                    )}
+                                                                                </p>
+                                                                            );
+                                                                        }
+                                                                        return null;
+                                                                    })()}
+                                                                </div>
+                                                                <div className="flex flex-col gap-2">
+                                                                    <Label htmlFor={`passengers.${index}.gender`}>
+                                                                        Gender *
+                                                                    </Label>
+                                                                    <Field name={`passengers.${index}.gender`}>
+                                                                        {({ field, form }: any) => (
+                                                                            <Select
+                                                                                value={field.value || ""}
+                                                                                onValueChange={(value) => {
+                                                                                    form.setFieldValue(field.name, value);
+                                                                                }}
+                                                                            >
+                                                                                <SelectTrigger className="w-full">
+                                                                                    <SelectValue placeholder="Select gender" />
+                                                                                </SelectTrigger>
+                                                                                <SelectContent>
+                                                                                    <SelectItem value="Male">Male</SelectItem>
+                                                                                    <SelectItem value="Female">Female</SelectItem>
+                                                                                    <SelectItem value="Other">Other</SelectItem>
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        )}
+                                                                    </Field>
+                                                                    <ErrorMessage
+                                                                        name={`passengers.${index}.gender`}
+                                                                        render={(msg) => (
+                                                                            <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                        )}
+                                                                    />
+                                                                </div>
+                                                                <div className="flex flex-col gap-2">
+                                                                    <Label htmlFor={`passengers.${index}.documentNumber`}>
+                                                                        Document Number (CCCD/Passport) *
+                                                                    </Label>
+                                                                    <Field
+                                                                        as={Input}
+                                                                        type="text"
+                                                                        id={`passengers.${index}.documentNumber`}
+                                                                        name={`passengers.${index}.documentNumber`}
+                                                                    />
+                                                                    <ErrorMessage
+                                                                        name={`passengers.${index}.documentNumber`}
+                                                                        render={(msg) => (
+                                                                            <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                        )}
+                                                                    />
+                                                                </div>
+                                                                <div className="flex flex-col gap-2">
+                                                                    <Label htmlFor={`passengers.${index}.loyaltyNumber`}>
+                                                                        Loyalty Number (Optional)
+                                                                    </Label>
+                                                                    <Field
+                                                                        as={Input}
+                                                                        type="text"
+                                                                        id={`passengers.${index}.loyaltyNumber`}
+                                                                        name={`passengers.${index}.loyaltyNumber`}
+                                                                    />
+                                                                </div>
                                                         </div>
                                                     </div>
                                                     );
