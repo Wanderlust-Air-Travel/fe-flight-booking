@@ -18,6 +18,41 @@ import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import { PassengerFormData, BookingFormData } from "@/types/booking-form-type";
 import { determinePassengerType, getFlightDate, calculateAge, isAdult } from "@/lib/passenger-utils";
+
+/**
+ * Calculate default DOB based on passenger type and flight date
+ * @param passengerType - ADT, CHD, or INF
+ * @param flightDate - Flight departure date
+ * @returns DOB string in YYYY-MM-DD format
+ */
+const getDefaultDOB = (passengerType: string, flightDate: Date): string => {
+    const flightDateCopy = new Date(flightDate);
+    
+    switch (passengerType) {
+        case "ADT":
+            // Adult: 18 years old at flight date (ensures >= 12 and can accompany infants)
+            flightDateCopy.setFullYear(flightDateCopy.getFullYear() - 18);
+            break;
+        case "CHD":
+            // Child: 6 years old at flight date (middle of 2-11 range)
+            flightDateCopy.setFullYear(flightDateCopy.getFullYear() - 6);
+            break;
+        case "INF":
+            // Infant: 1 year old at flight date (ensures < 2 years)
+            flightDateCopy.setFullYear(flightDateCopy.getFullYear() - 1);
+            break;
+        default:
+            // Default to ADT if unknown type
+            flightDateCopy.setFullYear(flightDateCopy.getFullYear() - 18);
+    }
+    
+    // Format as YYYY-MM-DD
+    const year = flightDateCopy.getFullYear();
+    const month = String(flightDateCopy.getMonth() + 1).padStart(2, '0');
+    const day = String(flightDateCopy.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+};
 import { Checkbox } from "@/components/ui/checkbox";
 import { useReservationCountdown } from "@/app/hooks/use-reservation-countdown";
 
@@ -230,8 +265,8 @@ const BookingInfoContent = () => {
                     `/api/bookings?reservationId=${reservationId}`,
                     {
                         passengers: values.passengers.map((p) => {
-                            // Build passenger object - only include documentNumber if provided
-                            // ADT requires documentNumber, CHD and INF do not
+                            // Build passenger object
+                            // ADT requires documentNumber, CHD and INF do not need it (field is hidden)
                             const passengerData: any = {
                                 passengerType: p.passengerType,
                                 fullname: p.fullname,
@@ -240,10 +275,12 @@ const BookingInfoContent = () => {
                                 loyaltyNumber: p.loyaltyNumber,
                             };
                             
-                            // Only include documentNumber if it has a value (required for ADT, optional for CHD/INF)
-                            if (p.documentNumber && p.documentNumber.trim().length > 0) {
+                            // Only include documentNumber for ADT passengers
+                            // CHD and INF: field is hidden, so documentNumber should not be sent
+                            if (p.passengerType === "ADT" && p.documentNumber && p.documentNumber.trim().length > 0) {
                                 passengerData.documentNumber = p.documentNumber.trim();
                             }
+                            // For CHD and INF, documentNumber is not included in the request
                             
                             return passengerData;
                         }),
@@ -577,6 +614,17 @@ const BookingInfoContent = () => {
                                                                                 value={field.value}
                                                                                 onValueChange={(value) => {
                                                                                     form.setFieldValue(field.name, value);
+                                                                                    
+                                                                                    // Auto-fill DOB based on selected passenger type
+                                                                                    const flightDate = getFlightDate(ticketData);
+                                                                                    const defaultDOB = getDefaultDOB(value, flightDate);
+                                                                                    form.setFieldValue(`passengers.${index}.dob`, defaultDOB);
+                                                                                    
+                                                                                    // Clear documentNumber when changing from ADT to CHD/INF
+                                                                                    // (since CHD/INF don't need documentNumber)
+                                                                                    if (value !== "ADT" && passenger.documentNumber) {
+                                                                                        form.setFieldValue(`passengers.${index}.documentNumber`, "");
+                                                                                    }
                                                                                 }}
                                                                             >
                                                                                 <SelectTrigger className="w-[180px]">
@@ -723,7 +771,7 @@ const BookingInfoContent = () => {
                                                                         )}
                                                                     />
                                                                 </div>
-                                                                {/* Document Number: Required for ADT, Optional for CHD and INF */}
+                                                                {/* Document Number: Only shown for ADT passengers, hidden for CHD and INF */}
                                                                 {values.passengers[index].passengerType === "ADT" && (
                                                                     <div className="flex flex-col gap-2">
                                                                         <Label htmlFor={`passengers.${index}.documentNumber`}>
@@ -743,26 +791,7 @@ const BookingInfoContent = () => {
                                                                         />
                                                                     </div>
                                                                 )}
-                                                                {values.passengers[index].passengerType !== "ADT" && (
-                                                                    <div className="flex flex-col gap-2">
-                                                                        <Label htmlFor={`passengers.${index}.documentNumber`}>
-                                                                            Document Number (CCCD/Passport) <span className="text-gray-500 text-sm">(Optional for {values.passengers[index].passengerType === "CHD" ? "Children" : "Infants"})</span>
-                                                                        </Label>
-                                                                        <Field
-                                                                            as={Input}
-                                                                            type="text"
-                                                                            id={`passengers.${index}.documentNumber`}
-                                                                            name={`passengers.${index}.documentNumber`}
-                                                                            placeholder="Optional - not required for children and infants"
-                                                                        />
-                                                                        <ErrorMessage
-                                                                            name={`passengers.${index}.documentNumber`}
-                                                                            render={(msg) => (
-                                                                                <p className="text-sm text-destructive mt-1">{msg}</p>
-                                                                            )}
-                                                                        />
-                                                                    </div>
-                                                                )}
+                                                                {/* CHD and INF: documentNumber field is completely hidden - not displayed at all */}
                                                                 <div className="flex flex-col gap-2">
                                                                     <Label htmlFor={`passengers.${index}.loyaltyNumber`}>
                                                                         Loyalty Number (Optional)
