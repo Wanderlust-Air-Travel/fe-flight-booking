@@ -443,15 +443,26 @@ const SeatMapPageContent = () => {
             }
 
             // Prepare request payload
+            // CRITICAL: Validate and ensure all required fields are present
+            const validatedSeats = selectedSeatsInfo.map((seat, index) => {
+                if (!seat.flightSeatId || !seat.seatNumber) {
+                    console.error(`[SeatMap] Invalid seat at index ${index}:`, seat);
+                    throw new Error(`Seat at index ${index} is missing flightSeatId or seatNumber`);
+                }
+                return {
+                    flightSeatId: seat.flightSeatId.trim(), // Ensure no whitespace
+                    seatNumber: seat.seatNumber.trim(), // Ensure no whitespace
+                };
+            });
+
             const requestPayload = {
-                flightInstanceId: flightInstanceId,
-                seats: selectedSeatsInfo.map(seat => ({
-                    flightSeatId: seat.flightSeatId,
-                    seatNumber: seat.seatNumber,
-                })),
+                flightInstanceId: flightInstanceId.trim(), // Ensure no whitespace
+                seats: validatedSeats,
             };
 
             console.log('[SeatMap] Request payload:', JSON.stringify(requestPayload, null, 2));
+            console.log('[SeatMap] Validated seats count:', validatedSeats.length);
+            console.log('[SeatMap] Each seat has flightSeatId and seatNumber:', validatedSeats.every(s => s.flightSeatId && s.seatNumber));
 
             const axiosClient = accessToken ? axiosInstance : axiosPublic;
             const response = await axiosClient.post(
