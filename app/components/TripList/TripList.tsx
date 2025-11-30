@@ -98,10 +98,10 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
             airline: "Bamboo",
             startDate: convertToDMY(trip.departureLocal),
             endDate: convertToDMY(trip.arrivalLocal),
-            startCode: trip.origin.iata,
-            endCode: trip.destination.iata,
-            start: trip.origin.city,
-            end: trip.destination.city,
+            startCode: trip.origin?.iata || '',
+            endCode: trip.destination?.iata || '',
+            start: trip.origin?.city || '',
+            end: trip.destination?.city || '',
             service: trips.tripType,
             stopCount: 0,
             stopDuration: "none",
@@ -241,7 +241,9 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                             )
                             :
                             (
-                                trips.outbound.map((trip: TripListType, index: number) => {
+                                trips.outbound
+                                    .filter((trip: TripListType) => trip && trip.origin && trip.destination) // Filter out invalid trips
+                                    .map((trip: TripListType, index: number) => {
                                     console.log(trip)
                                     return (
                                         <li
@@ -262,7 +264,9 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
                                                 <div className="w-[20%]">
                                                     <div className="flex flex-col gap-y-[0.2rem]">
-                                                        <p className="text-[var(--cl-five)] font-bold text-base">{trip.origin.iata} - {trip.destination.iata}</p>
+                                                        <p className="text-[var(--cl-five)] font-bold text-base">
+                                                            {trip.origin?.iata || 'N/A'} - {trip.destination?.iata || 'N/A'}
+                                                        </p>
                                                         {trip.departureLocal && <p className="text-[var(--cl-third)] text-mn">Start date: {convertToDMY(trip.departureLocal)}</p>}
                                                         {trip.arrivalLocal && <p className="text-[var(--cl-third)] text-mn">end date: {convertToDMY(trip.arrivalLocal)}</p>}
                                                     </div>

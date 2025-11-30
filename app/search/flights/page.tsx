@@ -36,10 +36,19 @@ const ServiceDetailsResultSearchContent = () => {
       )
       .then((res) => {
         const tripTypeValue = tripType === "round_trip" ? "round_trip" : "one_way";
+        // Backend returns { tripType, outbound, inbound?, totalPassengers }
+        // Handle both response formats: direct array or object with outbound property
+        const outboundFlights = Array.isArray(res.data) 
+          ? res.data 
+          : (res.data?.outbound || []);
+        const inboundFlights = tripTypeValue === "round_trip" 
+          ? (Array.isArray(res.data) ? undefined : (res.data?.inbound || undefined))
+          : undefined;
+        
         setTrips({
           tripType: tripTypeValue,
-          outbound: res.data,
-          inbound: tripTypeValue === "round_trip" ? res.data : undefined,
+          outbound: outboundFlights,
+          inbound: inboundFlights,
         });
       })
       .catch((err) => {
