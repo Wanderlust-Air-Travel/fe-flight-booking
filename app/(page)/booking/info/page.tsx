@@ -383,33 +383,33 @@ const BookingInfoContent = () => {
             <Breadcrumb />
             <InfoTicketBox />
 
-            <section className="">
-                <div className="container">
-                    <div className="flex flex-wrap -mx-[1.2rem]">
-                        <div className="px-[1.2rem] w-full lg:w-[70%]">
-                            <div className="bg-white rounded-[1rem] p-[2rem] border border-[var(--cl-third)]">
-                                <h2 className="text-lg font-bold text-[var(--cl-pri)] mb-[2rem]">
+            <section className="py-[2rem]">
+                <div className="container max-w-[160rem]">
+                    <div className="flex flex-wrap -mx-[2rem]">
+                        <div className="px-[2rem] w-full lg:w-[70%]">
+                            <div className="bg-white rounded-[1.5rem] p-[3rem] border-2 border-[var(--cl-pri)] shadow-lg">
+                                <h2 className="text-[3.6rem] font-bold text-[var(--cl-pri)] mb-[3rem] uppercase tracking-wide">
                                     Passenger Information
                                 </h2>
 
                                 {error && (
-                                    <Alert variant="destructive" className="mb-[2rem]">
-                                        <AlertDescription>{error}</AlertDescription>
+                                    <Alert variant="destructive" className="mb-[2.5rem] border-2">
+                                        <AlertDescription className="text-[1.6rem]">{error}</AlertDescription>
                                     </Alert>
                                 )}
 
                                 {reservationData && (
-                                    <Alert className="mb-[2rem]">
-                                        <AlertDescription>
-                                            <p>
+                                    <Alert className="mb-[2.5rem] border-2 border-[var(--cl-pri)] bg-blue-50">
+                                        <AlertDescription className="text-[1.6rem]">
+                                            <p className="font-semibold text-[var(--cl-pri)] mb-2">
                                                 Reservation Code:{" "}
-                                                <strong>{reservationData.reservationCode}</strong>
+                                                <span className="text-[1.8rem]">{reservationData.reservationCode}</span>
                                             </p>
-                                            <p>
+                                            <p className="text-gray-700">
                                                 Expires at:{" "}
-                                                {new Date(
+                                                <strong>{new Date(
                                                     reservationData.expiresAt
-                                                ).toLocaleString()}
+                                                ).toLocaleString()}</strong>
                                             </p>
                                         </AlertDescription>
                                     </Alert>
@@ -417,23 +417,23 @@ const BookingInfoContent = () => {
 
                                 {/* WebSocket: Real-time Reservation Countdown Timer */}
                                 {isCountdownSubscribed && countdown && (
-                                    <Alert className={`mb-[2rem] ${isExpired ? 'border-red-500 bg-red-50' : remainingSeconds < 300 ? 'border-yellow-500 bg-yellow-50' : 'border-blue-500 bg-blue-50'}`}>
+                                    <Alert className={`mb-[2.5rem] border-2 ${isExpired ? 'border-red-500 bg-red-50' : remainingSeconds < 300 ? 'border-yellow-500 bg-yellow-50' : 'border-[var(--cl-pri)] bg-blue-50'}`}>
                                         <AlertDescription>
                                             <div className="flex items-center justify-between">
                                                 <div>
-                                                    <p className="font-semibold">
+                                                    <p className={`font-bold text-[1.8rem] ${isExpired ? 'text-red-600' : remainingSeconds < 300 ? 'text-yellow-700' : 'text-[var(--cl-pri)]'}`}>
                                                         {isExpired ? 'Reservation Expired' : 'Reservation Time Remaining'}
                                                     </p>
-                                                    <p className="text-sm text-gray-600 mt-1">
+                                                    <p className="text-[1.4rem] text-gray-700 mt-2">
                                                         Complete your booking before the reservation expires
                                                     </p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className={`text-2xl font-bold ${isExpired ? 'text-red-600' : remainingSeconds < 300 ? 'text-yellow-600' : 'text-blue-600'}`}>
+                                                    <p className={`text-[3.2rem] font-bold ${isExpired ? 'text-red-600' : remainingSeconds < 300 ? 'text-yellow-700' : 'text-[var(--cl-pri)]'}`}>
                                                         {formattedCountdown}
                                                     </p>
                                                     {isExpired && (
-                                                        <p className="text-xs text-red-600 mt-1">
+                                                        <p className="text-[1.2rem] text-red-600 mt-2 font-medium">
                                                             Please create a new reservation
                                                         </p>
                                                     )}
@@ -449,15 +449,15 @@ const BookingInfoContent = () => {
                                     onSubmit={handleSubmit}
                                 >
                                     {({ values, setFieldValue }) => (
-                                        <Form className="flex flex-col gap-y-[2rem]">
+                                        <Form className="flex flex-col gap-y-[3rem]">
                                             {/* Contact Information */}
-                                            <div className="flex flex-col gap-y-[1rem]">
-                                                <h3 className="text-md font-semibold">
+                                            <div className="flex flex-col gap-y-[2rem]">
+                                                <h3 className="text-[2.4rem] font-bold text-[var(--cl-pri)] uppercase tracking-wide border-b-2 border-[var(--cl-pri)] pb-[1rem]">
                                                     Contact Information
                                                 </h3>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[1rem]">
-                                                    <div className="flex flex-col gap-2">
-                                                        <Label htmlFor="contactFullname">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-[2rem]">
+                                                    <div className="flex flex-col gap-[1rem]">
+                                                        <Label htmlFor="contactFullname" className="text-[1.6rem] font-semibold text-[var(--cl-pri)]">
                                                             Full Name *
                                                         </Label>
                                                         <Field
@@ -465,16 +465,17 @@ const BookingInfoContent = () => {
                                                             type="text"
                                                             id="contactFullname"
                                                             name="contactFullname"
+                                                            className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                         />
                                                         <ErrorMessage
                                                             name="contactFullname"
                                                             render={(msg) => (
-                                                                <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                <p className="text-[1.4rem] text-destructive mt-1 font-medium">{msg}</p>
                                                             )}
                                                         />
                                                     </div>
-                                                    <div className="flex flex-col gap-2">
-                                                        <Label htmlFor="contactEmail">
+                                                    <div className="flex flex-col gap-[1rem]">
+                                                        <Label htmlFor="contactEmail" className="text-[1.6rem] font-semibold text-[var(--cl-pri)]">
                                                             Email *
                                                         </Label>
                                                         <Field
@@ -482,16 +483,17 @@ const BookingInfoContent = () => {
                                                             type="email"
                                                             id="contactEmail"
                                                             name="contactEmail"
+                                                            className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                         />
                                                         <ErrorMessage
                                                             name="contactEmail"
                                                             render={(msg) => (
-                                                                <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                <p className="text-[1.4rem] text-destructive mt-1 font-medium">{msg}</p>
                                                             )}
                                                         />
                                                     </div>
-                                                    <div className="flex flex-col gap-2">
-                                                        <Label htmlFor="contactPhone">
+                                                    <div className="flex flex-col gap-[1rem]">
+                                                        <Label htmlFor="contactPhone" className="text-[1.6rem] font-semibold text-[var(--cl-pri)]">
                                                             Phone *
                                                         </Label>
                                                         <Field
@@ -499,11 +501,12 @@ const BookingInfoContent = () => {
                                                             type="text"
                                                             id="contactPhone"
                                                             name="contactPhone"
+                                                            className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                         />
                                                         <ErrorMessage
                                                             name="contactPhone"
                                                             render={(msg) => (
-                                                                <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                <p className="text-[1.4rem] text-destructive mt-1 font-medium">{msg}</p>
                                                             )}
                                                         />
                                                     </div>
@@ -512,7 +515,7 @@ const BookingInfoContent = () => {
 
                                             {/* User Traveling Selection - Only show if user is logged in */}
                                             {user && (
-                                                <div className="flex flex-col gap-y-[1rem] p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                                                <div className="flex flex-col gap-y-[2rem] p-[2.5rem] bg-gradient-to-br from-blue-50 to-white border-2 border-[var(--cl-pri)] rounded-[1.2rem] shadow-md">
                                                     <div className="flex items-center gap-3">
                                                         <Checkbox
                                                             id="isUserTraveling"
@@ -539,23 +542,27 @@ const BookingInfoContent = () => {
                                                                 }
                                                             }}
                                                         />
-                                                        <Label htmlFor="isUserTraveling" className="cursor-pointer">
+                                                        <Label htmlFor="isUserTraveling" className="cursor-pointer text-[1.8rem] font-bold text-[var(--cl-pri)]">
                                                             Tôi là một trong những hành khách
                                                         </Label>
                                                     </div>
                                                     
                                                     {values.isUserTraveling && (
-                                                        <div className="ml-7 mt-2">
-                                                            <Label className="mb-2">
+                                                        <div className="ml-7 mt-3">
+                                                            <Label className="mb-3 text-[1.6rem] font-semibold text-[var(--cl-pri)] block">
                                                                 Chọn hành khách là bạn:
                                                             </Label>
-                                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                            <div className="flex flex-wrap gap-3 mt-3">
                                                                 {values.passengers.map((_, idx) => (
                                                                     <Button
                                                                         key={idx}
                                                                         type="button"
                                                                         variant={values.userPassengerIndex === idx ? "default" : "outline"}
-                                                                        size="sm"
+                                                                        size="lg"
+                                                                        className={values.userPassengerIndex === idx 
+                                                                            ? "bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white border-2 border-[var(--cl-pri)] text-[1.5rem] font-bold px-6 py-3"
+                                                                            : "border-2 border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white text-[1.5rem] font-semibold px-6 py-3"
+                                                                        }
                                                                         onClick={() => {
                                                                             // Clear previous user selection
                                                                             const prevIndex = values.userPassengerIndex;
@@ -580,8 +587,8 @@ const BookingInfoContent = () => {
                                             )}
 
                                             {/* Passengers */}
-                                            <div className="flex flex-col gap-y-[1rem]">
-                                                <h3 className="text-md font-semibold">
+                                            <div className="flex flex-col gap-y-[2.5rem]">
+                                                <h3 className="text-[2.4rem] font-bold text-[var(--cl-pri)] uppercase tracking-wide border-b-2 border-[var(--cl-pri)] pb-[1rem]">
                                                     Passenger Information
                                                 </h3>
                                                 {values.passengers.map((passenger, index) => {
@@ -593,19 +600,19 @@ const BookingInfoContent = () => {
                                                     return (
                                                         <div
                                                             key={index}
-                                                            className="border border-[var(--cl-third)] rounded p-[1.5rem]"
+                                                            className="border-2 border-[var(--cl-pri)] rounded-[1.2rem] p-[2.5rem] bg-gradient-to-br from-white to-blue-50/30 shadow-md"
                                                         >
-                                                            <div className="flex justify-between items-center mb-[1rem]">
-                                                                <h4 className="text-sm font-semibold">
+                                                            <div className="flex justify-between items-center mb-[2rem] pb-[1.5rem] border-b-2 border-[var(--cl-pri)]">
+                                                                <h4 className="text-[2rem] font-bold text-[var(--cl-pri)]">
                                                                     Passenger {index + 1}
                                                                     {passenger.isCurrentUser && user && (
-                                                                        <span className="ml-2 text-xs text-blue-600 font-medium">
+                                                                        <span className="ml-3 text-[1.4rem] text-[var(--cl-four)] font-semibold bg-[var(--cl-four)]/20 px-3 py-1 rounded-full">
                                                                             (Bạn)
                                                                         </span>
                                                                     )}
                                                                 </h4>
-                                                                <div className="flex items-center gap-2">
-                                                                    <Label className="text-sm font-medium">
+                                                                <div className="flex items-center gap-3">
+                                                                    <Label className="text-[1.6rem] font-semibold text-[var(--cl-pri)]">
                                                                         Type:
                                                                     </Label>
                                                                     <Field name={`passengers.${index}.passengerType`}>
@@ -627,7 +634,7 @@ const BookingInfoContent = () => {
                                                                                     }
                                                                                 }}
                                                                             >
-                                                                                <SelectTrigger className="w-[180px]">
+                                                                                <SelectTrigger className="w-[220px] h-[5rem] text-[1.6rem] border-2 border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]">
                                                                                     <SelectValue placeholder="Select type" />
                                                                                 </SelectTrigger>
                                                                                 <SelectContent>
@@ -642,16 +649,16 @@ const BookingInfoContent = () => {
                                                             </div>
                                                             
                                                             {isInfant && (
-                                                                <Alert className="mb-3">
-                                                                    <AlertDescription>
-                                                                        <p className="font-semibold mb-2">Infant Requirements:</p>
-                                                                        <ul className="list-disc list-inside space-y-1">
+                                                                <Alert className="mb-[2rem] border-2 border-[var(--cl-pri)] bg-blue-50">
+                                                                    <AlertDescription className="text-[1.5rem]">
+                                                                        <p className="font-bold text-[var(--cl-pri)] mb-3 text-[1.8rem]">Infant Requirements:</p>
+                                                                        <ul className="list-disc list-inside space-y-2 text-gray-700">
                                                                             <li>Must be accompanied by an adult (18+)</li>
                                                                             <li>No separate seat (sits on adult's lap)</li>
                                                                             <li>Maximum 1 infant per adult</li>
                                                                         </ul>
                                                                         {infantCount > adultCount && (
-                                                                            <p className="mt-2 font-semibold text-destructive">
+                                                                            <p className="mt-3 font-bold text-destructive text-[1.6rem]">
                                                                                 Warning: You have {infantCount} infant(s) but only {adultCount} adult(s). 
                                                                                 Each adult can only accompany 1 infant. Additional infant(s) must be booked as Child (CHD).
                                                                             </p>
@@ -660,9 +667,9 @@ const BookingInfoContent = () => {
                                                                 </Alert>
                                                             )}
                                                             
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-[1rem]">
-                                                                <div className="flex flex-col gap-2">
-                                                                    <Label htmlFor={`passengers.${index}.fullname`}>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-[2rem]">
+                                                                <div className="flex flex-col gap-[1rem]">
+                                                                    <Label htmlFor={`passengers.${index}.fullname`} className="text-[1.6rem] font-semibold text-[var(--cl-pri)]">
                                                                         Full Name *
                                                                     </Label>
                                                                     <Field
@@ -670,22 +677,23 @@ const BookingInfoContent = () => {
                                                                         type="text"
                                                                         id={`passengers.${index}.fullname`}
                                                                         name={`passengers.${index}.fullname`}
-                                                                        disabled={passenger.isCurrentUser && user} // Disable if this is the current user
+                                                                        disabled={passenger.isCurrentUser && user}
+                                                                        className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                                     />
                                                                     {passenger.isCurrentUser && user && (
-                                                                        <p className="text-xs text-muted-foreground">
+                                                                        <p className="text-[1.3rem] text-[var(--cl-four)] font-medium">
                                                                             Thông tin này được tự động điền từ tài khoản của bạn
                                                                         </p>
                                                                     )}
                                                                     <ErrorMessage
                                                                         name={`passengers.${index}.fullname`}
                                                                         render={(msg) => (
-                                                                            <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                            <p className="text-[1.4rem] text-destructive mt-1 font-medium">{msg}</p>
                                                                         )}
                                                                     />
                                                                 </div>
-                                                                <div className="flex flex-col gap-2">
-                                                                    <Label htmlFor={`passengers.${index}.dob`}>
+                                                                <div className="flex flex-col gap-[1rem]">
+                                                                    <Label htmlFor={`passengers.${index}.dob`} className="text-[1.6rem] font-semibold text-[var(--cl-pri)]">
                                                                         Date of Birth *
                                                                     </Label>
                                                                     <Field
@@ -693,6 +701,7 @@ const BookingInfoContent = () => {
                                                                         type="date"
                                                                         id={`passengers.${index}.dob`}
                                                                         name={`passengers.${index}.dob`}
+                                                                        className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                                             const dob = e.target.value;
                                                                             setFieldValue(`passengers.${index}.dob`, dob);
@@ -718,7 +727,7 @@ const BookingInfoContent = () => {
                                                                     <ErrorMessage
                                                                         name={`passengers.${index}.dob`}
                                                                         render={(msg) => (
-                                                                            <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                            <p className="text-[1.4rem] text-destructive mt-1 font-medium">{msg}</p>
                                                                         )}
                                                                     />
                                                                     {passenger.dob && (() => {
@@ -729,11 +738,11 @@ const BookingInfoContent = () => {
                                                                         if (age >= 0 && determinedType) {
                                                                             const typeMatches = determinedType === passenger.passengerType;
                                                                             return (
-                                                                                <p className={`text-xs mt-1 ${typeMatches ? 'text-green-600' : 'text-orange-600'}`}>
+                                                                                <p className={`text-[1.4rem] mt-2 font-medium ${typeMatches ? 'text-[var(--cl-four)]' : 'text-orange-600'}`}>
                                                                                     {typeMatches ? (
-                                                                                        <span>Tuổi tại ngày bay: {age} tuổi - Loại hành khách phù hợp: {determinedType}</span>
+                                                                                        <span>✓ Tuổi tại ngày bay: {age} tuổi - Loại hành khách phù hợp: {determinedType}</span>
                                                                                     ) : (
-                                                                                        <span>Tuổi tại ngày bay: {age} tuổi - Đề xuất loại: {determinedType} (hiện tại: {passenger.passengerType})</span>
+                                                                                        <span>⚠ Tuổi tại ngày bay: {age} tuổi - Đề xuất loại: {determinedType} (hiện tại: {passenger.passengerType})</span>
                                                                                     )}
                                                                                 </p>
                                                                             );
@@ -741,8 +750,8 @@ const BookingInfoContent = () => {
                                                                         return null;
                                                                     })()}
                                                                 </div>
-                                                                <div className="flex flex-col gap-2">
-                                                                    <Label htmlFor={`passengers.${index}.gender`}>
+                                                                <div className="flex flex-col gap-[1rem]">
+                                                                    <Label htmlFor={`passengers.${index}.gender`} className="text-[1.6rem] font-semibold text-[var(--cl-pri)]">
                                                                         Gender *
                                                                     </Label>
                                                                     <Field name={`passengers.${index}.gender`}>
@@ -753,13 +762,13 @@ const BookingInfoContent = () => {
                                                                                     form.setFieldValue(field.name, value);
                                                                                 }}
                                                                             >
-                                                                                <SelectTrigger className="w-full">
+                                                                                <SelectTrigger className="w-full h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]">
                                                                                     <SelectValue placeholder="Select gender" />
                                                                                 </SelectTrigger>
                                                                                 <SelectContent>
-                                                                                    <SelectItem value="Male">Male</SelectItem>
-                                                                                    <SelectItem value="Female">Female</SelectItem>
-                                                                                    <SelectItem value="Other">Other</SelectItem>
+                                                                                    <SelectItem value="MALE">Male</SelectItem>
+                                                                                    <SelectItem value="FEMALE">Female</SelectItem>
+                                                                                    <SelectItem value="OTHER">Other</SelectItem>
                                                                                 </SelectContent>
                                                                             </Select>
                                                                         )}
@@ -767,14 +776,14 @@ const BookingInfoContent = () => {
                                                                     <ErrorMessage
                                                                         name={`passengers.${index}.gender`}
                                                                         render={(msg) => (
-                                                                            <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                            <p className="text-[1.4rem] text-destructive mt-1 font-medium">{msg}</p>
                                                                         )}
                                                                     />
                                                                 </div>
                                                                 {/* Document Number: Only shown for ADT passengers, hidden for CHD and INF */}
                                                                 {values.passengers[index].passengerType === "ADT" && (
-                                                                    <div className="flex flex-col gap-2">
-                                                                        <Label htmlFor={`passengers.${index}.documentNumber`}>
+                                                                    <div className="flex flex-col gap-[1rem]">
+                                                                        <Label htmlFor={`passengers.${index}.documentNumber`} className="text-[1.6rem] font-semibold text-[var(--cl-pri)]">
                                                                             Document Number (CCCD/Passport) *
                                                                         </Label>
                                                                         <Field
@@ -782,18 +791,19 @@ const BookingInfoContent = () => {
                                                                             type="text"
                                                                             id={`passengers.${index}.documentNumber`}
                                                                             name={`passengers.${index}.documentNumber`}
+                                                                            className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                                         />
                                                                         <ErrorMessage
                                                                             name={`passengers.${index}.documentNumber`}
                                                                             render={(msg) => (
-                                                                                <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                                <p className="text-[1.4rem] text-destructive mt-1 font-medium">{msg}</p>
                                                                             )}
                                                                         />
                                                                     </div>
                                                                 )}
                                                                 {/* CHD and INF: documentNumber field is completely hidden - not displayed at all */}
-                                                                <div className="flex flex-col gap-2">
-                                                                    <Label htmlFor={`passengers.${index}.loyaltyNumber`}>
+                                                                <div className="flex flex-col gap-[1rem]">
+                                                                    <Label htmlFor={`passengers.${index}.loyaltyNumber`} className="text-[1.6rem] font-semibold text-[var(--cl-pri)]">
                                                                         Loyalty Number (Optional)
                                                                     </Label>
                                                                     <Field
@@ -801,6 +811,7 @@ const BookingInfoContent = () => {
                                                                         type="text"
                                                                         id={`passengers.${index}.loyaltyNumber`}
                                                                         name={`passengers.${index}.loyaltyNumber`}
+                                                                        className="h-[5rem] text-[1.6rem] border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]"
                                                                     />
                                                                 </div>
                                                         </div>
@@ -809,17 +820,19 @@ const BookingInfoContent = () => {
                                                 })}
                                             </div>
 
-                                            <div className="flex gap-x-[1rem]">
+                                            <div className="flex gap-x-[2rem] pt-[2rem] border-t-2 border-[var(--cl-pri)]">
                                                 <Button
                                                     type="button"
                                                     variant="outline"
                                                     onClick={() => router.back()}
+                                                    className="h-[5.5rem] px-[3rem] text-[1.8rem] font-bold border-2 border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white transition-all"
                                                 >
                                                     Back
                                                 </Button>
                                                 <Button
                                                     type="submit"
                                                     disabled={isCreatingBooking}
+                                                    className="h-[5.5rem] px-[4rem] text-[1.8rem] font-bold bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white uppercase tracking-wide transition-all shadow-lg"
                                                 >
                                                     {isCreatingBooking
                                                         ? "Creating Booking..."
@@ -832,22 +845,22 @@ const BookingInfoContent = () => {
                             </div>
                         </div>
 
-                        <div className="px-[1.2rem] w-full lg:w-[30%]">
-                            <div className="sticky top-[calc(var(--hd)+1rem)] bg-white rounded-[1rem] p-[2rem] border border-[var(--cl-third)]">
-                                <h3 className="text-md font-bold text-[var(--cl-pri)] mb-[2rem]">
+                        <div className="px-[2rem] w-full lg:w-[30%]">
+                            <div className="sticky top-[calc(var(--hd)+2rem)] bg-gradient-to-br from-white to-blue-50/30 rounded-[1.5rem] p-[3rem] border-2 border-[var(--cl-pri)] shadow-lg">
+                                <h3 className="text-[2.4rem] font-bold text-[var(--cl-pri)] mb-[2.5rem] uppercase tracking-wide border-b-2 border-[var(--cl-pri)] pb-[1.5rem]">
                                     Booking Summary
                                 </h3>
                                 {reservationData && (
-                                    <div className="flex flex-col gap-y-[1rem]">
-                                        <div className="flex justify-between">
-                                            <span>Total Amount:</span>
-                                            <span className="font-bold">
+                                    <div className="flex flex-col gap-y-[2rem]">
+                                        <div className="flex justify-between items-center p-[1.5rem] bg-white rounded-[1rem] border-2 border-[var(--cl-pri)]">
+                                            <span className="text-[1.6rem] font-semibold text-gray-700">Total Amount:</span>
+                                            <span className="text-[2rem] font-bold text-[var(--cl-pri)]">
                                                 {FormatPrice(reservationData.totalAmount)}
                                             </span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Currency:</span>
-                                            <span>{reservationData.currencyCode || "VND"}</span>
+                                        <div className="flex justify-between items-center p-[1.5rem] bg-white rounded-[1rem] border border-[var(--cl-third)]">
+                                            <span className="text-[1.6rem] font-semibold text-gray-700">Currency:</span>
+                                            <span className="text-[1.8rem] font-bold text-[var(--cl-pri)]">{reservationData.currencyCode || "VND"}</span>
                                         </div>
                                     </div>
                                 )}
@@ -878,4 +891,3 @@ const BookingInfo = () => {
 };
 
 export default BookingInfo;
-
