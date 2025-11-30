@@ -13,7 +13,7 @@ import { LoginSchema } from "./login.schema";
 import { SigninFormValue } from "@/types/auth-form-type";
 
 const initialValues: SigninFormValue = {
-    identifier: "",
+    email: "",
     password: "",
     remember: false,
 }
@@ -32,7 +32,7 @@ const SignInPage = () => {
 
     const handleSubmit = (value: SigninFormValue, setSubmitting: (isSubmitting: boolean) => void) => {
         axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`, {
-            email: value.identifier,
+            email: value.email,
             password: value.password
         })
             .then((res) => {
@@ -89,7 +89,7 @@ const SignInPage = () => {
                                             <form onSubmit={handleSubmit}>
                                                 <div className="flex flex-col gap-y-[3.2rem]">
                                                     <div className="flex flex-col gap-y-[1.2rem]">
-                                                        <InputFormat name="identifier" placeholder="Enter phone or email" label="Account" />
+                                                        <InputFormat name="email" placeholder="Enter email" label="Email" />
                                                         <InputFormat name="password" placeholder="Enter password" label="Password" password={true} />
 
 

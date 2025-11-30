@@ -6,7 +6,7 @@ export interface SignupFormValue {
 }
 
 export interface SigninFormValue {
-    identifier: string | number;
+    email: string;
     password: string | number;
     remember: boolean;
 }

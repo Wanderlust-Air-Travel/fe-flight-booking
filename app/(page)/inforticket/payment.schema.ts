@@ -1,21 +1,34 @@
 import * as Yup from "yup";
+import { VALIDATION_MESSAGES, VIETNAMESE_PHONE_REGEX, DATE_DD_MM_YYYY_REGEX } from "@/lib/validation-messages";
 
+/**
+ * Payment Schema - Đồng bộ với BE CreateBookingFromReservationDto
+ * - Fullname: min 2, max 100 (đồng bộ với BE)
+ * - Email: valid email format
+ * - Phone: Vietnamese phone format (đồng bộ với BE IsVietnamesePhone)
+ * - DOB: DD/MM/YYYY format
+ */
 export const PaymentSchema = Yup.object().shape({
   fullName: Yup.string()
-    .required("Please enter your full name")
-    .min(3, "Full name must be at least 3 characters"),
+    .required(VALIDATION_MESSAGES.PAYMENT.FULLNAME_REQUIRED)
+    .min(2, VALIDATION_MESSAGES.PAYMENT.FULLNAME_MIN_LENGTH)
+    .max(100, "Họ tên không được vượt quá 100 ký tự"),
+  
   email: Yup.string()
-    .email("Invalid email format")
-    .required("Please enter your email"),
+    .required(VALIDATION_MESSAGES.PAYMENT.EMAIL_REQUIRED)
+    .email(VALIDATION_MESSAGES.PAYMENT.EMAIL_INVALID),
+  
   phone: Yup.string()
-    .matches(/^[0-9]{9,11}$/, "Phone number must be 9–11 digits")
-    .required("Please enter your phone number"),
+    .required(VALIDATION_MESSAGES.PAYMENT.PHONE_REQUIRED)
+    .matches(VIETNAMESE_PHONE_REGEX, VALIDATION_MESSAGES.PAYMENT.PHONE_INVALID),
+  
   dob: Yup.string()
-    .matches(
-      /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/,
-      "Date of birth must follow the format DD/MM/YYYY"
-    )
-    .required("Please enter your date of birth"),
-  address: Yup.string().required("Please enter your address"),
-  acceptTerms: Yup.boolean().oneOf([true], "Please agree"),
+    .required(VALIDATION_MESSAGES.PAYMENT.DOB_REQUIRED)
+    .matches(DATE_DD_MM_YYYY_REGEX, VALIDATION_MESSAGES.PAYMENT.DOB_INVALID_FORMAT),
+  
+  address: Yup.string()
+    .required(VALIDATION_MESSAGES.PAYMENT.ADDRESS_REQUIRED),
+  
+  acceptTerms: Yup.boolean()
+    .oneOf([true], VALIDATION_MESSAGES.PAYMENT.ACCEPT_TERMS_REQUIRED),
 });
