@@ -8,95 +8,56 @@ import FlightDatePicker from "../Date/FlightDatePicker";
 import { convertToYMD } from "../FormatDate/FormatDate";
 import Person from "../Person/Person";
 import { SelectComponent } from "../Select/SelectComponent";
+import { axiosPublic } from "@/lib/axios-instance";
 
-const dataLocation = [
-  {
-    name: "Hà Nội",
-    des: "Sân bay quốc tế Nội Bài",
-    value: "ha-noi",
-    code: "HAN",
-  },
-  {
-    name: "Hồ Chí Minh",
-    des: "Sân bay quốc tế Tân Sơn Nhất",
-    value: "ho-chi-minh",
-    code: "SGN",
-  },
-  {
-    name: "Đà Nẵng",
-    des: "Sân bay quốc tế Đà Nẵng",
-    value: "da-nang",
-    code: "DAD",
-  },
-  {
-    name: "Nha Trang",
-    des: "Sân bay quốc tế Cam Ranh",
-    value: "nha-trang",
-    code: "CXR",
-  },
-  {
-    name: "Phú Quốc",
-    des: "Sân bay quốc tế Phú Quốc",
-    value: "phu-quoc",
-    code: "PQC",
-  },
-  { name: "Huế", des: "Sân bay quốc tế Phú Bài", value: "hue", code: "HUI" },
-  {
-    name: "Cần Thơ",
-    des: "Sân bay quốc tế Cần Thơ",
-    value: "can-tho",
-    code: "VCA",
-  },
-
-  // Bổ sung đầy đủ:
-  {
-    name: "Hải Phòng",
-    des: "Sân bay quốc tế Cát Bi",
-    value: "hai-phong",
-    code: "HPH",
-  },
-  {
-    name: "Quảng Ninh",
-    des: "Sân bay quốc tế Vân Đồn",
-    value: "quang-ninh",
-    code: "VDO",
-  },
-  {
-    name: "Thanh Hóa",
-    des: "Sân bay Thọ Xuân",
-    value: "thanh-hoa",
-    code: "THD",
-  },
-  { name: "Vinh", des: "Sân bay Vinh", value: "vinh", code: "VII" },
-  {
-    name: "Điện Biên",
-    des: "Sân bay Điện Biên Phủ",
-    value: "dien-bien",
-    code: "DIN",
-  },
-
-  { name: "Chu Lai", des: "Sân bay Chu Lai", value: "chu-lai", code: "VCL" },
-  { name: "Quy Nhơn", des: "Sân bay Phù Cát", value: "quy-nhon", code: "UIH" },
-  { name: "Tuy Hòa", des: "Sân bay Tuy Hòa", value: "tuy-hoa", code: "TBB" },
-  { name: "Pleiku", des: "Sân bay Pleiku", value: "pleiku", code: "PXU" },
-  {
-    name: "Buôn Ma Thuột",
-    des: "Sân bay Buôn Ma Thuột",
-    value: "buon-ma-thuot",
-    code: "BMV",
-  },
-
-  { name: "Đà Lạt", des: "Sân bay Liên Khương", value: "da-lat", code: "DLI" },
-  { name: "Cà Mau", des: "Sân bay Cà Mau", value: "ca-mau", code: "CAH" },
-  { name: "Rạch Giá", des: "Sân bay Rạch Giá", value: "rach-gia", code: "VKG" },
-];
+interface AirportItem {
+  name: string;
+  des: string;
+  value: string;
+  code: string;
+}
 
 const FlightSearchBar = () => {
   const { data, setData } = useFightSearchBarStore();
   const [from, setFrom] = useState<string>(data.from || "");
   const [to, setTo] = useState<string>(data.to || "");
+  const [airports, setAirports] = useState<AirportItem[]>([]);
+  const [loadingAirports, setLoadingAirports] = useState<boolean>(true);
+  const [airportsError, setAirportsError] = useState<string | null>(null);
 
   const router = useRouter();
+
+  // Fetch airports from backend API
+  useEffect(() => {
+    const fetchAirports = async () => {
+      try {
+        setLoadingAirports(true);
+        setAirportsError(null);
+        const response = await axiosPublic.get('/api/v1/search/airports');
+        
+        if (response.data?.airports && Array.isArray(response.data.airports)) {
+          // Transform backend response to frontend format
+          const transformedAirports: AirportItem[] = response.data.airports.map((airport: any) => ({
+            name: airport.city, // Use city name as display name
+            des: airport.name, // Use airport name as description
+            value: airport.value || airport.city.toLowerCase().replace(/\s+/g, '-'), // Use slug value
+            code: airport.iata, // Use IATA code
+          }));
+          setAirports(transformedAirports);
+        } else {
+          setAirportsError('Invalid airports data format');
+        }
+      } catch (error: any) {
+        console.error('Error fetching airports:', error);
+        setAirportsError(error.response?.data?.message || error.message || 'Failed to load airports');
+        // Error toast will be shown automatically by axios interceptor
+      } finally {
+        setLoadingAirports(false);
+      }
+    };
+
+    fetchAirports();
+  }, []);
 
   useEffect(() => {
     if (from !== data.from) {
@@ -183,19 +144,27 @@ const FlightSearchBar = () => {
           <SelectComponent
             value={from}
             onChange={handleChangeForm}
-            placeholder="From Where?"
+            placeholder={loadingAirports ? "Loading airports..." : "From Where?"}
             icon="/icFrom.svg"
-            data={dataLocation.filter((item) => item.code !== to)}
+            data={airports.filter((item) => item.code !== to)}
+            disabled={loadingAirports || !!airportsError}
           />
+          {airportsError && (
+            <p className="text-xs text-red-500 mt-1 px-2">Failed to load airports. Please refresh the page.</p>
+          )}
         </div>
         <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6]">
           <SelectComponent
             value={to}
             onChange={handleChangeTo}
-            placeholder="To Where?"
+            placeholder={loadingAirports ? "Loading airports..." : "To Where?"}
             icon="/icTo.svg"
-            data={dataLocation.filter((item) => item.code !== from)}
+            data={airports.filter((item) => item.code !== from)}
+            disabled={loadingAirports || !!airportsError}
           />
+          {airportsError && (
+            <p className="text-xs text-red-500 mt-1 px-2">Failed to load airports. Please refresh the page.</p>
+          )}
         </div>
         <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6]">
           <label htmlFor="isOpenId" className="relative w-full block">

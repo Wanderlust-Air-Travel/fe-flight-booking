@@ -9,5 +9,6 @@ export interface SelectComponentProp {
         value: string;
         code: string;
     }[];
+    disabled?: boolean;
 }
 
