@@ -1,9 +1,9 @@
 // app/api/seats/[flightCode]/route.ts
-import { SeatMapRecord } from "@/types/seat-type";
+import { LegacySeatMapRecord } from "@/types/seat-type";
 import { NextResponse } from "next/server";
 
 // 👉 DATA GHÉP TỪ DATA BẠN ĐÃ GỬI
-const seatsData: SeatMapRecord = {
+const seatsData: LegacySeatMapRecord = {
   VN123: {
     flightCode: "VN123",
     seats: [

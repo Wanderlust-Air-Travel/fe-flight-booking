@@ -91,7 +91,7 @@ const useUserStore = create<AuthState>()(
                 return sessionStorage;
             }),
 
-            // ⭐ khi storage được hydrate xong → đánh dấu
+            // khi storage được hydrate xong → đánh dấu
             onRehydrateStorage: () => (state) => {
                 if (state) state.hydrated = true;
             },

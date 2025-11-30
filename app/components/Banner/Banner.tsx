@@ -4,16 +4,10 @@ import { showError, getErrorMessage } from "@/lib/toast";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import FlightSearchBar from "../FlightSearchBar/FlightSearchBar";
-
-
-interface bannerApi {
-    title: string,
-    url: string,
-    name: string
-}
+import { BannerApi } from "@/types/banner";
 
 const BannerHome = () => {
-    const [data, setData] = useState<bannerApi | null>(null)
+    const [data, setData] = useState<BannerApi | null>(null)
 
 
     useEffect(() => {

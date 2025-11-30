@@ -1,19 +1,17 @@
 "use client";
 
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axios-instance";
-import { axiosPublic } from "@/lib/axios-instance";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import { Button } from "@/components/ui/button";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
+import { PaymentStatus } from "@/types/payment";
 
-type PaymentStatus = "idle" | "processing" | "success" | "failed";
-
-const PaymentPage = () => {
+const PaymentPageContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { accessToken } = useUserStore();
@@ -298,6 +296,23 @@ const PaymentPage = () => {
         </div>
       </section>
     </main>
+  );
+};
+
+const PaymentPage = () => {
+  return (
+    <Suspense fallback={
+      <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+        <Breadcrumb />
+        <div className="container">
+          <div className="text-center py-[4rem]">
+            <p className="text-lg">Loading...</p>
+          </div>
+        </div>
+      </main>
+    }>
+      <PaymentPageContent />
+    </Suspense>
   );
 };
 

@@ -27,7 +27,10 @@ const useInfoTicket = create<InfoTicketTypeState>()(
         typeTicket: "",
         timeStart: "",
         timeEnd: "",
-        fareClassCode:""
+        fareClassCode: "",
+        flightInstanceId: "",
+        totalPerson: 0,
+        code: 0
       },
 
       // 👇 thêm field này

@@ -6,14 +6,14 @@ import { SeatGroup, SeatItem } from "@/types/seat-type";
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef, Suspense } from "react";
 import CabinSection from "@/app/components/SeatMap/CabinSection";
 import SectionNavigation from "@/app/components/SeatMap/SectionNavigation";
 import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
 
-const SeatMapPage = () => {
+const SeatMapPageContent = () => {
     const [seatBusiness, setSeatBusiness] = useState<SeatGroup | null>(null)
     const [seatEconomy, setSeatEconomy] = useState<SeatGroup | null>(null)
 
@@ -482,5 +482,22 @@ const SeatMapPage = () => {
         </main>
     )
 }
+
+const SeatMapPage = () => {
+    return (
+        <Suspense fallback={
+            <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+                <Breadcrumb />
+                <div className="container">
+                    <div className="text-center py-[4rem]">
+                        <p className="text-lg">Loading...</p>
+                    </div>
+                </div>
+            </main>
+        }>
+            <SeatMapPageContent />
+        </Suspense>
+    );
+};
 
 export default SeatMapPage;

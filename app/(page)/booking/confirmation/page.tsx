@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
@@ -10,7 +10,7 @@ import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import { CheckCircle2, Calendar, MapPin, Clock, User, CreditCard } from "lucide-react";
 import type { BookingDetails, PaymentDetails } from "@/types/confirmation-page-type";
 
-const ConfirmationPage = () => {
+const ConfirmationPageContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { accessToken } = useUserStore();
@@ -391,6 +391,23 @@ const ConfirmationPage = () => {
         </div>
       </div>
     </main>
+  );
+};
+
+const ConfirmationPage = () => {
+  return (
+    <Suspense fallback={
+      <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+        <Breadcrumb />
+        <div className="container">
+          <div className="text-center py-[4rem]">
+            <p className="text-lg">Loading...</p>
+          </div>
+        </div>
+      </main>
+    }>
+      <ConfirmationPageContent />
+    </Suspense>
   );
 };
 

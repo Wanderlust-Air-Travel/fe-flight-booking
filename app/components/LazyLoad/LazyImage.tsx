@@ -6,17 +6,9 @@
  * Uses Next.js Image component with lazy loading
  */
 
-import Image, { ImageProps } from 'next/image';
+import Image from 'next/image';
 import { useState } from 'react';
-
-interface LazyImageProps extends Omit<ImageProps, 'src' | 'placeholder'> {
-	src: string;
-	placeholderImage?: string; // Blur placeholder image URL
-	blurDataURL?: string; // Base64 blur placeholder
-	alt: string;
-	className?: string;
-	containerClassName?: string;
-}
+import { LazyImageProps } from '@/types/lazy-image';
 
 const LazyImage = ({
 	src,

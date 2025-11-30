@@ -19,6 +19,7 @@ export interface InfoTicketType {
   timeEnd:string,
   typeTicket:string,
   fareClassCode:string,
+  flightInstanceId: string;
   desc: {
     text: string;
     status: boolean;

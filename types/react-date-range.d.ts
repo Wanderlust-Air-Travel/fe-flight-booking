@@ -20,7 +20,16 @@ declare module "react-date-range" {
     showDateDisplay?: boolean;
     editableDateInputs?: boolean;
     className?: string;
+    minDate?: Date;
+  }
+
+  export interface CalendarProps {
+    date?: Date;
+    onChange: (date: Date) => void;
+    showDateDisplay?: boolean;
+    minDate?: Date;
   }
 
   export class DateRange extends React.Component<DateRangeProps> {}
+  export class Calendar extends React.Component<CalendarProps> {}
 }

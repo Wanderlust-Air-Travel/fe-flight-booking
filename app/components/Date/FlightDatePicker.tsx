@@ -6,12 +6,7 @@ import { addDays } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
-
-type TripType = "one_way" | "round_trip";
-
-interface FlightDatePickerProps {
-    onChangeDate?: (data: { startDate: Date; endDate?: Date }) => void;
-}
+import { TripType, FlightDatePickerProps } from "@/types/flight-date-picker";
 
 export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps) {
     const [tripType, setTripType] = useState<TripType>("one_way");
@@ -107,17 +102,14 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
 
             {/* Lịch */}
             {tripType === "one_way" ? (
-
                 <Calendar
                     date={range.startDate || new Date()}
-                    onChange={(date) => handleOneWaySelect(date as Date)}
-                    showDateDisplay={false as any}
+                    onChange={(date: Date) => handleOneWaySelect(date)}
+                    showDateDisplay={false}
                     minDate={new Date()}
                 />
             ) : (
-
                 <DateRange
-
                     onChange={handleRangeSelect}
                     moveRangeOnFirstSelection={false}
                     ranges={[range]}

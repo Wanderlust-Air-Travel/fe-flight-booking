@@ -8,10 +8,10 @@ const BACKEND_API_URL =
 
 export async function POST(
   req: NextRequest,
-  context: { params: { gateway: string } }
+  context: { params: Promise<{ gateway: string }> }
 ) {
   try {
-    const { gateway } = context.params || {};
+    const { gateway } = await context.params;
 
     if (!gateway) {
       return NextResponse.json(

@@ -12,12 +12,12 @@ Component chính để lazy load bất kỳ component hoặc element nào.
 **Location:** `app/components/LazyLoad/LazyLoad.tsx`
 
 **Features:**
-- ✅ Sử dụng Intersection Observer API (native browser API)
-- ✅ Hỗ trợ placeholder
-- ✅ Configurable offset (khoảng cách từ viewport)
-- ✅ Once mode (load một lần rồi bỏ qua)
-- ✅ SSR compatible
-- ✅ Fallback cho browsers không hỗ trợ IntersectionObserver
+- Sử dụng Intersection Observer API (native browser API)
+- Hỗ trợ placeholder
+- Configurable offset (khoảng cách từ viewport)
+- Once mode (load một lần rồi bỏ qua)
+- SSR compatible
+- Fallback cho browsers không hỗ trợ IntersectionObserver
 
 **Usage:**
 ```tsx
@@ -78,42 +78,42 @@ const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
 ## Đã tích hợp vào
 
 ### 1. Home Page (`app/page.tsx`)
-- ✅ `BannerHome` - Lazy loaded với dynamic import
-- ✅ `ServiceHome` - Lazy loaded với dynamic import
+- `BannerHome` - Lazy loaded với dynamic import
+- `ServiceHome` - Lazy loaded với dynamic import
 
 ### 2. Service Home (`app/components/Services/ServiceHome.tsx`)
-- ✅ `ItemService` - Lazy loaded với dynamic import
-- ✅ Mỗi service item được wrap trong `LazyLoad` component
+- `ItemService` - Lazy loaded với dynamic import
+- Mỗi service item được wrap trong `LazyLoad` component
 
 ### 3. Service Details Page (`app/(page)/service/[id]/page.tsx`)
-- ✅ `TripList` - Lazy loaded với dynamic import
+- `TripList` - Lazy loaded với dynamic import
 
 ### 4. ItemService Component (`app/components/ItemService/ItemService.tsx`)
-- ✅ Image sử dụng Next.js Image với `loading="lazy"`
-- ✅ Optimized với `fill` và `sizes` prop
+- Image sử dụng Next.js Image với `loading="lazy"`
+- Optimized với `fill` và `sizes` prop
 
 ## Best Practices
 
 ### 1. Khi nào sử dụng `LazyLoad`?
-- ✅ Components nặng không cần thiết ngay lập tức
-- ✅ Sections dưới fold (phải scroll mới thấy)
-- ✅ Images trong lists hoặc galleries
-- ✅ Modals, dropdowns, tooltips
+- Components nặng không cần thiết ngay lập tức
+- Sections dưới fold (phải scroll mới thấy)
+- Images trong lists hoặc galleries
+- Modals, dropdowns, tooltips
 
 ### 2. Khi nào sử dụng `dynamic` import?
-- ✅ Components lớn với nhiều dependencies
-- ✅ Components chỉ dùng ở một số routes cụ thể
-- ✅ Third-party libraries nặng
+- Components lớn với nhiều dependencies
+- Components chỉ dùng ở một số routes cụ thể
+- Third-party libraries nặng
 
 ### 3. Khi nào KHÔNG lazy load?
-- ❌ Above-the-fold content (phần hiển thị ngay khi load page)
-- ❌ Critical components (navigation, search bar)
-- ❌ Components cần cho SEO
-- ❌ Components nhỏ, không ảnh hưởng performance
+- Above-the-fold content (phần hiển thị ngay khi load page)
+- Critical components (navigation, search bar)
+- Components cần cho SEO
+- Components nhỏ, không ảnh hưởng performance
 
 ### 4. Tối ưu Images
 ```tsx
-// ✅ Good - Sử dụng Next.js Image với lazy loading
+// Good - Sử dụng Next.js Image với lazy loading
 <Image
     src="/image.jpg"
     alt="Description"
@@ -122,7 +122,7 @@ const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
     loading="lazy"
 />
 
-// ❌ Bad - Không lazy load
+// Bad - Không lazy load
 <img src="/image.jpg" alt="Description" />
 ```
 

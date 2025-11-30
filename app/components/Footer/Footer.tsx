@@ -2,19 +2,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation";
-
-interface FooterItem {
-    label: string;
-    link: string;
-}
-
-interface FooterSection {
-    title: string;
-    list: FooterItem[];
-    imgs?: {
-        image: string;
-    }[]
-}
+import { FooterSection } from "@/types/footer";
 
 const dataFooters: FooterSection[] = [
     {

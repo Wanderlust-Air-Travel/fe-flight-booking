@@ -24,7 +24,7 @@ export const InputFormat = ({
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.target.value;
 
-        // ✨ Auto format DOB -> DD/MM/YYYY
+        // Auto format DOB -> DD/MM/YYYY
         if (formatDob) {
             // Chỉ cho nhập số
             value = value.replace(/[^\d]/g, "");
@@ -41,7 +41,7 @@ export const InputFormat = ({
             value = value.replace(/\D/g, ""); // xoá hết cái gì không phải số
         }
 
-        // 👤 Name: chỉ cho nhập chữ (có dấu) + khoảng trắng
+        // Name: chỉ cho nhập chữ (có dấu) + khoảng trắng
         if (formatName) {
             value = value.replace(/[^A-Za-zÀ-ỹ\s]/g, ""); // xoá số, ký tự đặc biệt
         }

@@ -3,13 +3,13 @@ import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import FlightSearchBar from "@/app/components/FlightSearchBar/FlightSearchBar";
 import ServiceSlide from "@/app/components/Services/ServiceSlide";
 import TripList from "@/app/components/TripList/TripList";
-import { TripListType } from "@/types/trip-list-type";
+import { TripListProps } from "@/types/trip-list-type";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-const ServiceDetailsResultSearch = () => {
-  const [trips, setTrips] = useState<TripListType[]>([]);
+const ServiceDetailsResultSearchContent = () => {
+  const [trips, setTrips] = useState<TripListProps | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
 
@@ -35,8 +35,12 @@ const ServiceDetailsResultSearch = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/flights?origin=${origin}&destination=${destination}&departDate=${departDate}&returnDate=${returnDate}&tripType=${tripType}&adults=${adults}&minors=${minors}`
       )
       .then((res) => {
-        setTrips(res.data);
-
+        const tripTypeValue = tripType === "round_trip" ? "round_trip" : "one_way";
+        setTrips({
+          tripType: tripTypeValue,
+          outbound: res.data,
+          inbound: tripTypeValue === "round_trip" ? res.data : undefined,
+        });
       })
       .catch((err) => {
         console.log(err);
@@ -67,13 +71,30 @@ const ServiceDetailsResultSearch = () => {
             <h2 className="text-lg text-[var(--cl-pri)] font-bold uppercase">
               Trip list
             </h2>
-            <TripList trips={trips} loading={loading} />
+            {trips && <TripList trips={trips} loading={loading} />}
           </div>
         </div>
       </section>
 
       <ServiceSlide />
     </main>
+  );
+};
+
+const ServiceDetailsResultSearch = () => {
+  return (
+    <Suspense fallback={
+      <main className={`pt-[var(--hd)] flex flex-col gap-y-[var(--rowY)]`}>
+        <Breadcrumb />
+        <div className="container">
+          <div className="text-center py-[4rem]">
+            <p className="text-lg">Loading...</p>
+          </div>
+        </div>
+      </main>
+    }>
+      <ServiceDetailsResultSearchContent />
+    </Suspense>
   );
 };
 

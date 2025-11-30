@@ -13,18 +13,8 @@
  * - SSR compatible
  */
 
-import { useEffect, useRef, useState, ReactNode } from 'react';
-
-interface LazyLoadProps {
-	children: ReactNode;
-	placeholder?: ReactNode;
-	height?: number | string;
-	offset?: number; // Distance from viewport to start loading (in pixels)
-	once?: boolean; // If true, component will be loaded once and then ignored
-	threshold?: number; // Intersection threshold (0-1)
-	className?: string;
-	style?: React.CSSProperties;
-}
+import { useEffect, useRef, useState } from 'react';
+import { LazyLoadProps } from '@/types/lazy-load';
 
 const LazyLoad = ({
 	children,

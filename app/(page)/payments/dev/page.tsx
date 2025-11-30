@@ -1,12 +1,12 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import axiosInstance from "@/lib/axios-instance";
 import { Button } from "@/components/ui/button";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 
-const DevPaymentPage = () => {
+const DevPaymentPageContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const paymentId = searchParams.get("paymentId");
@@ -97,6 +97,23 @@ const DevPaymentPage = () => {
         </div>
       </section>
     </main>
+  );
+};
+
+const DevPaymentPage = () => {
+  return (
+    <Suspense fallback={
+      <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+        <Breadcrumb />
+        <div className="container">
+          <div className="text-center py-[4rem]">
+            <p className="text-lg">Loading...</p>
+          </div>
+        </div>
+      </main>
+    }>
+      <DevPaymentPageContent />
+    </Suspense>
   );
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ const bookingSchema = Yup.object().shape({
         .required("Passengers are required"),
 });
 
-const BookingInfo = () => {
+const BookingInfoContent = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { accessToken, refreshToken, user, refreshAccessToken } = useUserStore();
@@ -467,6 +467,23 @@ const BookingInfo = () => {
                 </div>
             </section>
         </main>
+    );
+};
+
+const BookingInfo = () => {
+    return (
+        <Suspense fallback={
+            <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+                <Breadcrumb />
+                <div className="container">
+                    <div className="text-center py-[4rem]">
+                        <p className="text-lg">Loading...</p>
+                    </div>
+                </div>
+            </main>
+        }>
+            <BookingInfoContent />
+        </Suspense>
     );
 };
 
