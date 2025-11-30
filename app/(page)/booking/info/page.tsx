@@ -53,7 +53,16 @@ const createPassengerSchema = (flightDate: Date) => Yup.object().shape({
             return true;
         }),
     gender: Yup.string().required("Gender is required"),
-    documentNumber: Yup.string().required("Document number is required"),
+    documentNumber: Yup.string()
+        .test("documentNumber-required", "Document number is required for adults", function(value) {
+            const { passengerType } = this.parent;
+            // ADT requires documentNumber, CHD and INF do not
+            if (passengerType === "ADT") {
+                return !!value && value.trim().length > 0;
+            }
+            // CHD and INF: documentNumber is optional
+            return true;
+        }),
 });
 
 const createBookingSchema = (flightDate: Date) => Yup.object().shape({
@@ -220,14 +229,24 @@ const BookingInfoContent = () => {
                 const response = await axiosInstance.post(
                     `/api/bookings?reservationId=${reservationId}`,
                     {
-                        passengers: values.passengers.map((p) => ({
-                            passengerType: p.passengerType,
-                            fullname: p.fullname,
-                            dob: p.dob,
-                            gender: p.gender,
-                            documentNumber: p.documentNumber,
-                            loyaltyNumber: p.loyaltyNumber,
-                        })),
+                        passengers: values.passengers.map((p) => {
+                            // Build passenger object - only include documentNumber if provided
+                            // ADT requires documentNumber, CHD and INF do not
+                            const passengerData: any = {
+                                passengerType: p.passengerType,
+                                fullname: p.fullname,
+                                dob: p.dob,
+                                gender: p.gender,
+                                loyaltyNumber: p.loyaltyNumber,
+                            };
+                            
+                            // Only include documentNumber if it has a value (required for ADT, optional for CHD/INF)
+                            if (p.documentNumber && p.documentNumber.trim().length > 0) {
+                                passengerData.documentNumber = p.documentNumber.trim();
+                            }
+                            
+                            return passengerData;
+                        }),
                         contactFullname: values.contactFullname,
                         contactEmail: values.contactEmail,
                         contactPhone: values.contactPhone,
@@ -461,7 +480,7 @@ const BookingInfoContent = () => {
                                                         <Checkbox
                                                             id="isUserTraveling"
                                                             checked={values.isUserTraveling}
-                                                            onCheckedChange={(checked) => {
+                                                            onCheckedChange={(checked: boolean) => {
                                                                 setFieldValue("isUserTraveling", checked);
                                                                 if (checked) {
                                                                     // Auto-select first passenger as user if not set
@@ -704,23 +723,46 @@ const BookingInfoContent = () => {
                                                                         )}
                                                                     />
                                                                 </div>
-                                                                <div className="flex flex-col gap-2">
-                                                                    <Label htmlFor={`passengers.${index}.documentNumber`}>
-                                                                        Document Number (CCCD/Passport) *
-                                                                    </Label>
-                                                                    <Field
-                                                                        as={Input}
-                                                                        type="text"
-                                                                        id={`passengers.${index}.documentNumber`}
-                                                                        name={`passengers.${index}.documentNumber`}
-                                                                    />
-                                                                    <ErrorMessage
-                                                                        name={`passengers.${index}.documentNumber`}
-                                                                        render={(msg) => (
-                                                                            <p className="text-sm text-destructive mt-1">{msg}</p>
-                                                                        )}
-                                                                    />
-                                                                </div>
+                                                                {/* Document Number: Required for ADT, Optional for CHD and INF */}
+                                                                {values.passengers[index].passengerType === "ADT" && (
+                                                                    <div className="flex flex-col gap-2">
+                                                                        <Label htmlFor={`passengers.${index}.documentNumber`}>
+                                                                            Document Number (CCCD/Passport) *
+                                                                        </Label>
+                                                                        <Field
+                                                                            as={Input}
+                                                                            type="text"
+                                                                            id={`passengers.${index}.documentNumber`}
+                                                                            name={`passengers.${index}.documentNumber`}
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name={`passengers.${index}.documentNumber`}
+                                                                            render={(msg) => (
+                                                                                <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                                {values.passengers[index].passengerType !== "ADT" && (
+                                                                    <div className="flex flex-col gap-2">
+                                                                        <Label htmlFor={`passengers.${index}.documentNumber`}>
+                                                                            Document Number (CCCD/Passport) <span className="text-gray-500 text-sm">(Optional for {values.passengers[index].passengerType === "CHD" ? "Children" : "Infants"})</span>
+                                                                        </Label>
+                                                                        <Field
+                                                                            as={Input}
+                                                                            type="text"
+                                                                            id={`passengers.${index}.documentNumber`}
+                                                                            name={`passengers.${index}.documentNumber`}
+                                                                            placeholder="Optional - not required for children and infants"
+                                                                        />
+                                                                        <ErrorMessage
+                                                                            name={`passengers.${index}.documentNumber`}
+                                                                            render={(msg) => (
+                                                                                <p className="text-sm text-destructive mt-1">{msg}</p>
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                )}
                                                                 <div className="flex flex-col gap-2">
                                                                     <Label htmlFor={`passengers.${index}.loyaltyNumber`}>
                                                                         Loyalty Number (Optional)

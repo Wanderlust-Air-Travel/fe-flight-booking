@@ -13,12 +13,38 @@ export async function POST(req: NextRequest) {
 
     // Lấy body từ request
     const body = await req.json();
-    const { flightInstanceId, flightSeatId, seatNumber } = body;
+    const { flightInstanceId, seats, seat, flightSeatId, seatNumber } = body;
 
-    // Validate required fields
-    if (!flightInstanceId || !flightSeatId || !seatNumber) {
+    // Validate flightInstanceId (required)
+    if (!flightInstanceId) {
       return NextResponse.json(
-        { message: 'flightInstanceId, flightSeatId, and seatNumber are required' },
+        { message: 'flightInstanceId is required' },
+        { status: 400 }
+      );
+    }
+
+    // Support multiple formats:
+    // 1. New format: seats array (preferred for multiple passengers)
+    // 2. Single seat object
+    // 3. Legacy format: flightSeatId and seatNumber at top level
+    let requestBody: any = {
+      flightInstanceId,
+    };
+
+    if (seats && Array.isArray(seats) && seats.length > 0) {
+      // New format: seats array
+      requestBody.seats = seats;
+    } else if (seat && seat.flightSeatId && seat.seatNumber) {
+      // Single seat object format
+      requestBody.seat = seat;
+    } else if (flightSeatId && seatNumber) {
+      // Legacy format: top-level fields
+      requestBody.flightSeatId = flightSeatId;
+      requestBody.seatNumber = seatNumber;
+    } else {
+      // No valid seat data provided
+      return NextResponse.json(
+        { message: 'Either seats array, seat object, or flightSeatId/seatNumber must be provided' },
         { status: 400 }
       );
     }
@@ -42,11 +68,7 @@ export async function POST(req: NextRequest) {
     const response = await fetch(`${BACKEND_API_URL}/api/v1/booking-state/seat`, {
       method: 'POST',
       headers: backendHeaders,
-      body: JSON.stringify({
-        flightInstanceId,
-        flightSeatId,
-        seatNumber,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     const data = await response.json();
