@@ -1,15 +1,18 @@
 "use client";
 
-import { useCallback, useState, Suspense } from "react";
+import { useCallback, useState, Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axios-instance";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import { PaymentStatus } from "@/types/payment";
+import { usePaymentStatus } from "@/app/hooks/use-payment-status";
+import { showSuccess, showError } from "@/lib/toast";
 
 const PaymentPageContent = () => {
   const searchParams = useSearchParams();
@@ -22,6 +25,39 @@ const PaymentPageContent = () => {
   const [error, setError] = useState<string | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [pollingMessage, setPollingMessage] = useState<string | null>(null);
+
+  // WebSocket: Real-time payment status updates
+  const { 
+    isSubscribed: isPaymentStatusSubscribed, 
+    paymentStatus, 
+    status: paymentStatusValue, 
+    isSuccess, 
+    isFailed, 
+    isPending 
+  } = usePaymentStatus(bookingId, paymentId);
+
+  // Handle real-time payment status updates from WebSocket
+  useEffect(() => {
+    if (!paymentStatus) return;
+
+    if (isSuccess) {
+      setStatus("success");
+      setPollingMessage(null);
+      showSuccess("Payment successful! Redirecting to confirmation...");
+      // Redirect to confirmation page
+      setTimeout(() => {
+        router.push(`/booking/confirmation?bookingId=${bookingId}&paymentId=${paymentStatus.paymentId}`);
+      }, 1500);
+    } else if (isFailed) {
+      setStatus("failed");
+      setPollingMessage(null);
+      setError("Payment failed. Please check your payment or try another method.");
+      showError("Payment failed. Please check your payment or try another method.");
+    } else if (isPending) {
+      setStatus("processing");
+      setPollingMessage("Waiting for payment confirmation from gateway...");
+    }
+  }, [paymentStatus, isSuccess, isFailed, isPending, bookingId, router]);
 
   const pollPaymentStatus = useCallback(
     async (paymentId: string) => {
@@ -143,9 +179,16 @@ const PaymentPageContent = () => {
         window.open(devPaymentUrl, "_blank");
       }
       
-      // Không tin status ngay lập tức nữa → luôn kiểm tra trong DB qua GET /api/payments/:id
-      setPollingMessage("Waiting for payment confirmation from gateway...");
-      await pollPaymentStatus(payment.paymentId);
+      // Use WebSocket for real-time updates (preferred)
+      // Fallback to polling if WebSocket is not connected
+      if (!isPaymentStatusSubscribed) {
+        setPollingMessage("Waiting for payment confirmation from gateway...");
+        await pollPaymentStatus(payment.paymentId);
+      } else {
+        // WebSocket is connected - it will handle status updates automatically
+        setPollingMessage(null);
+        setStatus("processing");
+      }
     } catch (err: any) {
       console.error("Error processing payment:", err);
       
@@ -251,7 +294,17 @@ const PaymentPageContent = () => {
                   </div>
                 )}
 
-                {pollingMessage && !error && (
+                {/* WebSocket Connection Status */}
+                {isPaymentStatusSubscribed && paymentId && (
+                  <Alert className="mb-[1.5rem] border-green-500 bg-green-50">
+                    <AlertDescription className="text-sm text-green-700">
+                      Real-time payment status monitoring active
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Polling fallback message (only shown if WebSocket is not connected) */}
+                {pollingMessage && !error && !isPaymentStatusSubscribed && (
                   <div className="mb-[1.5rem] p-[1rem] bg-yellow-50 border border-yellow-200 rounded text-yellow-700">
                     {pollingMessage}
                     {paymentId && (
@@ -260,6 +313,20 @@ const PaymentPageContent = () => {
                       </span>
                     )}
                   </div>
+                )}
+
+                {/* WebSocket status message */}
+                {isPaymentStatusSubscribed && isPending && (
+                  <Alert className="mb-[1.5rem] border-blue-500 bg-blue-50">
+                    <AlertDescription className="text-sm text-blue-700">
+                      Waiting for payment confirmation from gateway...
+                      {paymentId && (
+                        <span className="block text-xs mt-[0.5rem]">
+                          Payment ID: {paymentId}
+                        </span>
+                      )}
+                    </AlertDescription>
+                  </Alert>
                 )}
 
                 {status === "success" && (

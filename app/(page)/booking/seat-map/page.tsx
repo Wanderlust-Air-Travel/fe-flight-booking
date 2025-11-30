@@ -13,6 +13,8 @@ import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils"
 import useUserStore from "@/app/zustand/storeUser";
 import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 import { Button } from "@/components/ui/button";
+import { useSeatAvailability } from "@/app/hooks/use-seat-availability";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const SeatMapPageContent = () => {
     const [seatBusiness, setSeatBusiness] = useState<SeatGroup | null>(null)
@@ -37,6 +39,9 @@ const SeatMapPageContent = () => {
     // Lấy flightInstanceId và cabinType từ query params (theo docs BE)
     const flightInstanceId = searchParams.get('flightInstanceId');
     const cabinTypeFromUrl = searchParams.get('cabinType');
+
+    // WebSocket: Real-time seat availability updates
+    const { isSubscribed, seatChanges, applySeatChanges, clearSeatChanges } = useSeatAvailability(flightInstanceId);
 
     // Redirect nếu không có flightInstanceId
     useEffect(() => {
@@ -297,8 +302,18 @@ const SeatMapPageContent = () => {
                         return seat.id === "economy";
                     });
 
-                    setSeatBusiness(business || null);
-                    setSeatEconomy(economy || null);
+                    // Apply real-time seat changes from WebSocket if available
+                    let businessSeats = business?.list || [];
+                    let economySeats = economy?.list || [];
+                    
+                    if (seatChanges.length > 0) {
+                        businessSeats = applySeatChanges(businessSeats);
+                        economySeats = applySeatChanges(economySeats);
+                        clearSeatChanges(); // Clear after applying
+                    }
+
+                    setSeatBusiness(business ? { ...business, list: businessSeats } : null);
+                    setSeatEconomy(economy ? { ...economy, list: economySeats } : null);
                 } else {
                     console.error('Invalid seat map data format:', res.data);
                     setError('Invalid seat map data format');
@@ -330,7 +345,28 @@ const SeatMapPageContent = () => {
 
         // If hydrated or cabinType from URL, fetch immediately
         fetchSeatMap();
-    }, [flightInstanceId, accessToken, data.type, isHydrated, cabinTypeFromUrl, searchParams])
+    }, [flightInstanceId, accessToken, data.type, isHydrated, cabinTypeFromUrl, searchParams, seatChanges, applySeatChanges, clearSeatChanges])
+
+    // Apply real-time seat changes when they arrive via WebSocket
+    useEffect(() => {
+        if (seatChanges.length === 0) return;
+
+        // Update seat availability based on real-time changes
+        setSeatBusiness((prev) => {
+            if (!prev) return prev;
+            const updatedList = applySeatChanges(prev.list);
+            return { ...prev, list: updatedList };
+        });
+
+        setSeatEconomy((prev) => {
+            if (!prev) return prev;
+            const updatedList = applySeatChanges(prev.list);
+            return { ...prev, list: updatedList };
+        });
+
+        // Clear changes after applying
+        clearSeatChanges();
+    }, [seatChanges, applySeatChanges, clearSeatChanges])
 
     // Handle save seat selection and continue
     const handleContinue = useCallback(async () => {
@@ -515,6 +551,15 @@ const SeatMapPageContent = () => {
                                 <h2 className="text-center text-md text-[var(--cl-pri)] font-bold">
                                     Choose Position
                                 </h2>
+
+                                {/* WebSocket Connection Status */}
+                                {isSubscribed && (
+                                    <Alert className="mb-4">
+                                        <AlertDescription className="text-sm text-green-700">
+                                            Real-time seat updates active - You will be notified if seats are selected by others
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
                                 
                                 {/* Passenger count info */}
                                 {searchBarData.totalPerson > 0 && (

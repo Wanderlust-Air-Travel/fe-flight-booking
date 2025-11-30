@@ -19,6 +19,7 @@ import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import { PassengerFormData, BookingFormData } from "@/types/booking-form-type";
 import { determinePassengerType, getFlightDate, calculateAge, isAdult } from "@/lib/passenger-utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useReservationCountdown } from "@/app/hooks/use-reservation-countdown";
 
 // Validation schema with DOB-based passenger type validation
 const createPassengerSchema = (flightDate: Date) => Yup.object().shape({
@@ -113,6 +114,15 @@ const BookingInfoContent = () => {
     const [error, setError] = useState<string | null>(null);
     const [reservationData, setReservationData] = useState<any>(null);
     const hasCreatedReservationRef = useRef<boolean>(false);
+
+    // WebSocket: Real-time reservation countdown timer
+    const { 
+        isSubscribed: isCountdownSubscribed, 
+        countdown, 
+        remainingSeconds, 
+        isExpired, 
+        formattedCountdown 
+    } = useReservationCountdown(reservationId);
 
     // Create reservation when component mounts
     useEffect(() => {
@@ -345,6 +355,34 @@ const BookingInfoContent = () => {
                                                     reservationData.expiresAt
                                                 ).toLocaleString()}
                                             </p>
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+
+                                {/* WebSocket: Real-time Reservation Countdown Timer */}
+                                {isCountdownSubscribed && countdown && (
+                                    <Alert className={`mb-[2rem] ${isExpired ? 'border-red-500 bg-red-50' : remainingSeconds < 300 ? 'border-yellow-500 bg-yellow-50' : 'border-blue-500 bg-blue-50'}`}>
+                                        <AlertDescription>
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="font-semibold">
+                                                        {isExpired ? 'Reservation Expired' : 'Reservation Time Remaining'}
+                                                    </p>
+                                                    <p className="text-sm text-gray-600 mt-1">
+                                                        Complete your booking before the reservation expires
+                                                    </p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className={`text-2xl font-bold ${isExpired ? 'text-red-600' : remainingSeconds < 300 ? 'text-yellow-600' : 'text-blue-600'}`}>
+                                                        {formattedCountdown}
+                                                    </p>
+                                                    {isExpired && (
+                                                        <p className="text-xs text-red-600 mt-1">
+                                                            Please create a new reservation
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </AlertDescription>
                                     </Alert>
                                 )}
