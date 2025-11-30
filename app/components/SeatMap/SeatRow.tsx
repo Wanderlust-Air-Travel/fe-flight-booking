@@ -17,8 +17,14 @@ const SeatRow = memo(function SeatRow({
   isSelectable: sectionSelectable,
 }: SeatRowProps) {
   const renderSeat = (seat: SeatItem, side: "left" | "right") => {
-    const seatId = seat.flightSeatId || seat.idCabin || `${seat.seatNumber}-${side}`;
-    const seatSelectable = seat.isSelectable !== false && seat.isAvailable && sectionSelectable;
+    // CRITICAL: Always use flightSeatId as the primary identifier
+    // If flightSeatId is missing, use fallback but log warning
+    if (!seat.flightSeatId) {
+      console.warn(`[SeatRow] Seat ${seat.seatNumber} (${side}) missing flightSeatId. Using fallback ID.`);
+    }
+    // Use flightSeatId as primary, fallback to generated ID for display/tracking
+    const seatId = seat.flightSeatId || `${seat.seatNumber}-${side}`;
+    const seatSelectable = seat.isSelectable !== false && seat.isAvailable && sectionSelectable && !!seat.flightSeatId; // Disable if no flightSeatId
     const isSelected = selectedSeats.includes(seatId);
     const isOccupied = !seat.isAvailable;
 

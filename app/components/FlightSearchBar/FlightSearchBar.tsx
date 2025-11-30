@@ -9,13 +9,7 @@ import { convertToYMD } from "../FormatDate/FormatDate";
 import Person from "../Person/Person";
 import { SelectComponent } from "../Select/SelectComponent";
 import { axiosPublic } from "@/lib/axios-instance";
-
-interface AirportItem {
-  name: string;
-  des: string;
-  value: string;
-  code: string;
-}
+import { AirportItem } from "@/types/airport-item";
 
 const FlightSearchBar = () => {
   const { data, setData } = useFightSearchBarStore();

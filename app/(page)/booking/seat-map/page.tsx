@@ -52,12 +52,26 @@ const SeatMapPageContent = () => {
             ...(seatBusiness?.list || []),
             ...(seatEconomy?.list || [])
         ];
-        // Try to find by flightSeatId first, then by generated ID pattern
-        return allSeats.find(seat => 
-            seat.flightSeatId === seatId || 
-            `${seat.seatNumber}-left` === seatId || 
-            `${seat.seatNumber}-right` === seatId
-        ) || null;
+        // Try to find by flightSeatId first (primary method)
+        let foundSeat: SeatItem | null = allSeats.find(seat => seat.flightSeatId === seatId) || null;
+        
+        // If not found by flightSeatId, try by generated ID pattern (fallback for legacy support)
+        if (!foundSeat) {
+            const fallbackSeat = allSeats.find(seat => 
+                `${seat.seatNumber}-left` === seatId || 
+                `${seat.seatNumber}-right` === seatId ||
+                seat.idCabin === seatId
+            );
+            foundSeat = fallbackSeat || null;
+        }
+        
+        // Validate that found seat has required fields
+        if (foundSeat && (!foundSeat.flightSeatId || !foundSeat.seatNumber)) {
+            console.error('[SeatMap] Found seat but missing required fields:', foundSeat);
+            return null;
+        }
+        
+        return foundSeat;
     }, [seatBusiness, seatEconomy]);
 
     // Calculate passengers needing seats (adults + children, excluding infants)
@@ -76,7 +90,16 @@ const SeatMapPageContent = () => {
             const seat = findSeatBySeatId(seatId);
             
             if (!seat) {
+                console.error('[SeatMap] Seat not found for seatId:', seatId);
+                setSaveError('Seat not found. Please try selecting again.');
                 return; // Invalid seat
+            }
+
+            // CRITICAL: Validate that seat has flightSeatId (required for backend)
+            if (!seat.flightSeatId) {
+                console.error('[SeatMap] Seat missing flightSeatId:', seat);
+                setSaveError(`Seat ${seat.seatNumber} is missing required information. Please try again.`);
+                return;
             }
 
             // Validate seat availability and selectability
@@ -301,6 +324,20 @@ const SeatMapPageContent = () => {
             return;
         }
 
+        // Validate flightInstanceId
+        if (!flightInstanceId) {
+            setSaveError('Flight instance ID is missing. Please go back and select a flight again.');
+            return;
+        }
+
+        // Validate selected seats data
+        const invalidSeats = selectedSeatsInfo.filter(seat => !seat.flightSeatId || !seat.seatNumber);
+        if (invalidSeats.length > 0) {
+            console.error('[SeatMap] Invalid seat data:', invalidSeats);
+            setSaveError('Some selected seats have invalid data. Please deselect and reselect the seats.');
+            return;
+        }
+
         setIsSaving(true);
         setSaveError(null);
 
@@ -314,6 +351,8 @@ const SeatMapPageContent = () => {
             const sessionId = sessionStorage.getItem('guest_session_id');
             console.log('[SeatMap] Current sessionId from sessionStorage:', sessionId);
             console.log('[SeatMap] accessToken exists:', !!accessToken);
+            console.log('[SeatMap] flightInstanceId:', flightInstanceId);
+            console.log('[SeatMap] selectedSeatsInfo:', selectedSeatsInfo);
             
             if (!accessToken) {
                 // For guest users, sessionId is REQUIRED
@@ -339,16 +378,21 @@ const SeatMapPageContent = () => {
                 console.log('[SeatMap] Sending X-Session-Id header as fallback for authenticated user:', sessionId);
             }
 
+            // Prepare request payload
+            const requestPayload = {
+                flightInstanceId: flightInstanceId,
+                seats: selectedSeatsInfo.map(seat => ({
+                    flightSeatId: seat.flightSeatId,
+                    seatNumber: seat.seatNumber,
+                })),
+            };
+
+            console.log('[SeatMap] Request payload:', JSON.stringify(requestPayload, null, 2));
+
             const axiosClient = accessToken ? axiosInstance : axiosPublic;
             const response = await axiosClient.post(
                 '/api/booking-state/seat',
-                {
-                    flightInstanceId,
-                    seats: selectedSeatsInfo.map(seat => ({
-                        flightSeatId: seat.flightSeatId,
-                        seatNumber: seat.seatNumber,
-                    })),
-                },
+                requestPayload,
                 {
                     headers
                 }
