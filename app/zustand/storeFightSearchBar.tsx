@@ -21,15 +21,25 @@ const useFightSearchBarStore = create<FightSearchBarStoreState>()(
         minor: 0, // Deprecated: use child + infant instead
       },
 
+      isHydrated: false,
+
       setData: (newData) =>
         set((state) => ({
           data: { ...state.data, ...newData },
+        })),
+
+      setHydrated: (value: boolean) =>
+        set(() => ({
+          isHydrated: value,
         })),
     }),
     {
       name: "flight-search-data",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({ data: state.data }), // chỉ lưu data
+      onRehydrateStorage: () => (state) => {
+        state?.setHydrated(true);
+      },
     }
   )
 );

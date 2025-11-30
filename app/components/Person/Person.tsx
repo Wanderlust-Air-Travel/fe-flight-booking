@@ -15,13 +15,15 @@ const Person = ({classNameParent,classNameChild}:any) => {
     }, [adult, child, infant])
 
     useEffect(() => {
-        setData({ 
+        const newData = { 
             totalPerson: total, 
             adult: adult,
             child: child,
             infant: infant,
             minor: child + infant // Keep for backward compatibility
-        });
+        };
+        console.log('[Person] Updating store with passenger data:', newData);
+        setData(newData);
     }, [adult, child, infant, total, setData])
 
 

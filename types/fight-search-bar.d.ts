@@ -13,5 +13,7 @@
 
 export interface FightSearchBarStoreState {
   data: FightSearchBarData;
+  isHydrated: boolean;
   setData: (data: Partial<FightSearchBarData>) => void;
+  setHydrated: (value: boolean) => void;
 }

@@ -32,7 +32,7 @@ const SeatMapPageContent = () => {
 
     const { data, isHydrated } = useInfoTicket();
     const { accessToken } = useUserStore();
-    const { data: searchBarData } = useFightSearchBarStore();
+    const { data: searchBarData, isHydrated: isSearchBarHydrated } = useFightSearchBarStore();
 
     // Lấy flightInstanceId và cabinType từ query params (theo docs BE)
     const flightInstanceId = searchParams.get('flightInstanceId');
@@ -45,6 +45,18 @@ const SeatMapPageContent = () => {
             return;
         }
     }, [flightInstanceId, router]);
+
+    // Debug: Log search bar data when it changes
+    useEffect(() => {
+        console.log('[SeatMap] Search bar data updated:', {
+            isHydrated: isSearchBarHydrated,
+            searchBarData,
+            adults: searchBarData?.adult,
+            children: searchBarData?.child,
+            infants: searchBarData?.infant,
+            totalPerson: searchBarData?.totalPerson,
+        });
+    }, [searchBarData, isSearchBarHydrated]);
 
     // Helper function to find seat by seatId (which can be flightSeatId or generated ID)
     const findSeatBySeatId = useCallback((seatId: string): SeatItem | null => {
@@ -76,10 +88,26 @@ const SeatMapPageContent = () => {
 
     // Calculate passengers needing seats (adults + children, excluding infants)
     const passengersNeedingSeats = useMemo(() => {
+        // Wait for hydration before calculating
+        if (!isSearchBarHydrated) {
+            return 0;
+        }
+        
         const adults = searchBarData?.adult || 0;
         const children = searchBarData?.child || 0;
-        return adults + children; // Infants don't need seats
-    }, [searchBarData?.adult, searchBarData?.child]);
+        const total = adults + children; // Infants don't need seats
+        
+        // Debug logging
+        console.log('[SeatMap] Passengers calculation:', {
+            isHydrated: isSearchBarHydrated,
+            searchBarData,
+            adults,
+            children,
+            total,
+        });
+        
+        return total;
+    }, [searchBarData?.adult, searchBarData?.child, isSearchBarHydrated, searchBarData]);
 
     // Optimized seat toggle handlers with useCallback
     // Supports multiple seat selection for multiple passengers

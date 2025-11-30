@@ -21,13 +21,13 @@ const FlightSearchBar = () => {
 
   const router = useRouter();
 
-  // Fetch airports from backend API
+  // Fetch airports from backend API via Next.js API route
   useEffect(() => {
     const fetchAirports = async () => {
       try {
         setLoadingAirports(true);
         setAirportsError(null);
-        const response = await axiosPublic.get('/api/v1/search/airports');
+        const response = await axiosPublic.get('/api/search/airports');
         
         if (response.data?.airports && Array.isArray(response.data.airports)) {
           // Transform backend response to frontend format
