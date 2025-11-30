@@ -143,8 +143,9 @@ axiosInstance.interceptors.response.use(
             }
         }
 
-        // Show error toast for non-401 errors
-        if (error.response?.status !== 401) {
+        // Show error toast for non-401 errors (including network errors)
+        // Network errors don't have response, so we check if status is not 401 or if there's no response
+        if (!error.response || error.response.status !== 401) {
             const errorMessage = getErrorMessage(error);
             showError(errorMessage);
         }
@@ -168,8 +169,9 @@ axiosPublic.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
-        // Show error toast for non-401 errors
-        if (error.response?.status !== 401) {
+        // Show error toast for non-401 errors (including network errors)
+        // Network errors don't have response, so we check if status is not 401 or if there's no response
+        if (!error.response || error.response.status !== 401) {
             const errorMessage = getErrorMessage(error);
             showError(errorMessage);
         }
