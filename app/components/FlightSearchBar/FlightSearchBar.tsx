@@ -10,6 +10,7 @@ import Person from "../Person/Person";
 import { SelectComponent } from "../Select/SelectComponent";
 import { axiosPublic } from "@/lib/axios-instance";
 import { AirportItem } from "@/types/airport-item";
+import { showError, showLoading, updateToast } from "@/lib/toast";
 
 const FlightSearchBar = () => {
   const { data, setData } = useFightSearchBarStore();
@@ -97,7 +98,7 @@ const FlightSearchBar = () => {
     return true;
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     // Prevent search if form is not valid
     if (!isFormValid()) {
       return;
@@ -106,15 +107,64 @@ const FlightSearchBar = () => {
     const startDateFormat = convertToYMD(data.startDate);
     const endDateFormat = data.endDate ? convertToYMD(data.endDate) : "";
 
-    router.push(
-      `/search/flights?origin=${data.from}` +
-      `&destination=${data.to}` +
-      `&departDate=${startDateFormat}` +
-      `&returnDate=${endDateFormat}` +
-      `&tripType=${data.service}&adults=${data.adult}&minors=${data.minor}`
-    );
+    // Show loading toast
+    const loadingToastId = showLoading('Đang kiểm tra chuyến bay...');
 
-    console.log(startDateFormat);
+    try {
+      // Validate flight availability before navigating
+      const searchParams = new URLSearchParams({
+        origin: data.from,
+        destination: data.to,
+        departDate: startDateFormat,
+        returnDate: endDateFormat || '',
+        tripType: data.service,
+        adults: String(data.adult),
+        minors: String(data.minor),
+      });
+
+      const response = await axiosPublic.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/flights?${searchParams.toString()}`
+      );
+
+      // Check if flights are available
+      const hasOutboundFlights = response.data?.outbound && Array.isArray(response.data.outbound) && response.data.outbound.length > 0;
+      const hasInboundFlights = data.service === 'round_trip' 
+        ? (response.data?.inbound && Array.isArray(response.data.inbound) && response.data.inbound.length > 0)
+        : true; // One-way doesn't need inbound
+
+      if (!hasOutboundFlights || !hasInboundFlights) {
+        // Dismiss loading toast
+        updateToast(loadingToastId, '', 'error', { autoClose: 0 });
+        
+        const errorMessage = !hasOutboundFlights
+          ? `Không tìm thấy chuyến bay từ ${data.from} đến ${data.to} vào ngày ${startDateFormat}. Vui lòng chọn ngày khác.`
+          : `Không tìm thấy chuyến bay khứ hồi từ ${data.to} đến ${data.from} vào ngày ${endDateFormat}. Vui lòng chọn ngày khác.`;
+        
+        showError(errorMessage, { autoClose: 6000 });
+        return;
+      }
+
+      // Dismiss loading toast
+      updateToast(loadingToastId, '', 'success', { autoClose: 0 });
+
+      // Navigate to results page
+      router.push(
+        `/search/flights?origin=${data.from}` +
+        `&destination=${data.to}` +
+        `&departDate=${startDateFormat}` +
+        `&returnDate=${endDateFormat}` +
+        `&tripType=${data.service}&adults=${data.adult}&minors=${data.minor}`
+      );
+    } catch (error: any) {
+      // Dismiss loading toast
+      updateToast(loadingToastId, '', 'error', { autoClose: 0 });
+      
+      // Show error toast
+      const errorMessage = error.response?.data?.message 
+        || error.message 
+        || 'Không thể tìm kiếm chuyến bay. Vui lòng thử lại sau.';
+      showError(errorMessage, { autoClose: 6000 });
+    }
   };
 
   const handleChangeForm = (value: string) => {
