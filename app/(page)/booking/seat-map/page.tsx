@@ -11,6 +11,7 @@ import CabinSection from "@/app/components/SeatMap/CabinSection";
 import SectionNavigation from "@/app/components/SeatMap/SectionNavigation";
 import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils";
 import useUserStore from "@/app/zustand/storeUser";
+import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 import { Button } from "@/components/ui/button";
 
 const SeatMapPageContent = () => {
@@ -31,6 +32,7 @@ const SeatMapPageContent = () => {
 
     const { data, isHydrated } = useInfoTicket();
     const { accessToken } = useUserStore();
+    const { data: searchBarData } = useFightSearchBarStore();
 
     // Lấy flightInstanceId và cabinType từ query params (theo docs BE)
     const flightInstanceId = searchParams.get('flightInstanceId');
@@ -392,6 +394,27 @@ const SeatMapPageContent = () => {
                                 <h2 className="text-center text-md text-[var(--cl-pri)] font-bold">
                                     Choose Position
                                 </h2>
+                                
+                                {/* Passenger count info */}
+                                {searchBarData.totalPerson > 0 && (
+                                    <div className="p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                                        <p className="font-semibold mb-1">Passenger Information:</p>
+                                        <ul className="list-disc list-inside space-y-1">
+                                            <li>Total passengers: {searchBarData.totalPerson}</li>
+                                            <li>Adults: {searchBarData.adult || 1}</li>
+                                            {searchBarData.child > 0 && <li>Children (2-11): {searchBarData.child}</li>}
+                                            {searchBarData.infant > 0 && (
+                                                <li className="text-yellow-700">
+                                                    Infants (&lt;2): {searchBarData.infant} (no seat needed)
+                                                </li>
+                                            )}
+                                        </ul>
+                                        <p className="mt-2 font-semibold">
+                                            Seats needed: {searchBarData.totalPerson - (searchBarData.infant || 0)} 
+                                            {searchBarData.infant > 0 && ` (excluding ${searchBarData.infant} infant(s))`}
+                                        </p>
+                                    </div>
+                                )}
 
                                 {/* Section Navigation */}
                                 {data.type === "business" && businessSections.length > 0 && (

@@ -5,8 +5,10 @@
   startDate: string;
   endDate?: string;
   totalPerson: number;
-  minor:number,
-  adult:number
+  adult: number;
+  child: number; // Child (2-11 years old)
+  infant: number; // Infant (<2 years old)
+  minor: number; // Deprecated: use child + infant instead
 }
 
 export interface FightSearchBarStoreState {

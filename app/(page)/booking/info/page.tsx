@@ -8,6 +8,7 @@ import { Form, Formik, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import useUserStore from "@/app/zustand/storeUser";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
+import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
@@ -15,6 +16,7 @@ import { PassengerFormData, BookingFormData } from "@/types/booking-form-type";
 
 // Validation schema
 const passengerSchema = Yup.object().shape({
+    passengerType: Yup.string().oneOf(["ADT", "CHD", "INF"], "Invalid passenger type").required("Passenger type is required"),
     fullname: Yup.string().required("Full name is required"),
     dob: Yup.string().required("Date of birth is required"),
     gender: Yup.string().required("Gender is required"),
@@ -28,7 +30,22 @@ const bookingSchema = Yup.object().shape({
     passengers: Yup.array()
         .of(passengerSchema)
         .min(1, "At least one passenger is required")
-        .required("Passengers are required"),
+        .required("Passengers are required")
+        .test("infant-adult-ratio", "Each adult can only accompany maximum 1 infant. Additional infant(s) must be booked as Child (CHD).", function(passengers) {
+            if (!passengers) return true;
+            const adults = passengers.filter((p: any) => p.passengerType === "ADT").length;
+            const infants = passengers.filter((p: any) => p.passengerType === "INF").length;
+            return infants <= adults;
+        })
+        .test("infant-requires-adult", "Infants (INF) must be accompanied by at least one adult (ADT)", function(passengers) {
+            if (!passengers) return true;
+            const adults = passengers.filter((p: any) => p.passengerType === "ADT").length;
+            const infants = passengers.filter((p: any) => p.passengerType === "INF").length;
+            if (infants > 0 && adults === 0) {
+                return this.createError({ message: "Infants (INF) must be accompanied by at least one adult (ADT)" });
+            }
+            return true;
+        }),
 });
 
 const BookingInfoContent = () => {
@@ -36,6 +53,7 @@ const BookingInfoContent = () => {
     const router = useRouter();
     const { accessToken, refreshToken, user, refreshAccessToken } = useUserStore();
     const { data: ticketData } = useInfoTicket();
+    const { data: searchBarData } = useFightSearchBarStore();
 
     const flightInstanceId = searchParams.get("flightInstanceId");
     const [reservationId, setReservationId] = useState<string | null>(null);
@@ -87,7 +105,7 @@ const BookingInfoContent = () => {
                                 segmentType: "outbound",
                             },
                         ],
-                        numberOfPassengers: 1, // TODO: Get from search params or state
+                        numberOfPassengers: searchBarData.totalPerson || 1,
                         currencyCode: "VND",
                     },
                     {
@@ -180,19 +198,34 @@ const BookingInfoContent = () => {
         [reservationId, router, accessToken]
     );
 
+    // Initialize passengers based on reservation data
+    const getInitialPassengers = (): PassengerFormData[] => {
+        const numberOfPassengers = reservationData?.numberOfPassengers || 1;
+        const passengers: PassengerFormData[] = [];
+        
+        for (let i = 0; i < numberOfPassengers; i++) {
+            // If user is logged in and this is the first passenger, auto-fill with user info
+            const isFirstPassenger = i === 0;
+            const isCurrentUser = isFirstPassenger && user;
+            
+            passengers.push({
+                passengerType: "ADT", // Default to ADT, user can change
+                fullname: isCurrentUser ? (user?.fullname || "") : "",
+                dob: "", // DOB is required, user must enter
+                gender: "",
+                documentNumber: "",
+                loyaltyNumber: "",
+            });
+        }
+        
+        return passengers;
+    };
+
     const initialValues: BookingFormData = {
         contactFullname: user?.fullname || "",
         contactEmail: user?.email || "",
         contactPhone: user?.phone ? String(user.phone) : "",
-        passengers: [
-            {
-                passengerType: "ADT",
-                fullname: "",
-                dob: "",
-                gender: "",
-                documentNumber: "",
-            },
-        ],
+        passengers: getInitialPassengers(),
     };
 
     // Guest bookings are now allowed - no need to check accessToken
@@ -330,19 +363,64 @@ const BookingInfoContent = () => {
                                                 <h3 className="text-md font-semibold">
                                                     Passenger Information
                                                 </h3>
-                                                {values.passengers.map((passenger, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className="border border-[var(--cl-third)] rounded p-[1.5rem]"
-                                                    >
-                                                        <h4 className="text-sm font-semibold mb-[1rem]">
-                                                            Passenger {index + 1}
-                                                        </h4>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-[1rem]">
-                                                            <div>
-                                                                <label className="block text-sm font-medium mb-[0.5rem]">
-                                                                    Full Name *
-                                                                </label>
+                                                {values.passengers.map((passenger, index) => {
+                                                    const isInfant = passenger.passengerType === "INF";
+                                                    const isChild = passenger.passengerType === "CHD";
+                                                    const adultCount = values.passengers.filter(p => p.passengerType === "ADT").length;
+                                                    const infantCount = values.passengers.filter(p => p.passengerType === "INF").length;
+                                                    
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className="border border-[var(--cl-third)] rounded p-[1.5rem]"
+                                                        >
+                                                            <div className="flex justify-between items-center mb-[1rem]">
+                                                                <h4 className="text-sm font-semibold">
+                                                                    Passenger {index + 1}
+                                                                    {index === 0 && user && (
+                                                                        <span className="ml-2 text-xs text-gray-500">
+                                                                            (You)
+                                                                        </span>
+                                                                    )}
+                                                                </h4>
+                                                                <div className="flex items-center gap-2">
+                                                                    <label className="text-sm font-medium">
+                                                                        Type:
+                                                                    </label>
+                                                                    <Field
+                                                                        as="select"
+                                                                        name={`passengers.${index}.passengerType`}
+                                                                        className="px-2 py-1 border border-[var(--cl-third)] rounded text-sm"
+                                                                    >
+                                                                        <option value="ADT">Adult (12+)</option>
+                                                                        <option value="CHD">Child (2-11)</option>
+                                                                        <option value="INF">Infant (&lt;2)</option>
+                                                                    </Field>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            {isInfant && (
+                                                                <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                                                                    <p className="font-semibold">Infant Requirements:</p>
+                                                                    <ul className="list-disc list-inside mt-1 space-y-1">
+                                                                        <li>Must be accompanied by an adult (18+)</li>
+                                                                        <li>No separate seat (sits on adult's lap)</li>
+                                                                        <li>Maximum 1 infant per adult</li>
+                                                                    </ul>
+                                                                    {infantCount > adultCount && (
+                                                                        <p className="mt-2 font-semibold text-red-600">
+                                                                            Warning: You have {infantCount} infant(s) but only {adultCount} adult(s). 
+                                                                            Each adult can only accompany 1 infant. Additional infant(s) must be booked as Child (CHD).
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-[1rem]">
+                                                                <div>
+                                                                    <label className="block text-sm font-medium mb-[0.5rem]">
+                                                                        Full Name *
+                                                                    </label>
                                                                 <Field
                                                                     type="text"
                                                                     name={`passengers.${index}.fullname`}
@@ -416,7 +494,8 @@ const BookingInfoContent = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                ))}
+                                                    );
+                                                })}
                                             </div>
 
                                             <div className="flex gap-x-[1rem]">
