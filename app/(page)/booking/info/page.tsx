@@ -759,7 +759,8 @@ const BookingInfoContent = () => {
                                                                                             }}
                                                                                             disabled={(date) => date > flightDate}
                                                                                             initialFocus
-                                                                                            className="rounded-md"
+                                                                                            className="rounded-md border shadow-sm"
+                                                                                            captionLayout="dropdown"
                                                                                             classNames={{
                                                                                                 day_selected: "bg-[var(--cl-pri)] text-white hover:bg-[var(--cl-pri)] hover:text-white",
                                                                                                 day_today: "bg-[var(--cl-four)]/20 text-[var(--cl-pri)] font-bold",
@@ -810,24 +811,18 @@ const BookingInfoContent = () => {
                                                                                 onValueChange={(value: string) => {
                                                                                     form.setFieldValue(field.name, value);
                                                                                 }}
-                                                                                className="flex flex-row gap-6"
+                                                                                className="flex flex-row gap-8"
                                                                             >
                                                                                 <div className="flex items-center space-x-3">
-                                                                                    <RadioGroupItem value="MALE" id={`gender-male-${index}`} className="size-5 border-2 border-[var(--cl-pri)] data-[state=checked]:bg-[var(--cl-pri)]" />
+                                                                                    <RadioGroupItem value="MALE" id={`gender-male-${index}`} className="size-6 border-2 border-[var(--cl-pri)] data-[state=checked]:bg-[var(--cl-pri)]" />
                                                                                     <Label htmlFor={`gender-male-${index}`} className="text-[1.8rem] font-semibold text-[var(--cl-pri)] cursor-pointer">
                                                                                         Male
                                                                                     </Label>
                                                                                 </div>
                                                                                 <div className="flex items-center space-x-3">
-                                                                                    <RadioGroupItem value="FEMALE" id={`gender-female-${index}`} className="size-5 border-2 border-[var(--cl-pri)] data-[state=checked]:bg-[var(--cl-pri)]" />
+                                                                                    <RadioGroupItem value="FEMALE" id={`gender-female-${index}`} className="size-6 border-2 border-[var(--cl-pri)] data-[state=checked]:bg-[var(--cl-pri)]" />
                                                                                     <Label htmlFor={`gender-female-${index}`} className="text-[1.8rem] font-semibold text-[var(--cl-pri)] cursor-pointer">
                                                                                         Female
-                                                                                    </Label>
-                                                                                </div>
-                                                                                <div className="flex items-center space-x-3">
-                                                                                    <RadioGroupItem value="OTHER" id={`gender-other-${index}`} className="size-5 border-2 border-[var(--cl-pri)] data-[state=checked]:bg-[var(--cl-pri)]" />
-                                                                                    <Label htmlFor={`gender-other-${index}`} className="text-[1.8rem] font-semibold text-[var(--cl-pri)] cursor-pointer">
-                                                                                        Other
                                                                                     </Label>
                                                                                 </div>
                                                                             </RadioGroup>
