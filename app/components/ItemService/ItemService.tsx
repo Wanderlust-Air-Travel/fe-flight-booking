@@ -14,10 +14,11 @@ const ItemService = ({ image, title, link, startDate, endDate, service, price }:
                 <Image 
                     src={imageUrl} 
                     alt={title} 
-                    width={100} 
-                    height={100} 
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     unoptimized 
-                    className="w-full h-full absolute inset-0 object-cover transition-transform ease-linear duration-300 group-hover:scale-[1.05]" 
+                    loading="lazy"
+                    className="object-cover transition-transform ease-linear duration-300 group-hover:scale-[1.05]" 
                 />
             </div>
             <div className="p-[1.2rem] flex flex-col gap-y-[0.8rem]">

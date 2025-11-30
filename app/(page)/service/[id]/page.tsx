@@ -1,10 +1,22 @@
 "use client";
+import dynamic from "next/dynamic";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import FlightSearchBar from "@/app/components/FlightSearchBar/FlightSearchBar";
-import TripList from "@/app/components/TripList/TripList";
 import { TripListProps } from "@/types/trip-list-type";
 import axios from "axios";
 import { useEffect, useState } from "react";
+
+// Lazy load TripList component (heavy component with many interactions)
+const TripList = dynamic(() => import("@/app/components/TripList/TripList"), {
+    loading: () => (
+        <div className="flex flex-col gap-y-[1rem]">
+            {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-[200px] bg-gray-200 animate-pulse rounded" />
+            ))}
+        </div>
+    ),
+    ssr: true,
+});
 
 const ServiceDetails = () => {
     const [trips, setTrips] = useState<TripListProps | null>(null);

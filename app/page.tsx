@@ -1,13 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import BannerHome from "./components/Banner/Banner";
+import dynamic from "next/dynamic";
 import useIsActiveStore from "./zustand/storeHeader";
 import { Button } from "@/components/ui/button";
-import ServiceHome from "./components/Services/ServiceHome";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import useFightSearchBarStore from "./zustand/storeFightSearchBar";
+
+// Lazy load heavy components
+const BannerHome = dynamic(() => import("./components/Banner/Banner"), {
+    loading: () => <div className="h-[calc(100vh-var(--hd))] bg-gray-100 animate-pulse" />,
+    ssr: true,
+});
+
+const ServiceHome = dynamic(() => import("./components/Services/ServiceHome"), {
+    loading: () => (
+        <ul className="flex flex-wrap gap-y-[2.4rem] -mx-[1.2rem] pb-1">
+            {Array.from({ length: 8 }).map((_, i) => (
+                <li key={i} className="w-[calc(100%/4)] px-[1.2rem]">
+                    <div className="h-[300px] bg-gray-200 animate-pulse rounded-[1rem]" />
+                </li>
+            ))}
+        </ul>
+    ),
+    ssr: true,
+});
 
 
 
