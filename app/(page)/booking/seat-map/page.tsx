@@ -60,31 +60,59 @@ const SeatMapPageContent = () => {
         ) || null;
     }, [seatBusiness, seatEconomy]);
 
+    // Calculate passengers needing seats (adults + children, excluding infants)
+    const passengersNeedingSeats = useMemo(() => {
+        const adults = searchBarData?.adult || 0;
+        const children = searchBarData?.child || 0;
+        return adults + children; // Infants don't need seats
+    }, [searchBarData?.adult, searchBarData?.child]);
+
     // Optimized seat toggle handlers with useCallback
     // Supports multiple seat selection for multiple passengers
+    // IMPORTANT: Enforces seat limit based on passenger count (adults + children)
     const handleSeatToggle = useCallback(
         (cabinType: "business" | "economy") => (seatId: string, checked: boolean) => {
             // Find the actual seat to get flightSeatId and seatNumber
             const seat = findSeatBySeatId(seatId);
             
-            if (checked && seat) {
+            if (!seat) {
+                return; // Invalid seat
+            }
+
+            // Validate seat availability and selectability
+            if (!seat.isSelectable || !seat.isAvailable) {
+                setSaveError('This seat is not available or selectable.');
+                return;
+            }
+
+            if (checked) {
+                // Check if we've reached the maximum number of seats needed
+                if (selectedSeatsInfo.length >= passengersNeedingSeats) {
+                    setSaveError(`You can only select ${passengersNeedingSeats} seat(s) for ${passengersNeedingSeats} passenger(s) (${searchBarData?.adult || 0} adult(s) + ${searchBarData?.child || 0} child(ren)). Infants do not require seats.`);
+                    return;
+                }
+
+                // Check if seat already exists
+                const exists = selectedSeatsInfo.some(s => s.flightSeatId === seat.flightSeatId);
+                if (exists) {
+                    return; // Already selected
+                }
+
                 // Add seat to selected seats array
-                setSelectedSeatsInfo((prev) => {
-                    // Check if seat already exists
-                    const exists = prev.some(s => s.flightSeatId === seat.flightSeatId);
-                    if (exists) return prev;
-                    return [...prev, {
-                        flightSeatId: seat.flightSeatId,
-                        seatNumber: seat.seatNumber,
-                    }];
-                });
-            } else if (seat) {
+                setSelectedSeatsInfo((prev) => [...prev, {
+                    flightSeatId: seat.flightSeatId,
+                    seatNumber: seat.seatNumber,
+                }]);
+                setSaveError(null); // Clear error on successful selection
+            } else {
                 // Remove seat from selected seats array
                 setSelectedSeatsInfo((prev) => 
                     prev.filter(s => s.flightSeatId !== seat.flightSeatId)
                 );
+                setSaveError(null); // Clear error on deselection
             }
 
+            // Update visual selection state
             if (cabinType === "business") {
                 setChooseBusiness((prev) =>
                     checked ? [...prev, seatId] : prev.filter((id) => id !== seatId)
@@ -95,7 +123,7 @@ const SeatMapPageContent = () => {
                 );
             }
         },
-        [findSeatBySeatId]
+        [findSeatBySeatId, selectedSeatsInfo, passengersNeedingSeats, searchBarData]
     );
 
     const handleBusinessSeatToggle = handleSeatToggle("business");
@@ -255,11 +283,8 @@ const SeatMapPageContent = () => {
 
     // Handle save seat selection and continue
     const handleContinue = useCallback(async () => {
-        // Get selected seats based on cabin type
-        const selectedSeatIds = data.type === "business" ? chooseBusiness : chooseEconomy;
-        
-        // Calculate how many seats are needed (excluding infants)
-        const seatsNeeded = searchBarData.totalPerson - (searchBarData.infant || 0);
+        // Calculate how many seats are needed (adults + children, excluding infants)
+        const seatsNeeded = passengersNeedingSeats;
         
         if (selectedSeatsInfo.length === 0) {
             setSaveError('Please select at least one seat');
@@ -267,12 +292,12 @@ const SeatMapPageContent = () => {
         }
 
         if (selectedSeatsInfo.length < seatsNeeded) {
-            setSaveError(`Please select ${seatsNeeded} seat(s) for ${seatsNeeded} passenger(s) (excluding ${searchBarData.infant || 0} infant(s))`);
+            setSaveError(`Please select ${seatsNeeded} seat(s) for ${seatsNeeded} passenger(s) (${searchBarData?.adult || 0} adult(s) + ${searchBarData?.child || 0} child(ren)). Infants do not require seats.`);
             return;
         }
 
         if (selectedSeatsInfo.length > seatsNeeded) {
-            setSaveError(`You have selected ${selectedSeatsInfo.length} seat(s), but only ${seatsNeeded} seat(s) are needed (excluding ${searchBarData.infant || 0} infant(s))`);
+            setSaveError(`You have selected ${selectedSeatsInfo.length} seat(s), but only ${seatsNeeded} seat(s) are needed (${searchBarData?.adult || 0} adult(s) + ${searchBarData?.child || 0} child(ren)). Infants do not require seats.`);
             return;
         }
 
@@ -353,7 +378,7 @@ const SeatMapPageContent = () => {
         } finally {
             setIsSaving(false);
         }
-    }, [data.type, chooseBusiness, chooseEconomy, selectedSeatsInfo, flightInstanceId, router, accessToken, searchBarData]);
+    }, [data.type, chooseBusiness, chooseEconomy, selectedSeatsInfo, flightInstanceId, router, accessToken, searchBarData, passengersNeedingSeats]);
 
     if (loading) {
         return (
@@ -392,7 +417,7 @@ const SeatMapPageContent = () => {
                             <div className="pt-[calc(100%*6000/2000)] w-full relative overflow-hidden block">
                                 <Image src="/plane.png" alt="plane" width={100} height={100} className="w-full h-full absolute inset-0 object-cover " priority unoptimized />
 
-                                <div className="absolute h-[55%] w-[24%] top-[16%] left-1/2 z-10 -translate-x-1/2 flex flex-col gap-y-[2rem] overflow-y-auto max-h-full">
+                                <div className="absolute h-[55%] w-[24%] top-[16%] left-1/2 z-10 -translate-x-1/2 flex flex-col gap-y-[2rem] overflow-y-auto max-h-full overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
                                     {/* Business Section */}
                                     <CabinSection
                                         seatGroup={seatBusiness}
@@ -434,11 +459,12 @@ const SeatMapPageContent = () => {
                                             )}
                                         </ul>
                                         <p className="mt-2 font-semibold">
-                                            Seats needed: {searchBarData.totalPerson - (searchBarData.infant || 0)} 
+                                            Seats needed: {passengersNeedingSeats} 
                                             {searchBarData.infant > 0 && ` (excluding ${searchBarData.infant} infant(s))`}
                                         </p>
-                                        <p className="mt-2 text-green-700 font-semibold">
-                                            Seats selected: {selectedSeatsInfo.length} / {searchBarData.totalPerson - (searchBarData.infant || 0)}
+                                        <p className={`mt-2 font-semibold ${selectedSeatsInfo.length === passengersNeedingSeats ? 'text-green-700' : selectedSeatsInfo.length > passengersNeedingSeats ? 'text-red-700' : 'text-orange-700'}`}>
+                                            Seats selected: {selectedSeatsInfo.length} / {passengersNeedingSeats}
+                                            {selectedSeatsInfo.length > passengersNeedingSeats && ' (Too many seats selected!)'}
                                         </p>
                                         {selectedSeatsInfo.length > 0 && (
                                             <div className="mt-2">
@@ -527,7 +553,7 @@ const SeatMapPageContent = () => {
                                         )}
                                         <Button
                                             onClick={handleContinue}
-                                            disabled={isSaving || selectedSeatsInfo.length === 0 || selectedSeatsInfo.length !== (searchBarData.totalPerson - (searchBarData.infant || 0))}
+                                            disabled={isSaving || selectedSeatsInfo.length === 0 || selectedSeatsInfo.length !== passengersNeedingSeats}
                                             className="w-full"
                                         >
                                             {isSaving ? 'Saving...' : 'Continue'}
