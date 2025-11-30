@@ -1,5 +1,6 @@
 "use client";
 import axios from "axios";
+import { showError, getErrorMessage } from "@/lib/toast";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import FlightSearchBar from "../FlightSearchBar/FlightSearchBar";
@@ -22,6 +23,7 @@ const BannerHome = () => {
             })
             .catch((error) => {
                 console.log(error)
+                // Error toast sẽ tự động hiển thị từ axios interceptor
             })
     }, [])
 

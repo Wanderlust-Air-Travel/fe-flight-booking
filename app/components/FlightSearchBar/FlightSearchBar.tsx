@@ -109,9 +109,45 @@ const FlightSearchBar = () => {
 
   console.log(data);
 
+  /**
+   * Validate search form data
+   * Returns true if all required fields are filled and valid
+   */
+  const isFormValid = (): boolean => {
+    // Required fields: from, to, startDate, adult >= 1
+    if (!data.from || !data.to || !data.startDate || !data.adult || data.adult < 1) {
+      return false;
+    }
 
+    // Origin and destination must be different
+    if (data.from === data.to) {
+      return false;
+    }
+
+    // If tripType is round_trip, endDate is required
+    if (data.service === 'round_trip' && (!data.endDate || data.endDate.trim() === '')) {
+      return false;
+    }
+
+    // Ensure minors is valid (>= 0)
+    if (data.minor < 0 || isNaN(data.minor)) {
+      return false;
+    }
+
+    // Ensure adult is a valid number
+    if (isNaN(data.adult)) {
+      return false;
+    }
+
+    return true;
+  };
 
   const handleSearch = () => {
+    // Prevent search if form is not valid
+    if (!isFormValid()) {
+      return;
+    }
+
     const startDateFormat = convertToYMD(data.startDate);
     const endDateFormat = data.endDate ? convertToYMD(data.endDate) : "";
 
@@ -229,8 +265,9 @@ const FlightSearchBar = () => {
         </div>
         <div className="w-full md:w-[20%] p-2 flex justify-center">
           <Button
-            className="w-full h-[4.4rem] bg-[var(--cl-pri)] text-sm sm:text-base md:text-[1.6rem] uppercase hover:bg-[var(--cl-four)] transition-colors duration-200 font-semibold"
+            className="w-full h-[4.4rem] bg-[var(--cl-pri)] text-sm sm:text-base md:text-[1.6rem] uppercase hover:bg-[var(--cl-four)] transition-colors duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[var(--cl-pri)]"
             onClick={handleSearch}
+            disabled={!isFormValid()}
           >
             Search
           </Button>

@@ -5,6 +5,7 @@
 
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import useUserStore from '@/app/zustand/storeUser';
+import { showError, getErrorMessage } from '@/lib/toast';
 
 // Create axios instance
 const axiosInstance = axios.create({
@@ -142,6 +143,12 @@ axiosInstance.interceptors.response.use(
             }
         }
 
+        // Show error toast for non-401 errors
+        if (error.response?.status !== 401) {
+            const errorMessage = getErrorMessage(error);
+            showError(errorMessage);
+        }
+
         return Promise.reject(error);
     }
 );
@@ -154,6 +161,21 @@ export const axiosPublic = axios.create({
         'Content-Type': 'application/json',
     },
 });
+
+// Add error interceptor for public axios instance
+axiosPublic.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error: AxiosError) => {
+        // Show error toast for non-401 errors
+        if (error.response?.status !== 401) {
+            const errorMessage = getErrorMessage(error);
+            showError(errorMessage);
+        }
+        return Promise.reject(error);
+    }
+);
 
 export default axiosInstance;
 

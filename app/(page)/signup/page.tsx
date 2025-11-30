@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { RegisterSchema } from "./register.schema";
 import { SignupFormValue } from "@/types/auth-form-type";
+import { showSuccess, showError, getErrorMessage } from "@/lib/toast";
 
 const initialValues: SignupFormValue = {
     email: "",
@@ -18,15 +19,10 @@ const initialValues: SignupFormValue = {
     fullname: ""
 }
 
-
-
-
 const SignUpPage = () => {
     const { login } = useUserStore();
     const [error, setError] = useState<string>("")
     const router = useRouter();
-
-
 
     const handleSubmit = (value: SignupFormValue, setSubmitting: (isSubmitting: boolean) => void) => {
         axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/register`, {
@@ -40,6 +36,7 @@ const SignUpPage = () => {
 
                 if (res.data) {
                     login(res.data);
+                    showSuccess('Đăng ký thành công!');
                     router.push("/");
                 }
 
@@ -47,14 +44,12 @@ const SignUpPage = () => {
             .catch((err) => {
                 setSubmitting(false);
                 console.log(err)
-                console.log(err.response.data.message)
-                setError(err.response.data.message)
-
+                const errorMessage = getErrorMessage(err, 'Đăng ký thất bại');
+                setError(errorMessage);
+                showError(errorMessage);
             })
             .finally(() => {
                 setSubmitting(false);
-
-
             })
     }
 
