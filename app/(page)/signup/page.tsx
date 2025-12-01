@@ -58,13 +58,15 @@ const SignUpPage = () => {
             <section className={`h-[calc(100dvh-var(--hd))]`}>
                 <div className="container">
                     <div className="flex h-full -mx-[1.2rem]">
-                        <div className="w-[55%] px-[1.2rem]">
+                        {/* Left side image area - 70% width (same as Sign In) */}
+                        <div className="w-[70%] px-[1.2rem]">
                             <div className="-ml-[calc((100vw-140rem)/2)] h-full">
-                                <Image src="/resBg.png" alt="loginBg" unoptimized priority width={100} height={100} className="object-cover w-full h-full" />
+                                <Image src="/resBg.png" alt="registerBg" unoptimized priority width={100} height={100} className="object-cover w-full h-full" />
                             </div>
                         </div>
-                        <div className="w-full flex-1 px-[1.2rem] ">
-                            <div className="flex h-full flex-col justify-center gap-y-[1.2rem] py-[var(--rowY)]">
+                        {/* Right side register form - 30% width and centered (same as Sign In) */}
+                        <div className="w-[30%] px-[1.2rem] flex items-center">
+                            <div className="w-full max-w-[40rem] mx-auto flex flex-col justify-center gap-y-[1.2rem] py-[var(--rowY)]">
                                 <h2 className="text-center text-lg font-bold text-[var(--cl-pri)] uppercase">Register</h2>
 
                                 <Formik
