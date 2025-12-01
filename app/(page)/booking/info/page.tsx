@@ -108,7 +108,7 @@ const BookingInfoContent = () => {
                 <div className="container max-w-[160rem]">
                     <div className="flex flex-wrap -mx-2 md:-mx-4 lg:-mx-8">
                         <div className="px-2 md:px-4 lg:px-8 w-full lg:w-[70%]">
-                            <div className="bg-white rounded-lg md:rounded-xl lg:rounded-2xl p-4 md:p-6 lg:p-8 xl:p-12 border-2 border-[var(--cl-pri)] shadow-lg">
+                            <div className="bg-white rounded-lg md:rounded-xl lg:rounded-2xl p-4 md:p-6 lg:p-8 xl:p-12 border border-[var(--cl-third)] shadow-md">
                                 <h2 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-[var(--cl-pri)] mb-4 md:mb-6 lg:mb-8 uppercase tracking-wide">
                                     Passenger Information
                                 </h2>
@@ -120,7 +120,7 @@ const BookingInfoContent = () => {
                                 )}
 
                                 {reservationData && (
-                                    <Alert className="mb-4 md:mb-6 lg:mb-8 border-2 border-[var(--cl-pri)] bg-blue-50">
+                                    <Alert className="mb-4 md:mb-6 lg:mb-8 border border-[var(--cl-third)] bg-blue-50">
                                         <AlertDescription className="text-sm md:text-base">
                                             <p className="font-semibold text-[var(--cl-pri)] mb-2">
                                                 Reservation Code:{" "}
@@ -187,7 +187,7 @@ const BookingInfoContent = () => {
                                                                 {...field}
                                                                 type="text"
                                                                 className={cn(
-                                                                    "h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] pr-10",
+                                                                    "h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] pr-10",
                                                                     className
                                                                 )}
                                                             />
@@ -204,7 +204,7 @@ const BookingInfoContent = () => {
                                                                 {...field}
                                                                 type="email"
                                                                 className={cn(
-                                                                    "h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] pr-10",
+                                                                    "h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] pr-10",
                                                                     className
                                                                 )}
                                                             />
@@ -222,7 +222,7 @@ const BookingInfoContent = () => {
                                                                     {...field}
                                                                     type="tel"
                                                                     className={cn(
-                                                                        "h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] pr-10",
+                                                                        "h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] pr-10",
                                                                         className
                                                                     )}
                                                                 />
@@ -234,7 +234,7 @@ const BookingInfoContent = () => {
 
                                             {/* User Traveling Selection - Only show if user is logged in */}
                                             {user && (
-                                                <div className="flex flex-col gap-y-4 md:gap-y-6 p-4 md:p-6 lg:p-8 bg-gradient-to-br from-blue-50 to-white border-2 border-[var(--cl-pri)] rounded-lg md:rounded-xl shadow-md">
+                                                <div className="flex flex-col gap-y-4 md:gap-y-6 p-4 md:p-6 lg:p-8 bg-gradient-to-br from-blue-50 to-white border border-[var(--cl-third)] rounded-lg md:rounded-xl shadow-sm">
                                                     <div className="flex items-center gap-2 md:gap-3">
                                                         <Checkbox
                                                             id="isUserTraveling"
@@ -279,8 +279,8 @@ const BookingInfoContent = () => {
                                                                         variant={values.userPassengerIndex === idx ? "default" : "outline"}
                                                                         size="sm"
                                                                         className={values.userPassengerIndex === idx 
-                                                                            ? "bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white border-2 border-[var(--cl-pri)] text-xs md:text-sm lg:text-base font-bold px-3 md:px-4 lg:px-6 py-2 md:py-2.5 lg:py-3"
-                                                                            : "border-2 border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white text-xs md:text-sm lg:text-base font-semibold px-3 md:px-4 lg:px-6 py-2 md:py-2.5 lg:py-3"
+                                                                            ? "bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white border border-[var(--cl-pri)] text-xs md:text-sm lg:text-base font-bold px-3 md:px-4 lg:px-6 py-2 md:py-2.5 lg:py-3"
+                                                                            : "border border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white text-xs md:text-sm lg:text-base font-semibold px-3 md:px-4 lg:px-6 py-2 md:py-2.5 lg:py-3"
                                                                         }
                                                                         onClick={() => {
                                                                             // Clear previous user selection
@@ -319,7 +319,7 @@ const BookingInfoContent = () => {
                                                     return (
                                                         <div
                                                             key={index}
-                                                            className="border-2 border-[var(--cl-pri)] rounded-lg md:rounded-xl p-4 md:p-6 lg:p-8 bg-gradient-to-br from-white to-blue-50/30 shadow-md"
+                                                            className="border border-[var(--cl-third)] rounded-lg md:rounded-xl p-4 md:p-6 lg:p-8 bg-gradient-to-br from-white to-blue-50/30 shadow"
                                                         >
                                                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4 md:mb-6 pb-3 md:pb-4 border-b-2 border-[var(--cl-pri)]">
                                                                 <h4 className="text-base md:text-lg lg:text-xl xl:text-2xl font-bold text-[var(--cl-pri)]">
@@ -352,7 +352,7 @@ const BookingInfoContent = () => {
                                                                                     }
                                                                                 }}
                                                                             >
-                                                                                <SelectTrigger className="w-full sm:w-[180px] md:w-[220px] h-12 md:h-14 lg:h-16 text-sm md:text-base border-2 border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]">
+                                                                                <SelectTrigger className="w-full sm:w-[180px] md:w-[220px] h-12 md:h-14 lg:h-16 text-sm md:text-base border border-[var(--cl-third)] focus:ring-2 focus:ring-[var(--cl-pri)]">
                                                                                     <SelectValue placeholder="Select type" />
                                                                                 </SelectTrigger>
                                                                                 <SelectContent>
@@ -367,7 +367,7 @@ const BookingInfoContent = () => {
                                                             </div>
                                                             
                                                             {isInfant && (
-                                                                <Alert className="mb-4 md:mb-6 border-2 border-[var(--cl-pri)] bg-blue-50">
+                                                                <Alert className="mb-4 md:mb-6 border border-[var(--cl-third)] bg-blue-50">
                                                                     <AlertDescription className="text-xs md:text-sm lg:text-base">
                                                                         <p className="font-bold text-[var(--cl-pri)] mb-2 md:mb-3 text-sm md:text-base lg:text-lg">Infant Requirements:</p>
                                                                         <ul className="list-disc list-inside space-y-1 md:space-y-2 text-gray-700 text-xs md:text-sm">
@@ -398,7 +398,7 @@ const BookingInfoContent = () => {
                                                                                 type="text"
                                                                                 disabled={passenger.isCurrentUser && user}
                                                                                 className={cn(
-                                                                                    "h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] pr-10",
+                                                                                    "h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] pr-10",
                                                                                     className
                                                                                 )}
                                                                             />
@@ -577,7 +577,7 @@ const BookingInfoContent = () => {
                                                                                 {...field}
                                                                                 type="text"
                                                                                 className={cn(
-                                                                                    "h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border-2 border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] pr-10",
+                                                                                    "h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)] pr-10",
                                                                                     className
                                                                                 )}
                                                                             />
@@ -611,7 +611,7 @@ const BookingInfoContent = () => {
                                                     type="button"
                                                     variant="outline"
                                                     onClick={() => router.back()}
-                                                    className="h-12 md:h-14 lg:h-16 px-4 md:px-6 lg:px-8 text-sm md:text-base lg:text-lg font-bold border-2 border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white transition-all order-2 sm:order-1"
+                                                    className="h-12 md:h-14 lg:h-16 px-4 md:px-6 lg:px-8 text-sm md:text-base lg:text-lg font-bold border border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white transition-all order-2 sm:order-1"
                                                 >
                                                     Back
                                                 </Button>
@@ -632,13 +632,13 @@ const BookingInfoContent = () => {
                         </div>
 
                         <div className="px-2 md:px-4 lg:px-8 w-full lg:w-[30%] mt-6 lg:mt-0">
-                            <div className="lg:sticky lg:top-[calc(var(--hd)+1rem)] bg-gradient-to-br from-white to-blue-50/30 rounded-lg md:rounded-xl lg:rounded-2xl p-4 md:p-6 lg:p-8 border-2 border-[var(--cl-pri)] shadow-lg">
+                            <div className="lg:sticky lg:top-[calc(var(--hd)+1rem)] bg-gradient-to-br from-white to-blue-50/30 rounded-lg md:rounded-xl lg:rounded-2xl p-4 md:p-6 lg:p-8 border border-[var(--cl-third)] shadow-md">
                                 <h3 className="text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-[var(--cl-pri)] mb-4 md:mb-6 lg:mb-8 uppercase tracking-wide border-b-2 border-[var(--cl-pri)] pb-3 md:pb-4 lg:pb-6">
                                     Booking Summary
                                 </h3>
                                 {reservationData && (
                                     <div className="flex flex-col gap-y-4 md:gap-y-6">
-                                        <div className="flex justify-between items-center p-3 md:p-4 lg:p-6 bg-white rounded-lg md:rounded-xl border-2 border-[var(--cl-pri)]">
+                                        <div className="flex justify-between items-center p-3 md:p-4 lg:p-6 bg-white rounded-lg md:rounded-xl border border-[var(--cl-third)]">
                                             <span className="text-sm md:text-base font-semibold text-gray-700">Total Amount:</span>
                                             <span className="text-base md:text-lg lg:text-xl xl:text-2xl font-bold text-[var(--cl-pri)]">
                                                 {FormatPrice(reservationData.totalAmount)}

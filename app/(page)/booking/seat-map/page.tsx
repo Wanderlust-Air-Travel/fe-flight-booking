@@ -682,7 +682,7 @@ const SeatMapPageContent = () => {
                                         <Button
                                             onClick={handleContinue}
                                             disabled={isSaving || selectedSeatsInfo.length === 0 || selectedSeatsInfo.length !== passengersNeedingSeats}
-                                            className="w-full"
+                                            className="w-full h-[4.4rem] bg-[var(--cl-pri)] text-white text-sm md:text-base font-semibold uppercase tracking-wide shadow-md hover:bg-[var(--cl-four)] hover:shadow-lg transition-colors transition-shadow duration-200 rounded-md disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[var(--cl-pri)]"
                                         >
                                             {isSaving ? 'Saving...' : 'Continue'}
                                         </Button>

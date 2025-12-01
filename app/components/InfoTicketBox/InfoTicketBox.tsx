@@ -11,15 +11,17 @@ const InfoTicketBox = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const { data: dataPerson } = useInfoTicket();
 
-
-
-    
-
     const handleOpen = () => {
         setIsOpen(!isOpen)
     }
 
     console.log(data)
+
+    // Nếu store đã hydrate nhưng chưa có chuyến/ticket được chọn,
+    // ẩn toàn bộ box thay vì hiển thị "No data, please buy tickets".
+    if (isHydrated && !data.flightInstanceId) {
+        return null;
+    }
 
     return (
 

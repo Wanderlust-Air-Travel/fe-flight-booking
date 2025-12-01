@@ -1,127 +1,138 @@
 /**
- * Toast notification utilities
- * Centralized toast functions for consistent notifications across the application
+ * Toast notification utilities using SweetAlert2
+ * Centralized helpers so the rest of the app stays decoupled from the UI library.
+ *
+ * Docs: https://sweetalert2.github.io/
  */
 
-import { toast, ToastOptions, Id } from 'react-toastify';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 /**
- * Default toast options
+ * Minimal toast options interface (compatible with existing usage)
+ * - Currently we only care about autoClose duration.
  */
-const defaultOptions: ToastOptions = {
-	position: 'top-right',
-	autoClose: 3000,
-	hideProgressBar: false,
-	closeOnClick: true,
-	pauseOnHover: true,
-	draggable: true,
-	progress: undefined,
-	theme: 'light',
+export interface ToastOptions {
+	autoClose?: number; // milliseconds
+}
+
+// Internal helper: map toast type to SweetAlert2 icon
+type ToastType = 'success' | 'error' | 'warning' | 'info';
+
+const typeToIcon = (type: ToastType): SweetAlertIcon => {
+	switch (type) {
+		case 'success':
+			return 'success';
+		case 'error':
+			return 'error';
+		case 'warning':
+			return 'warning';
+		case 'info':
+		default:
+			return 'info';
+	}
+};
+
+// Base toast config (top-end, auto close, progress bar)
+const fireToast = (icon: SweetAlertIcon, message: string, options?: ToastOptions) => {
+	return Swal.fire({
+		toast: true,
+		position: 'top-end',
+		icon,
+		title: message,
+		showConfirmButton: false,
+		timer: options?.autoClose ?? 3000,
+		timerProgressBar: true,
+	});
 };
 
 /**
  * Show success toast notification
- * @param message - Success message to display
- * @param options - Optional toast configuration
- * @returns Toast ID
  */
-export const showSuccess = (message: string, options?: ToastOptions): Id => {
-	return toast.success(message, {
-		...defaultOptions,
-		...options,
-	});
+export const showSuccess = (message: string, options?: ToastOptions): string => {
+	fireToast('success', message, options);
+	// Return a dummy ID to keep API compatible with previous react-toastify usage
+	return Date.now().toString();
 };
 
 /**
  * Show error toast notification
- * @param message - Error message to display
- * @param options - Optional toast configuration
- * @returns Toast ID
  */
-export const showError = (message: string, options?: ToastOptions): Id => {
-	return toast.error(message, {
-		...defaultOptions,
-		autoClose: 5000, // Errors stay longer
+export const showError = (message: string, options?: ToastOptions): string => {
+	fireToast('error', message, {
+		autoClose: 5000,
 		...options,
 	});
+	return Date.now().toString();
 };
 
 /**
  * Show warning toast notification
- * @param message - Warning message to display
- * @param options - Optional toast configuration
- * @returns Toast ID
  */
-export const showWarning = (message: string, options?: ToastOptions): Id => {
-	return toast.warning(message, {
-		...defaultOptions,
-		autoClose: 4000, // Warnings stay a bit longer
+export const showWarning = (message: string, options?: ToastOptions): string => {
+	fireToast('warning', message, {
+		autoClose: 4000,
 		...options,
 	});
+	return Date.now().toString();
 };
 
 /**
  * Show info toast notification
- * @param message - Info message to display
- * @param options - Optional toast configuration
- * @returns Toast ID
  */
-export const showInfo = (message: string, options?: ToastOptions): Id => {
-	return toast.info(message, {
-		...defaultOptions,
-		...options,
-	});
+export const showInfo = (message: string, options?: ToastOptions): string => {
+	fireToast('info', message, options);
+	return Date.now().toString();
 };
 
 /**
  * Show loading toast notification
- * @param message - Loading message to display
- * @param options - Optional toast configuration
- * @returns Toast ID (use this to dismiss the toast)
+ * NOTE: SweetAlert2 không hỗ trợ "update theo ID" như react-toastify,
+ * nên hàm này chỉ hiển thị 1 toast loading; update/dismiss sẽ tạo toast mới.
  */
-export const showLoading = (message: string, options?: ToastOptions): Id => {
-	return toast.loading(message, {
-		...defaultOptions,
-		autoClose: false, // Loading toasts don't auto-close
-		...options,
+export const showLoading = (message: string, options?: ToastOptions): string => {
+	Swal.fire({
+		toast: true,
+		position: 'top-end',
+		title: message,
+		icon: 'info',
+		showConfirmButton: false,
+		timer: options?.autoClose, // đa phần loading sẽ không auto-close nếu không truyền
+		timerProgressBar: !!options?.autoClose,
+		didOpen: () => {
+			Swal.showLoading();
+		},
 	});
+	return Date.now().toString();
 };
 
 /**
- * Update existing toast
- * @param toastId - ID of the toast to update
- * @param message - New message
- * @param type - New toast type
- * @param options - Optional toast configuration
+ * "Update" existing toast
+ * Do SweetAlert2 không có cơ chế update theo id, ta đơn giản tạo 1 toast mới
+ * với kiểu/type tương ứng. Việc nhận toastId ở đây chỉ để giữ API cũ.
  */
 export const updateToast = (
-	toastId: Id,
+	_toastId: string,
 	message: string,
-	type: 'success' | 'error' | 'warning' | 'info' = 'info',
+	type: ToastType = 'info',
 	options?: ToastOptions
 ): void => {
-	toast.update(toastId, {
-		render: message,
-		type,
-		...defaultOptions,
-		...options,
-		isLoading: false,
-	});
+	fireToast(typeToIcon(type), message, options);
 };
 
 /**
  * Dismiss toast by ID
- * @param toastId - ID of the toast to dismiss
+ * SweetAlert2 không quản lý nhiều toast cùng lúc như react-toastify,
+ * nên ta chỉ close modal/toast hiện tại.
  */
-export const dismissToast = (toastId: Id): void => {
-	toast.dismiss(toastId);
+export const dismissToast = (_toastId: string): void => {
+	Swal.close();
 };
 
 /**
  * Dismiss all toasts
  */
 export const dismissAllToasts = (): void => {
-	toast.dismiss();
+	Swal.close();
 };
 
 /**

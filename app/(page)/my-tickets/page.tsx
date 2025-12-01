@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
+import { showError, showInfo, showSuccess } from "@/lib/toast"
 import type { MyTicketsResponse } from "@/types/my-tickets-type"
 import useUserStore from "@/app/zustand/storeUser"
 
@@ -96,7 +96,7 @@ const MyTicketsPage = () => {
       }
 
       if (!userId) {
-        toast.error("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
+        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
         return
       }
 
@@ -106,10 +106,10 @@ const MyTicketsPage = () => {
       })
 
       setOtpSent(bookingId)
-      toast.success('Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra email.')
+      showSuccess('Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra email.')
     } catch (err: any) {
       console.error("Error sending OTP:", err)
-      toast.error(err.response?.data?.message || "Không thể gửi mã OTP. Vui lòng thử lại sau.")
+      showError(err.response?.data?.message || "Không thể gửi mã OTP. Vui lòng thử lại sau.")
     } finally {
       setSendingOtp(false)
     }
@@ -126,7 +126,7 @@ const MyTicketsPage = () => {
       }
 
       if (!userId) {
-        toast.error("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
+        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
         return
       }
 
@@ -140,10 +140,10 @@ const MyTicketsPage = () => {
       })
 
       setOtpSent(ticketId)
-      toast.success('Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra email.')
+      showSuccess('Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra email.')
     } catch (err: any) {
       console.error("Error sending OTP:", err)
-      toast.error(err.response?.data?.message || "Không thể gửi mã OTP. Vui lòng thử lại sau.")
+      showError(err.response?.data?.message || "Không thể gửi mã OTP. Vui lòng thử lại sau.")
     } finally {
       setSendingOtp(false)
     }
@@ -151,7 +151,7 @@ const MyTicketsPage = () => {
 
   const handleVerifyOtpAndCancel = async (bookingId: string) => {
     if (!otpValue || otpValue.length !== 6) {
-      toast.error("Vui lòng nhập đầy đủ 6 chữ số OTP")
+      showError("Vui lòng nhập đầy đủ 6 chữ số OTP")
       return
     }
 
@@ -165,7 +165,7 @@ const MyTicketsPage = () => {
       }
 
       if (!userId) {
-        toast.error("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
+        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
         return
       }
 
@@ -180,7 +180,7 @@ const MyTicketsPage = () => {
       await performCancellation(bookingId)
     } catch (err: any) {
       console.error("Error verifying OTP:", err)
-      toast.error(err.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.")
+      showError(err.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.")
     } finally {
       setVerifyingOtp(false)
     }
@@ -205,7 +205,7 @@ const MyTicketsPage = () => {
 
   const handleVerifyOtpAndCancelTicket = async (ticketId: string) => {
     if (!otpValue || otpValue.length !== 6) {
-      toast.error("Vui lòng nhập đầy đủ 6 chữ số OTP")
+      showError("Vui lòng nhập đầy đủ 6 chữ số OTP")
       return
     }
 
@@ -219,7 +219,7 @@ const MyTicketsPage = () => {
       }
 
       if (!userId) {
-        toast.error("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
+        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
         return
       }
 
@@ -238,7 +238,7 @@ const MyTicketsPage = () => {
       await performTicketCancellation(ticketId)
     } catch (err: any) {
       console.error("Error verifying OTP:", err)
-      toast.error(err.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.")
+      showError(err.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.")
     } finally {
       setVerifyingOtp(false)
     }
@@ -256,24 +256,24 @@ const MyTicketsPage = () => {
 
       // Show success toast with refund information
       if (response.data.refundAmount) {
-        toast.success(
+        showSuccess(
           `Hủy vé thành công! Số tiền hoàn lại: ${response.data.refundAmount.toLocaleString('vi-VN')} VND. Số tiền sẽ được chuyển về tài khoản của bạn trong vòng 5-7 ngày làm việc.`,
-          { duration: 6000 }
+          { autoClose: 6000 }
         )
       } else {
-        toast.success(response.data.message || "Hủy vé thành công!")
+        showSuccess(response.data.message || "Hủy vé thành công!")
       }
 
       // If booking was auto-cancelled, show additional message
       if (response.data.bookingCancelled) {
-        toast.info("Tất cả vé trong đặt chỗ đã được hủy. Đặt chỗ đã được tự động hủy.")
+        showInfo("Tất cả vé trong đặt chỗ đã được hủy. Đặt chỗ đã được tự động hủy.")
       }
 
       // Refresh the tickets list
       await fetchTickets(currentPage)
     } catch (err: any) {
       console.error("Error cancelling ticket:", err)
-      toast.error(err.response?.data?.message || "Không thể hủy vé. Vui lòng thử lại sau.")
+      showError(err.response?.data?.message || "Không thể hủy vé. Vui lòng thử lại sau.")
     } finally {
       setCancellingId(null)
     }
@@ -291,19 +291,19 @@ const MyTicketsPage = () => {
 
       // Show success toast with refund information
       if (response.data.refundAmount) {
-        toast.success(
+        showSuccess(
           `Hủy đặt chỗ thành công! Số tiền hoàn lại: ${response.data.refundAmount.toLocaleString('vi-VN')} VND. Số tiền sẽ được chuyển về tài khoản của bạn trong vòng 5-7 ngày làm việc.`,
-          { duration: 6000 }
+          { autoClose: 6000 }
         )
       } else {
-        toast.success("Hủy đặt chỗ thành công!")
+        showSuccess("Hủy đặt chỗ thành công!")
       }
 
       // Refresh the tickets list
       await fetchTickets(currentPage)
     } catch (err: any) {
       console.error("Error cancelling booking:", err)
-      toast.error(err.response?.data?.message || "Không thể hủy đặt chỗ. Vui lòng thử lại sau.")
+      showError(err.response?.data?.message || "Không thể hủy đặt chỗ. Vui lòng thử lại sau.")
     } finally {
       setCancellingId(null)
     }

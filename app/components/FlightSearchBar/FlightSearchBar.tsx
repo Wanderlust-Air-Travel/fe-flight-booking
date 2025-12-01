@@ -10,7 +10,7 @@ import Person from "../Person/Person";
 import { SelectComponent } from "../Select/SelectComponent";
 import { axiosPublic } from "@/lib/axios-instance";
 import { AirportItem } from "@/types/airport-item";
-import { showError, showLoading, updateToast } from "@/lib/toast";
+import { dismissToast, showError, showLoading, showSuccess } from "@/lib/toast";
 
 const FlightSearchBar = () => {
   const { data, setData } = useFightSearchBarStore();
@@ -134,8 +134,8 @@ const FlightSearchBar = () => {
 
       if (!hasOutboundFlights || !hasInboundFlights) {
         // Dismiss loading toast
-        updateToast(loadingToastId, '', 'error', { autoClose: 0 });
-        
+        dismissToast(loadingToastId);
+
         const errorMessage = !hasOutboundFlights
           ? `Không tìm thấy chuyến bay từ ${data.from} đến ${data.to} vào ngày ${startDateFormat}. Vui lòng chọn ngày khác.`
           : `Không tìm thấy chuyến bay khứ hồi từ ${data.to} đến ${data.from} vào ngày ${endDateFormat}. Vui lòng chọn ngày khác.`;
@@ -144,8 +144,9 @@ const FlightSearchBar = () => {
         return;
       }
 
-      // Dismiss loading toast
-      updateToast(loadingToastId, '', 'success', { autoClose: 0 });
+      // Dismiss loading toast và hiển thị thông báo thành công rõ ràng
+      dismissToast(loadingToastId);
+      showSuccess("Đã tìm thấy chuyến bay phù hợp. Đang chuyển đến trang kết quả...");
 
       // Navigate to results page
       router.push(
@@ -157,8 +158,8 @@ const FlightSearchBar = () => {
       );
     } catch (error: any) {
       // Dismiss loading toast
-      updateToast(loadingToastId, '', 'error', { autoClose: 0 });
-      
+      dismissToast(loadingToastId);
+
       // Show error toast
       const errorMessage = error.response?.data?.message 
         || error.message 
