@@ -2,10 +2,9 @@
 import { Input } from "@/components/ui/input";
 import { InputProps } from "@/types/input-props";
 import { useFormikInput } from "./UseFormikInput";
-import { Eye, EyeOff } from "lucide-react";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-
-
+import { cn } from "@/lib/utils";
 
 export const InputFormat = ({
     name,
@@ -18,6 +17,7 @@ export const InputFormat = ({
     password = false,
 }: InputProps) => {
     const { field, error, isError } = useFormikInput(name);
+    const hasError = Boolean(isError && error);
 
     const [isShow, setIShow] = useState<boolean>(false)
 
@@ -60,9 +60,16 @@ export const InputFormat = ({
 
     return (
         <label className="flex flex-col gap-y-[0.8rem]">
-            <p className="text-mn text-[var(--cl-pri)] font-medium">{label}</p>
+            <p
+                className={cn(
+                    "text-mn font-medium",
+                    hasError ? "text-destructive" : "text-[var(--cl-pri)]"
+                )}
+            >
+                {label}
+            </p>
 
-            <div className="relative">
+            <div className="relative flex flex-col gap-y-1">
                 <Input
                     {...field}
                     onChange={handleChange}
@@ -73,27 +80,32 @@ export const InputFormat = ({
                     }
                     placeholder={placeholder}
                     maxLength={formatDob ? 10 : undefined}
-                    className={`h-[4rem] px-[1rem] placeholder:text-[var(--cl-six)] !text-[var(--cl-pri)] text-mn border-[0.1rem] border-[var(--cl-six)] focus:!border-[var(--cl-pri)] transition ease-linear ${password && "pr-[4rem]"}`}
+                    aria-invalid={hasError}
+                    className={cn(
+                        "h-[4rem] px-[1rem] placeholder:text-[var(--cl-six)] !text-[var(--cl-pri)] text-mn border-[0.1rem] border-[var(--cl-six)] focus:!border-[var(--cl-pri)] transition-all duration-200 ease-linear",
+                        password && "pr-[4rem]",
+                        hasError && "border-destructive focus:!border-destructive focus:ring-destructive/20"
+                    )}
                 />
 
-                {
-                    password && (
-                        <span onClick={handleShowPass} className="absolute top-1/2 -translate-y-1/2 right-0 w-[4rem] h-full flex justify-center items-center cursor-pointer z-10">
-                            {
-                                !isShow
-                                    ?
-                                    <Eye className="text-[var(--cl-pri)] w-[50%] h-[50%]" />
-                                    :
-                                    <EyeOff className="text-[var(--cl-pri)] w-[50%] h-[50%]" />
-                            }
-                        </span>
-                    )
-                }
+                {password && (
+                    <span
+                        onClick={handleShowPass}
+                        className="absolute top-1/2 -translate-y-1/2 right-0 w-[4rem] h-full flex justify-center items-center cursor-pointer z-10"
+                    >
+                        {!isShow ? (
+                            <Eye className="text-[var(--cl-pri)] w-[50%] h-[50%]" />
+                        ) : (
+                            <EyeOff className="text-[var(--cl-pri)] w-[50%] h-[50%]" />
+                        )}
+                    </span>
+                )}
 
-                {isError && (
-                    <p className="inputError">
-                        {error}
-                    </p>
+                {hasError && (
+                    <div className="flex items-start gap-2 text-xs md:text-sm text-destructive font-medium animate-in fade-in-0 slide-in-from-top-1">
+                        <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                        <span>{error}</span>
+                    </div>
                 )}
             </div>
         </label>
