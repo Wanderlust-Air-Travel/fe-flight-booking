@@ -490,7 +490,7 @@ const BookingInfoContent = () => {
                                                                                             captionLayout="dropdown"
                                                                                             fromYear={1900}
                                                                                             toYear={new Date().getFullYear()}
-                                                                                            className="rounded-md border"
+                                                                                            className="rounded-md border shadow-sm"
                                                                                             classNames={{
                                                                                                 day_selected: "bg-[var(--cl-pri)] text-white hover:bg-[var(--cl-pri)] hover:text-white",
                                                                                                 day_today: "bg-[var(--cl-four)]/20 text-[var(--cl-pri)] font-bold",

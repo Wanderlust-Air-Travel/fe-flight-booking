@@ -103,11 +103,14 @@ const ConfirmationPageContent = () => {
 
   if (loading) {
     return (
-      <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+      <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)] bg-[var(--cl-six)]/40">
         <Breadcrumb />
-        <div className="container">
-          <div className="text-center py-[4rem]">
-            <p className="text-lg">Loading confirmation...</p>
+        <div className="container max-w-6xl px-2 sm:px-4">
+          <div className="flex flex-col items-center justify-center py-10 sm:py-14 gap-4">
+            <div className="w-12 h-12 rounded-full border-4 border-[var(--cl-pri)] border-t-transparent animate-spin" />
+            <p className="text-base sm:text-lg text-[var(--cl-pri)] font-semibold text-center">
+              Loading confirmation...
+            </p>
           </div>
         </div>
       </main>
@@ -116,14 +119,17 @@ const ConfirmationPageContent = () => {
 
   if (error || !booking) {
     return (
-      <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+      <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)] bg-[var(--cl-six)]/40">
         <Breadcrumb />
-        <div className="container">
-          <div className="text-center py-[4rem]">
-            <p className="text-lg text-red-500 mb-[2rem]">
+        <div className="container max-w-6xl px-2 sm:px-4">
+          <div className="flex flex-col items-center justify-center py-10 sm:py-14 gap-4">
+            <p className="text-base sm:text-lg text-[var(--cl-red)] font-semibold text-center max-w-[48rem]">
               {error || "Booking not found"}
             </p>
-            <Button onClick={() => router.push("/search/flights")}>
+            <Button
+              onClick={() => router.push("/search/flights")}
+              className="bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white px-6 sm:px-8"
+            >
               Back to Search
             </Button>
           </div>
@@ -133,49 +139,63 @@ const ConfirmationPageContent = () => {
   }
 
   return (
-    <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+    <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)] bg-[var(--cl-six)]/40">
       <Breadcrumb />
-      <div className="container">
+      <div className="container max-w-6xl px-2 sm:px-4 py-6 md:py-8 lg:py-10">
         {/* Success Header */}
-        <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-8 h-8 text-green-600" />
-            <div>
-              <h1 className="text-2xl font-bold text-green-800">
-                Booking Confirmed!
-              </h1>
-              <p className="text-green-700 mt-1">
-                Your flight booking has been successfully confirmed.
-              </p>
+        <div className="mb-8 rounded-2xl bg-gradient-to-r from-[var(--cl-pri)] to-[var(--cl-five)] shadow-lg px-6 py-5 md:px-8 md:py-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/40">
+                <CheckCircle2 className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-wide">
+                  Booking Confirmed
+                </h1>
+                <p className="text-xs sm:text-sm md:text-base text-white/80 mt-1">
+                  Your Wanderlust Airways trip is ready. A confirmation email has been sent to your inbox.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col items-start md:items-end gap-1 text-sm text-white/90">
+              <span className="uppercase tracking-wide text-[0.7rem] sm:text-xs opacity-80">
+                Booking Code
+              </span>
+              <span className="text-lg sm:text-xl md:text-2xl font-extrabold break-all">
+                {booking.pnrCode}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Booking Information */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="bg-white rounded-xl border border-[var(--cl-third)]/40 shadow-sm p-5 sm:p-6 md:p-7">
               <h2 className="text-xl font-bold text-[var(--cl-pri)] mb-4 flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
                 Booking Information
               </h2>
               <div className="space-y-3">
-                <div className="flex justify-between">
+                <div className="flex justify-between text-xs sm:text-sm md:text-base gap-4">
                   <span className="text-gray-600">PNR Code:</span>
                   <span className="font-bold">{booking.pnrCode}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-xs sm:text-sm md:text-base gap-4">
                   <span className="text-gray-600">Booking ID:</span>
                   <span className="font-mono text-sm">{booking.bookingId}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-xs sm:text-sm md:text-base gap-4">
                   <span className="text-gray-600">Status:</span>
-                  <span className="font-semibold capitalize">{booking.status}</span>
+                  <span className="font-semibold capitalize text-[var(--cl-five)]">
+                    {booking.status}
+                  </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center pt-2 border-t border-dashed border-[var(--cl-third)]/40 mt-3 text-sm sm:text-base">
                   <span className="text-gray-600">Total Amount:</span>
-                  <span className="font-bold text-lg">
+                  <span className="font-bold text-lg text-[var(--cl-pri)]">
                     {FormatPrice(booking.totalAmount)} {booking.currencyCode}
                   </span>
                 </div>
@@ -184,28 +204,33 @@ const ConfirmationPageContent = () => {
 
             {/* Flight Details */}
             {booking.segments && booking.segments.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-xl border border-[var(--cl-third)]/40 shadow-sm p-5 sm:p-6 md:p-7">
                 <h2 className="text-xl font-bold text-[var(--cl-pri)] mb-4 flex items-center gap-2">
                   <MapPin className="w-5 h-5" />
                   Flight Details
                 </h2>
                 <div className="space-y-6">
                   {booking.segments.map((segment, index) => (
-                    <div key={segment.segmentId} className="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
-                      <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <p className="font-semibold text-lg">
+                    <div
+                      key={segment.segmentId}
+                      className="border-b border-dashed border-[var(--cl-third)]/40 pb-4 last:border-b-0 last:pb-0"
+                    >
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3">
+                        <div className="flex-1">
+                          <p className="font-semibold text-lg text-[var(--cl-pri)]">
                             {segment.flightInstance.origin.cityName} ({segment.flightInstance.origin.airportCode})
                           </p>
                           <p className="text-sm text-gray-600">
                             {segment.flightInstance.origin.airportName}
                           </p>
                         </div>
-                        <div className="text-center">
-                          <p className="text-sm text-gray-600">to</p>
+                        <div className="text-center text-[var(--cl-third)] font-semibold text-sm uppercase tracking-wide">
+                          <span className="inline-block px-3 py-1 rounded-full bg-[var(--cl-six)]">
+                            to
+                          </span>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-lg">
+                        <div className="flex-1 text-right">
+                          <p className="font-semibold text-lg text-[var(--cl-pri)]">
                             {segment.flightInstance.destination.cityName} ({segment.flightInstance.destination.airportCode})
                           </p>
                           <p className="text-sm text-gray-600">
@@ -213,21 +238,25 @@ const ConfirmationPageContent = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4 text-sm md:text-base">
                         <div>
-                          <p className="text-sm text-gray-600">Departure</p>
-                          <p className="font-semibold">
+                          <p className="text-xs uppercase tracking-wide text-gray-500">
+                            Departure
+                          </p>
+                          <p className="font-semibold text-[var(--cl-pri)]">
                             {formatDate(segment.flightInstance.departureDatetimeLocal)} at {formatTime(segment.flightInstance.departureDatetimeLocal)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Arrival</p>
-                          <p className="font-semibold">
+                          <p className="text-xs uppercase tracking-wide text-gray-500">
+                            Arrival
+                          </p>
+                          <p className="font-semibold text-[var(--cl-pri)]">
                             {formatDate(segment.flightInstance.arrivalDatetimeLocal)} at {formatTime(segment.flightInstance.arrivalDatetimeLocal)}
                           </p>
                         </div>
                       </div>
-                      <div className="mt-4 flex items-center gap-4">
+                      <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
                         <div>
                           <p className="text-sm text-gray-600">Flight Number</p>
                           <p className="font-semibold">{segment.flightInstance.flight.flightNumber}</p>
@@ -243,8 +272,8 @@ const ConfirmationPageContent = () => {
                           </div>
                         )}
                       </div>
-                      <div className="mt-4 p-3 bg-blue-50 rounded">
-                        <p className="text-sm text-blue-800">
+                      <div className="mt-4 p-3 bg-[var(--cl-pri)]/5 border border-[var(--cl-pri)]/10 rounded-md">
+                        <p className="text-sm text-[var(--cl-pri)]">
                           <Clock className="w-4 h-4 inline mr-1" />
                           <strong>Recommended Check-in Time:</strong> {getRecommendedCheckInTime(segment.flightInstance.departureDatetimeLocal)}
                         </p>
@@ -257,16 +286,21 @@ const ConfirmationPageContent = () => {
 
             {/* Passenger Information */}
             {booking.passengers && booking.passengers.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-xl border border-[var(--cl-third)]/40 shadow-sm p-5 sm:p-6 md:p-7">
                 <h2 className="text-xl font-bold text-[var(--cl-pri)] mb-4 flex items-center gap-2">
                   <User className="w-5 h-5" />
                   Passenger Information
                 </h2>
                 <div className="space-y-4">
                   {booking.passengers.map((passenger) => (
-                    <div key={passenger.passengerId} className="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
-                      <p className="font-semibold text-lg mb-2">{passenger.fullname}</p>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div
+                      key={passenger.passengerId}
+                      className="border-b border-dashed border-[var(--cl-third)]/40 pb-4 last:border-b-0 last:pb-0"
+                    >
+                      <p className="font-semibold text-lg mb-2 text-[var(--cl-pri)]">
+                        {passenger.fullname}
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
                         <div>
                           <span className="text-gray-600">Date of Birth:</span>
                           <span className="ml-2">{formatDate(passenger.dob)}</span>
@@ -288,10 +322,10 @@ const ConfirmationPageContent = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Payment Information */}
             {payment && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-xl border border-[var(--cl-third)]/40 shadow-sm p-5 sm:p-6 md:p-7">
                 <h2 className="text-xl font-bold text-[var(--cl-pri)] mb-4 flex items-center gap-2">
                   <CreditCard className="w-5 h-5" />
                   Payment Information
@@ -339,7 +373,7 @@ const ConfirmationPageContent = () => {
 
             {/* Contact Information */}
             {(booking.contactFullname || booking.contactEmail || booking.contactPhone) && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-xl border border-[var(--cl-third)]/40 shadow-sm p-5 sm:p-6 md:p-7">
                 <h2 className="text-xl font-bold text-[var(--cl-pri)] mb-4">
                   Contact Information
                 </h2>
@@ -367,19 +401,18 @@ const ConfirmationPageContent = () => {
             )}
 
             {/* Actions */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="bg-white rounded-xl border border-[var(--cl-third)]/40 shadow-sm p-5 sm:p-6 md:p-7">
               <div className="space-y-3">
                 <Button
                   onClick={() => router.push("/search/flights")}
-                  className="w-full"
-                  variant="outline"
+                  className="w-full h-11 md:h-12 bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white font-semibold"
                 >
                   Book Another Flight
                 </Button>
                 {accessToken && (
                   <Button
                     onClick={() => router.push("/my-tickets")}
-                    className="w-full"
+                    className="w-full h-11 md:h-12 border border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white font-semibold"
                     variant="outline"
                   >
                     View My Tickets
