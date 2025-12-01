@@ -21,7 +21,7 @@ import { TripListPropsType } from '@/types/trip-list-component-type';
 
 const TripList = ({ trips, loading }: TripListPropsType) => {
 
-    // ❗ FIX 1: Nhiều panel => phải dùng mảng ref
+    // FIX 1: Nhiều panel => phải dùng mảng ref
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [type, setType] = useState<string>("");
     const [tickets, setTickets] = useState<FareOption[] | null>(null);
@@ -30,7 +30,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
     const [openPanelIndex, setOpenPanelIndex] = useState<number | null>(null); // Track which panel is open
     const { setData, data } = useInfoTicket();
     const router = useRouter();
-    const { accessToken } = useUserStore()
+    const { accessToken, isLoggedIn } = useUserStore()
     const [loadingChild, setLoadingChild] = useState(false);
 
     // Khi click cabin
@@ -128,7 +128,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
         try {
             // Always save to backend Redis (both authenticated and guest users)
-            const headers: Record<string, string> = {};
+                const headers: Record<string, string> = {};
             
             // For guest users, get or generate session ID
             let sessionId: string | null = null;
@@ -143,7 +143,8 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                 }
             }
 
-            const axiosClient = accessToken ? axiosInstance : axiosPublic;
+            const isGuest = !isLoggedIn;
+            const axiosClient = isGuest ? axiosPublic : axiosInstance;
             const response = await axiosClient.post(
                 '/api/booking-state/cabin',
                 {
@@ -158,12 +159,12 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
             if (response.status === 200 || response.status === 201) {
                 console.log('Cabin selection saved to backend:', response.data);
-                
-                // For guest users, save sessionId from response (CRITICAL for seat selection)
-                if (!accessToken) {
+
+                // Chỉ lưu sessionId cho guest; user đã được BE nhận diện qua JWT
+                if (isGuest) {
                     if (response.data.sessionId) {
                         sessionStorage.setItem('guest_session_id', response.data.sessionId);
-                        console.log('[TripList] Saved guest_session_id:', response.data.sessionId);
+                        console.log('[TripList] Saved guest_session_id for guest:', response.data.sessionId);
                     } else {
                         console.warn('[TripList] No sessionId in response for guest user');
                     }

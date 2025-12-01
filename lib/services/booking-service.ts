@@ -4,45 +4,12 @@
  */
 
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
-
-export interface CreateReservationRequest {
-    segments: Array<{
-        flightInstanceId: string;
-        segmentType: "outbound" | "return";
-    }>;
-    numberOfPassengers: number;
-    currencyCode: string;
-}
-
-export interface CreateReservationResponse {
-    reservationId: string;
-    reservationCode: string;
-    totalAmount: number;
-    currencyCode: string;
-    expiresAt: string;
-    numberOfPassengers: number;
-}
-
-export interface CreateBookingRequest {
-    passengers: Array<{
-        passengerType: "ADT" | "CHD" | "INF";
-        fullname: string;
-        dob: string;
-        gender: "MALE" | "FEMALE";
-        documentNumber?: string;
-        loyaltyNumber?: string;
-    }>;
-    contactFullname: string;
-    contactEmail: string;
-    contactPhone: string;
-    channel: string;
-}
-
-export interface CreateBookingResponse {
-    bookingId: string;
-    bookingCode: string;
-    status: string;
-}
+import type {
+    CreateReservationRequest,
+    CreateReservationResponse,
+    CreateBookingRequest,
+    CreateBookingResponse,
+} from "@/types/booking-service-type";
 
 /**
  * Create a new reservation
@@ -52,14 +19,15 @@ export async function createReservation(
     accessToken?: string
 ): Promise<CreateReservationResponse> {
     const headers: Record<string, string> = {};
-    
+
     if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
-    } else {
-        // For guest users, get session ID from sessionStorage
-        const sessionId = sessionStorage.getItem('guest_session_id');
+        // Authenticated user: chỉ dựa vào JWT, không gửi X-Session-Id để tránh BE hiểu nhầm là guest
+        headers["Authorization"] = `Bearer ${accessToken}`;
+    } else if (typeof window !== "undefined") {
+        // Guest: gửi X-Session-Id nếu có
+        const sessionId = sessionStorage.getItem("guest_session_id");
         if (sessionId) {
-            headers['X-Session-Id'] = sessionId;
+            headers["X-Session-Id"] = sessionId;
         }
     }
 

@@ -33,7 +33,7 @@ const SeatMapPageContent = () => {
     const hasFetchedRef = useRef<boolean>(false);
 
     const { data, isHydrated } = useInfoTicket();
-    const { accessToken } = useUserStore();
+    const { accessToken, isLoggedIn, hydrated: isAuthHydrated } = useUserStore();
     const { data: searchBarData, isHydrated: isSearchBarHydrated } = useFightSearchBarStore();
 
     // Lấy flightInstanceId và cabinType từ query params (theo docs BE)
@@ -370,6 +370,12 @@ const SeatMapPageContent = () => {
 
     // Handle save seat selection and continue
     const handleContinue = useCallback(async () => {
+        // Đợi auth hydrate xong để phân biệt đúng user vs guest
+        if (!isAuthHydrated) {
+            setSaveError('Đang tải thông tin phiên đăng nhập, vui lòng thử lại sau 1 giây.');
+            return;
+        }
+
         // Calculate how many seats are needed (adults + children, excluding infants)
         const seatsNeeded = passengersNeedingSeats;
         
@@ -418,28 +424,23 @@ const SeatMapPageContent = () => {
             console.log('[SeatMap] flightInstanceId:', flightInstanceId);
             console.log('[SeatMap] selectedSeatsInfo:', selectedSeatsInfo);
             
-            if (!accessToken) {
-                // For guest users, sessionId is REQUIRED
+            const isGuest = !isLoggedIn;
+
+            if (isGuest) {
+                // Guest users: sessionId là bắt buộc
                 if (!sessionId) {
                     console.error('[SeatMap] No sessionId found for guest user');
                     setSaveError('Session ID not found. Please select a cabin type first, then try again.');
                     setIsSaving(false);
-                    // Redirect to search flights after showing error
                     setTimeout(() => {
                         router.push('/search/flights');
                     }, 3000);
                     return;
                 }
-                
-                // Add X-Session-Id header for guest users (REQUIRED by backend)
+
+                // Gửi X-Session-Id cho guest, BE dùng sessionId để lookup booking-state
                 headers['X-Session-Id'] = sessionId;
                 console.log('[SeatMap] Sending X-Session-Id header for guest user:', sessionId);
-            } else if (sessionId) {
-                // For authenticated users, also send X-Session-Id as fallback
-                // This handles cases where JWT token might be expired/invalid
-                // Backend will prioritize userId from JWT, but can fallback to sessionId if needed
-                headers['X-Session-Id'] = sessionId;
-                console.log('[SeatMap] Sending X-Session-Id header as fallback for authenticated user:', sessionId);
             }
 
             // Prepare request payload
@@ -464,7 +465,7 @@ const SeatMapPageContent = () => {
             console.log('[SeatMap] Validated seats count:', validatedSeats.length);
             console.log('[SeatMap] Each seat has flightSeatId and seatNumber:', validatedSeats.every(s => s.flightSeatId && s.seatNumber));
 
-            const axiosClient = accessToken ? axiosInstance : axiosPublic;
+            const axiosClient = isGuest ? axiosPublic : axiosInstance;
             const response = await axiosClient.post(
                 '/api/booking-state/seat',
                 requestPayload,

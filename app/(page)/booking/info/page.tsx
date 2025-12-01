@@ -32,11 +32,12 @@ import { getDefaultDOB } from "@/lib/utils/booking-utils";
 const BookingInfoContent = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { accessToken, user } = useUserStore();
+    const { accessToken, user, hydrated } = useUserStore();
     const { data: ticketData } = useInfoTicket();
     const { data: searchBarData } = useFightSearchBarStore();
 
     const flightInstanceId = searchParams.get("flightInstanceId");
+    const reservationIdFromUrl = searchParams.get("reservationId");
 
     // Business logic hook - separates business logic from UI
     const {
@@ -50,10 +51,12 @@ const BookingInfoContent = () => {
         flightDate,
     } = useBookingInfo({
         flightInstanceId,
+        reservationIdFromUrl,
         accessToken,
         user,
         ticketData,
         searchBarData,
+        isAuthHydrated: hydrated,
     });
 
     // WebSocket: Real-time reservation countdown timer

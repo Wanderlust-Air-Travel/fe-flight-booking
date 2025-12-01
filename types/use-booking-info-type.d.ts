@@ -11,10 +11,12 @@ import type { CreateReservationResponse } from "@/lib/services/booking-service";
  */
 export interface UseBookingInfoParams {
     flightInstanceId: string | null;
+    reservationIdFromUrl?: string | null;
     accessToken?: string | null;
     user?: any;
     ticketData?: any;
     searchBarData?: any;
+    isAuthHydrated?: boolean;
 }
 
 /**

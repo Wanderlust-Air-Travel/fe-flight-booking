@@ -16,13 +16,15 @@ import type { UseBookingInfoParams, UseBookingInfoReturn } from "@/types/use-boo
  */
 export function useBookingInfo({
     flightInstanceId,
+    reservationIdFromUrl,
     accessToken,
     user,
     ticketData,
     searchBarData,
+    isAuthHydrated,
 }: UseBookingInfoParams): UseBookingInfoReturn {
     const router = useRouter();
-    const [reservationId, setReservationId] = useState<string | null>(null);
+    const [reservationId, setReservationId] = useState<string | null>(reservationIdFromUrl || null);
     const [reservationData, setReservationData] = useState<CreateReservationResponse | null>(null);
     const [isCreatingReservation, setIsCreatingReservation] = useState(false);
     const [isCreatingBooking, setIsCreatingBooking] = useState(false);
@@ -33,15 +35,24 @@ export function useBookingInfo({
     const numberOfPassengers = searchBarData?.totalPerson || 1;
     const initialValues = getInitialBookingValues(user, numberOfPassengers);
 
-    // Create reservation when component mounts
+    // Create reservation when component mounts (idempotent: nếu URL đã có reservationId thì không tạo lại)
     useEffect(() => {
+        // Chờ cho đến khi trạng thái auth đã hydrate xong.
+        // Tránh call API như guest trong khi user thực tế đã đăng nhập (F5 trên /booking/info).
+        if (!isAuthHydrated) return;
+
         // Prevent multiple fetches - only fetch once on mount
-        if (hasCreatedReservationRef.current) {
-            return;
-        }
+        if (hasCreatedReservationRef.current) return;
 
         if (!flightInstanceId) {
             setError("Please select a flight");
+            return;
+        }
+
+        // Nếu URL đã có reservationId → không tạo lại reservation, chỉ dùng id đó
+        if (reservationIdFromUrl) {
+            hasCreatedReservationRef.current = true;
+            setReservationId(reservationIdFromUrl);
             return;
         }
 
@@ -69,6 +80,14 @@ export function useBookingInfo({
                 if (response?.reservationId) {
                     setReservationId(response.reservationId);
                     setReservationData(response);
+
+                    // Cập nhật URL để chứa reservationId, giúp F5 không tạo reservation lần nữa
+                    if (typeof window !== "undefined" && flightInstanceId) {
+                        const params = new URLSearchParams(window.location.search);
+                        params.set("flightInstanceId", flightInstanceId);
+                        params.set("reservationId", response.reservationId);
+                        router.replace(`/booking/info?${params.toString()}`);
+                    }
                 } else {
                     setError("Failed to create reservation");
                     // Reset ref on error so user can retry
@@ -89,7 +108,7 @@ export function useBookingInfo({
         };
 
         createReservationAsync();
-    }, [accessToken, flightInstanceId, numberOfPassengers]);
+    }, [accessToken, flightInstanceId, numberOfPassengers, isAuthHydrated]);
 
     const handleSubmit = useCallback(
         async (values: BookingFormData) => {
