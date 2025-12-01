@@ -1,15 +1,20 @@
 "use client"
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
+import useUserStore from "@/app/zustand/storeUser";
 import { Check, ChevronDown, X } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import FormatPrice from "../FormatPrice/FormatPrice";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const InfoTicketBox = () => {
 
     const { data, isHydrated } = useInfoTicket();
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const { data: dataPerson } = useInfoTicket();
+    const { user, accessToken } = useUserStore();
+    const isLoggedIn = Boolean(accessToken || user?.id);
 
     const handleOpen = () => {
         setIsOpen(!isOpen)
@@ -17,10 +22,58 @@ const InfoTicketBox = () => {
 
     console.log(data)
 
-    // Nếu store đã hydrate nhưng chưa có chuyến/ticket được chọn,
-    // ẩn toàn bộ box thay vì hiển thị "No data, please buy tickets".
-    if (isHydrated && !data.flightInstanceId) {
-        return null;
+    // Nếu store đã hydrate nhưng chưa có chuyến/ticket được chọn:
+    // - Với user đã login: hiển thị placeholder hướng dẫn (vào /my-tickets hoặc quay lại search)
+    // - Với guest: KHÔNG hiển thị gì (guest giữ state qua URL/session, tránh message gây hiểu nhầm)
+    if (isHydrated && !data.flightInstanceId && isLoggedIn) {
+        return (
+            <section className="w-full">
+                <div className="container">
+                    <div className="border-[0.1rem] border-[var(--cl-third)] rounded-[1rem] bg-gradient-to-r from-blue-50/60 to-white p-[2rem] md:p-[2.4rem] flex flex-col md:flex-row items-center justify-between gap-[1.6rem] shadow-sm">
+                        {isLoggedIn ? (
+                            <>
+                                <div className="flex flex-col gap-y-[0.4rem]">
+                                    <p className="text-base md:text-lg font-bold text-[var(--cl-pri)] uppercase tracking-wide">
+                                        Bạn chưa có đặt chỗ nào đang được xử lý
+                                    </p>
+                                    <p className="text-sm md:text-base text-[var(--cl-third)] max-w-[40rem]">
+                                        Vui lòng kiểm tra danh sách vé của bạn hoặc quay lại trang tìm kiếm để đặt chuyến bay mới.
+                                    </p>
+                                </div>
+                                <div className="flex flex-col sm:flex-row gap-[0.8rem]">
+                                    <Link href="/my-tickets">
+                                        <Button variant="outline" className="h-[3.6rem] px-[2.4rem] border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white text-sm md:text-base font-semibold uppercase tracking-wide rounded-md">
+                                            Xem vé của tôi
+                                        </Button>
+                                    </Link>
+                                    <Link href="/">
+                                        <Button className="h-[3.6rem] px-[2.4rem] bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white text-sm md:text-base font-semibold uppercase tracking-wide rounded-md shadow-md">
+                                            Quay lại tìm kiếm
+                                        </Button>
+                                    </Link>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="flex flex-col gap-y-[0.4rem]">
+                                    <p className="text-base md:text-lg font-bold text-[var(--cl-pri)] uppercase tracking-wide">
+                                        Chưa có chuyến bay nào được chọn
+                                    </p>
+                                    <p className="text-sm md:text-base text-[var(--cl-third)] max-w-[40rem]">
+                                        Vui lòng quay lại trang tìm kiếm để chọn chuyến bay và hạng vé trước khi tiếp tục đặt chỗ.
+                                    </p>
+                                </div>
+                                <Link href="/">
+                                    <Button className="h-[3.6rem] px-[2.4rem] bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white text-sm md:text-base font-semibold uppercase tracking-wide rounded-md shadow-md">
+                                        Quay lại tìm kiếm
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </section>
+        );
     }
 
     return (

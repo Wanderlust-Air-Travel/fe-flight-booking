@@ -94,6 +94,8 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
         setData({
             id: trip.flightInstanceId,
+            // Quan trọng: lưu cả flightInstanceId để InfoTicketBox nhận diện đã có chuyến được chọn
+            flightInstanceId: trip.flightInstanceId,
             icon: "/logoBrand.png",
             airline: "Wanderlust",
             startDate: convertToDMY(trip.departureLocal),
