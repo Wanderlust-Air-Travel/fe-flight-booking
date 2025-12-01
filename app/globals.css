@@ -429,9 +429,7 @@ main {
   }
   body {
     @apply bg-background text-foreground;
-
   }
-
 }
 
 /* Toast Notification Styles - Moderate font size */
