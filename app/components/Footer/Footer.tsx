@@ -2,154 +2,93 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation";
-import { FooterSection } from "@/types/footer";
-
-const dataFooters: FooterSection[] = [
-    {
-        title: "About",
-        list: [
-            { label: "About Tripma", link: "/about-tripma" },
-            { label: "How it works", link: "/how-it-works" },
-            { label: "Careers", link: "/careers" },
-            { label: "Press", link: "/press" },
-            { label: "Blog", link: "/blog" },
-            { label: "Forum", link: "/forum" },
-        ]
-    },
-    {
-        title: "Partner with us",
-        list: [
-            { label: "Partnership programs", link: "/partnership-programs" },
-            { label: "Affiliate program", link: "/affiliate" },
-            { label: "Connectivity partners", link: "/connectivity" },
-            { label: "Promotions and events", link: "/events" },
-            { label: "Integrations", link: "/integrations" },
-            { label: "Community", link: "/community" },
-            { label: "Loyalty program", link: "/loyalty" },
-        ]
-    },
-    {
-        title: "Support",
-        list: [
-            { label: "Help Center", link: "/help" },
-            { label: "Contact us", link: "/contact" },
-            { label: "Privacy policy", link: "/privacy-policy" },
-            { label: "Terms of service", link: "/terms" },
-            { label: "Trust and safety", link: "/trust" },
-            { label: "Accessibility", link: "/accessibility" },
-        ]
-    },
-    {
-        title: "Get the app",
-        list: [
-            { label: "Tripma for Android", link: "/app-android" },
-            { label: "Tripma for iOS", link: "/app-ios" },
-            { label: "Mobile site", link: "/mobile" },
-        ],
-        imgs: [
-            {
-                image: "/alert.png"
-            },
-            {
-                image: "/dmca.png"
-            },
-        ]
-    }
-];
 
 
 const Footer = () => {
     const router = usePathname();
     return (
-        <footer className="pt-[var(--rowY)]">
-
-            <div  className="flex flex-col">
-                <div className="bg-[var(--cl-pri)]">
-                    <div className="container">
-                        <div className="flex flex-col gap-y-[3.2rem] md:flex-row md:flex-wrap py-[4rem] -mx-[-1.2rem] w-full">
-                            <div className="w-full md:w-1/2 lg:w-1/4 xl:w-[20%] px-[1.2rem]">
-                                <Link
-                                    className="group max-w-[18rem] block w-full !h-auto overflow-hidden"
-                                    href="/"
-                                >
-                                    <Image
-                                        src="/logoHD.png"
-                                        alt="logoHD"
-                                        width={100}
-                                        height={100}
-                                        priority
-                                        unoptimized
-                                        className="w-full h-full object-contain transition ease-linear group-hover:scale-95 filter-white"
-                                    />
-                                </Link>
-                            </div>
-                            {
-                                dataFooters.map((dataFooter, index) => {
-                                    return (
-                                        <div key={index} className="w-full md:w-1/2 lg:w-1/4 xl:w-[20%] px-[1.2rem] flex justify-center">
-                                            <div className="flex flex-col gap-y-[2rem]">
-                                                <div className="flex flex-col gap-y-[0.8rem]">
-                                                    <p className="text-base cl-white font-bold">
-                                                        {dataFooter.title}
-                                                    </p>
-                                                    <ul className="flex flex-col gap-y-[0.8rem]">
-                                                        {
-                                                            dataFooter.list.map((list, index) => {
-                                                                return (
-                                                                    <li key={index}>
-                                                                        <Link className={`text-base hover:!text-[var(--cl-four)] ${router === list.link ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`} href={list.link}>
-                                                                            {list.label}
-                                                                        </Link>
-                                                                    </li>
-                                                                )
-                                                            })
-                                                        }
-    
-                                                    </ul>
-                                                </div>
-                                                <div className="flex flex-col gap-y-[1.6rem]">
-                                                    {
-                                                        dataFooter.imgs?.map((img, index) => {
-                                                            return (
-                                                                <Image key={index} src={img.image} alt="image" width={120} height={60} priority />
-                                                            )
-                                                        })
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )
-                                })
-                            }
-                        </div>
+        <footer className="mt-auto border-t border-[var(--cl-pri)]/20 bg-[var(--cl-pri)] text-white">
+            <div className="container py-2.5 md:py-3">
+                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                    {/* Logo + short text */}
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <Link
+                            className="group block max-w-[11rem] md:max-w-[13rem] !h-auto overflow-hidden"
+                            href="/"
+                        >
+                            <Image
+                                src="/logoHD.png"
+                                alt="logoHD"
+                                width={110}
+                                height={36}
+                                priority
+                                unoptimized
+                                className="w-full h-full object-contain transition ease-linear group-hover:scale-95 filter-white"
+                            />
+                        </Link>
+                        <p className="hidden sm:block text-xs md:text-sm text-white/80">
+                            © 2025 Wanderlust Airways. All rights reserved.
+                        </p>
                     </div>
-                </div>
-                <div className="bg-white">
-                    <div className="container">
-                        <div className="flex flex-col-reverse gap-y-[1.6rem] py-[1.6rem] md:flex-row md:justify-between md:items-center md:gap-x-[2rem]">
-                            <ul className="flex items-center gap-x-[1.2rem] justify-center md:justify-start">
-                                <li>
-                                    <Link className="hover:scale-[1.2] block transition ease-linear" href="/">
-                                        <Image src="/facebook.svg" alt="facebook" width={24} height={24} priority />
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link className="hover:scale-[1.2] block transition ease-linear" href="/">
-                                        <Image src="/instagram.svg" alt="instagram" width={24} height={24} priority />
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link className="hover:scale-[1.2] block transition ease-linear" href="/">
-                                        <Image src="/twitter.svg" alt="twitter" width={24} height={24} priority />
-                                    </Link>
-                                </li>
-                            </ul>
-                            <p className="text-base text-[var(--cl-pri)] text-center md:text-right">© 2025 Wanderlust incorporated</p>
+
+                    {/* Quick links */}
+                    <nav className="flex flex-wrap items-center justify-center gap-3 text-xs md:text-sm text-white/80">
+                        <Link
+                            href="/about"
+                            className={`hover:text-[var(--cl-four)] transition-colors ${
+                                router === "/about" ? "text-[var(--cl-four)]" : ""
+                            }`}
+                        >
+                            About
+                        </Link>
+                        <span className="hidden sm:inline-block h-[0.8rem] w-px bg-white/25" />
+                        <Link
+                            href="/help"
+                            className={`hover:text-[var(--cl-four)] transition-colors ${
+                                router === "/help" ? "text-[var(--cl-four)]" : ""
+                            }`}
+                        >
+                            Support
+                        </Link>
+                        <span className="hidden sm:inline-block h-[0.8rem] w-px bg-white/25" />
+                        <Link
+                            href="/contact"
+                            className={`hover:text-[var(--cl-four)] transition-colors ${
+                                router === "/contact" ? "text-[var(--cl-four)]" : ""
+                            }`}
+                        >
+                            Contact
+                        </Link>
+                        <span className="hidden sm:inline-block h-[0.8rem] w-px bg-white/25" />
+                        <Link
+                            href="/privacy-policy"
+                            className={`hover:text-[var(--cl-four)] transition-colors ${
+                                router === "/privacy-policy" ? "text-[var(--cl-four)]" : ""
+                            }`}
+                        >
+                            Privacy
+                        </Link>
+                    </nav>
+
+                    {/* Social + copyright on mobile */}
+                    <div className="flex items-center justify-center gap-3 md:gap-4">
+                        <div className="flex items-center gap-2">
+                            <Link className="hover:scale-110 transition ease-linear" href="/">
+                                <Image src="/facebook.svg" alt="facebook" width={18} height={18} priority />
+                            </Link>
+                            <Link className="hover:scale-110 transition ease-linear" href="/">
+                                <Image src="/instagram.svg" alt="instagram" width={18} height={18} priority />
+                            </Link>
+                            <Link className="hover:scale-110 transition ease-linear" href="/">
+                                <Image src="/twitter.svg" alt="twitter" width={18} height={18} priority />
+                            </Link>
                         </div>
+                        <p className="sm:hidden text-[0.75rem] text-white/70">
+                            © 2025 Wanderlust Airways.
+                        </p>
                     </div>
                 </div>
             </div>
-
         </footer>
     )
 }

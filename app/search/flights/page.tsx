@@ -7,28 +7,51 @@ import { TripListProps } from "@/types/trip-list-type";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
+import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 
 const ServiceDetailsResultSearchContent = () => {
   const [trips, setTrips] = useState<TripListProps | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-
-
   const searchParams = useSearchParams();
+  const { setData } = useFightSearchBarStore();
 
-  const origin = searchParams.get("origin");
-  const destination = searchParams.get("destination");
-  const departDate = searchParams.get("departDate");
-  const returnDate = searchParams.get("returnDate") === "undefined-undefined-" ? "" : searchParams.get("returnDate");
-  const adults = searchParams.get("adults");
-  const minors = searchParams.get("minors");
-  const tripType = searchParams.get("tripType");
+  const origin = searchParams.get("origin") || "";
+  const destination = searchParams.get("destination") || "";
+  const departDate = searchParams.get("departDate") || "";
+  const rawReturnDate = searchParams.get("returnDate");
+  const returnDate =
+    rawReturnDate === "undefined-undefined-" ? "" : (rawReturnDate || "");
+  const tripType = searchParams.get("tripType") || "one_way";
 
+  // Nếu adults / minors không có (case click từ Service), default hợp lý để BE xử lý được
+  const adultsParam = searchParams.get("adults");
+  const minorsParam = searchParams.get("minors");
+  const adults = adultsParam && !Number.isNaN(Number(adultsParam)) ? adultsParam : "1";
+  const minors = minorsParam && !Number.isNaN(Number(minorsParam)) ? minorsParam : "0";
 
-  console.log(returnDate);
+  const adultNumber = Number(adults) || 1;
+  const minorNumber = Number(minors) || 0;
 
+  // Hydrate flight search store từ URL khi user vào trực tiếp từ Service
+  useEffect(() => {
+    if (!origin || !destination || !departDate) return;
+
+    setData({
+      from: origin,
+      to: destination,
+      startDate: departDate,
+      endDate: tripType === "round_trip" ? returnDate : "",
+      service: tripType,
+      adult: adultNumber,
+      minor: minorNumber,
+      totalPerson: adultNumber + minorNumber,
+    });
+  }, [origin, destination, departDate, returnDate, tripType, adultNumber, minorNumber, setData]);
 
   useEffect(() => {
+    if (!origin || !destination || !departDate) return;
+
     setLoading(true);
     axios
       .get(
@@ -38,13 +61,14 @@ const ServiceDetailsResultSearchContent = () => {
         const tripTypeValue = tripType === "round_trip" ? "round_trip" : "one_way";
         // Backend returns { tripType, outbound, inbound?, totalPassengers }
         // Handle both response formats: direct array or object with outbound property
-        const outboundFlights = Array.isArray(res.data) 
-          ? res.data 
-          : (res.data?.outbound || []);
-        const inboundFlights = tripTypeValue === "round_trip" 
-          ? (Array.isArray(res.data) ? undefined : (res.data?.inbound || undefined))
-          : undefined;
-        
+        const outboundFlights = Array.isArray(res.data)
+          ? res.data
+          : res.data?.outbound || [];
+        const inboundFlights =
+          tripTypeValue === "round_trip"
+            ? (Array.isArray(res.data) ? undefined : res.data?.inbound || undefined)
+            : undefined;
+
         setTrips({
           tripType: tripTypeValue,
           outbound: outboundFlights,
@@ -54,15 +78,11 @@ const ServiceDetailsResultSearchContent = () => {
       .catch((err) => {
         console.log(err);
         setLoading(false);
-
       })
       .finally(() => {
         setLoading(false);
-
-      })
+      });
   }, [origin, destination, departDate, adults, minors, tripType, returnDate]);
-
-
 
   console.log(trips);
 
