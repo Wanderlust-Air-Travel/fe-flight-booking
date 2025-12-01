@@ -15,8 +15,9 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
         endDate: addDays(new Date(), 5),
         key: "selection",
     });
+    const [initializedFromStore, setInitializedFromStore] = useState(false);
 
-    const { setData } = useFightSearchBarStore();
+    const { data, isHydrated, setData } = useFightSearchBarStore();
 
 
 
@@ -63,9 +64,47 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
         onChangeDate?.({ startDate: date });
     };
 
-    useEffect(()=>{
-        setData({service:tripType})
-    },[tripType])
+    useEffect(() => {
+        setData({ service: tripType });
+    }, [tripType, setData]);
+
+    // Parse date string "dd/mm/yyyy" (vi-VN) to Date
+    const parseViDate = (value?: string): Date | undefined => {
+        if (!value) return undefined;
+        const parts = value.split("/");
+        if (parts.length !== 3) return undefined;
+        const [day, month, year] = parts.map((p) => Number(p));
+        if (!day || !month || !year) return undefined;
+        return new Date(year, month - 1, day);
+    };
+
+    // Khi store đã hydrate, đồng bộ tripType + range từ state đã lưu
+    useEffect(() => {
+        if (!isHydrated || initializedFromStore) return;
+
+        const savedTripType = (data.service as TripType) || "one_way";
+        const savedStart = parseViDate(data.startDate);
+        const savedEnd = parseViDate(data.endDate);
+
+        if (savedTripType === "round_trip" && savedStart && savedEnd) {
+            setTripType("round_trip");
+            setRange({
+                startDate: savedStart,
+                endDate: savedEnd,
+                key: "selection",
+            });
+        } else if (savedStart) {
+            // one_way hoặc round_trip nhưng mới chọn ngày đi
+            setTripType("one_way");
+            setRange({
+                startDate: savedStart,
+                endDate: savedStart,
+                key: "selection",
+            });
+        }
+
+        setInitializedFromStore(true);
+    }, [isHydrated, initializedFromStore, data.service, data.startDate, data.endDate]);
 
 
     const formatDate = (date?: Date) =>

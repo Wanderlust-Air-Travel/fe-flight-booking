@@ -2,16 +2,14 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import useIsActiveStore from "./zustand/storeHeader";
 import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
-import useFightSearchBarStore from "./zustand/storeFightSearchBar";
 
 // Lazy load heavy components
 const BannerHome = dynamic(() => import("./components/Banner/Banner"), {
     loading: () => <div className="h-[calc(100vh-var(--hd))] bg-gray-100 animate-pulse" />,
-    ssr: true,
+    // Banner (FlightSearchBar, calendar, Radix Select...) phụ thuộc mạnh vào client state (Date, session),
+    // disable SSR để tránh lỗi hydration do chênh lệch server/client markup.
+    ssr: false,
 });
 
 const ServiceHome = dynamic(() => import("./components/Services/ServiceHome"), {
@@ -32,24 +30,6 @@ const ServiceHome = dynamic(() => import("./components/Services/ServiceHome"), {
 
 
 export default function Home() {
-
-  const pathName = usePathname();
-  const { setData } = useFightSearchBarStore()
-  useEffect(() => {
-    if (pathName === "/") {
-      setData({
-        adult: 1,
-        startDate: "",
-        endDate: "",
-        from: "",
-        to: "",
-
-      })
-    }
-  }, [pathName])
-
-
-
   return (
     <>
       <main className="overflow-hidden pt-[var(--hd)] flex flex-col gap-y-[var(--rowY)]">
