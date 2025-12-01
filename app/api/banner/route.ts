@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 
 const bannerHomeApi = {
-  title:"Wellcome to Bamboo",
+  title:"Wellcome to Wanderlust",
   name: "banner-home",
   url: "/banner.png",
 };

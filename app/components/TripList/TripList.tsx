@@ -95,7 +95,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
         setData({
             id: trip.flightInstanceId,
             icon: "/logoBrand.png",
-            airline: "Bamboo",
+            airline: "Wanderlust",
             startDate: convertToDMY(trip.departureLocal),
             endDate: convertToDMY(trip.arrivalLocal),
             startCode: trip.origin?.iata || '',
@@ -258,7 +258,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                 <div className="w-[20%]">
                                                     <div className="flex flex-col gap-y-[0.2rem]">
                                                         <p className="text-[var(--cl-five)] font-bold text-base">{convertToLocalTime(trip.departureLocal)}AM - {convertToLocalTime(trip.arrivalLocal)}PM</p>
-                                                        <p className="text-[var(--cl-third)] text-base">Bamboo</p>
+                                                        <p className="text-[var(--cl-third)] text-base">Wanderlust</p>
                                                     </div>
                                                 </div>
 

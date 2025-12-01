@@ -368,7 +368,7 @@ const MyTicketsPage = () => {
 
         {/* Cancellation Policy Section */}
         <div className="mb-8 p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-          <h2 className="text-2xl font-bold text-[var(--cl-pri)] mb-5">Quy định hủy vé Bamboo Airways</h2>
+          <h2 className="text-2xl font-bold text-[var(--cl-pri)] mb-5">Quy định hủy vé Wanderlust Airways</h2>
           <div className="space-y-4 text-base text-gray-700">
             <div>
               <p className="font-semibold text-lg mb-3">Thời gian hủy vé:</p>
@@ -387,7 +387,7 @@ const MyTicketsPage = () => {
             </div>
             <div>
               <p className="font-semibold text-lg mb-2">Hạng vé không được hoàn:</p>
-              <p className="ml-2">Economy Saver Max, Economy Saver (Bamboo Eco) - các hạng vé siêu tiết kiệm thông thường không được phép hoàn/hủy vé.</p>
+              <p className="ml-2">Economy Saver Max, Economy Saver (Wanderlust Eco) - các hạng vé siêu tiết kiệm thông thường không được phép hoàn/hủy vé.</p>
             </div>
             <div className="mt-5 p-4 bg-blue-50 rounded border-l-4 border-blue-400">
               <p className="text-blue-800 text-sm italic">

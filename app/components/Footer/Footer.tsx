@@ -144,7 +144,7 @@ const Footer = () => {
                                     </Link>
                                 </li>
                             </ul>
-                            <p className="text-base text-[var(--cl-pri)]">© 2025 Bamboo incorporated</p>
+                            <p className="text-base text-[var(--cl-pri)]">© 2025 Wanderlust incorporated</p>
                         </div>
                     </div>
                 </div>
