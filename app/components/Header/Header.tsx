@@ -1,14 +1,13 @@
 "use client"
 import useIsActiveStore from "@/app/zustand/storeHeader";
 import useUserStore from "@/app/zustand/storeUser";
-import { ChevronDown, CircleUserRound, X } from "lucide-react";
+import { ChevronDown, CircleUserRound, X, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MenuListsInterface } from "@/types/header-type"
-
-
-
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 const menuLists: MenuListsInterface[] = [
     {
         title: "Home",
@@ -44,12 +43,13 @@ const Header = () => {
     const { isLoggedIn, user ,logout } = useUserStore();
     const router = usePathname();
     const hydrated = useUserStore((state) => state.hydrated);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     console.log(hydrated)
 
     const handleLogout = () =>{
         logout();
-
+        setIsMobileMenuOpen(false);
     }
 
     return (
@@ -59,10 +59,10 @@ const Header = () => {
             <div
                 className={`bg-[var(--cl-pri)] h-full transition ease-linear`}
             >
-                <div className="container">
-                    <div className="flex h-full justify-between gap-x-[3.2rem]">
+                <div className="container h-full">
+                    <div className="flex h-full items-center justify-between gap-x-[1.6rem]">
                         <Link
-                            className="group max-w-[20rem] w-full !h-auto overflow-hidden block"
+                            className="group max-w-[16rem] w-full !h-auto overflow-hidden block"
                             href="/"
                         >
                             <Image
@@ -75,7 +75,8 @@ const Header = () => {
                                 className="w-full h-full object-contain transition ease-linear xl:group-hover:scale-95 filter-white"
                             />
                         </Link>
-                        <ul className="flex gap-x-[1.2rem] items-center ">
+                        {/* Desktop navigation */}
+                        <ul className="hidden lg:flex gap-x-[1.2rem] items-center ">
                             {menuLists.map((menuList, index) => {
                                 return (
                                     <li
@@ -133,7 +134,7 @@ const Header = () => {
                                             </div>
                                             <span className="w-[2rem] h-[2rem] flex justify-center items-center ">
                                                 <ChevronDown
-                                                    className="text-[var(--cl-white)] w-full h-full mt-[0.25rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-white)]"
+                                                className="text-[var(--cl-white)] w-full h-full mt-[0.25rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-white)]"
                                                 />
                                             </span>
                                         </div>
@@ -193,7 +194,97 @@ const Header = () => {
                                 )
                             }
                         </ul>
+                        {/* Mobile actions */}
+                        <div className="flex items-center gap-x-2 lg:hidden ml-auto">
+                            {hydrated && !isLoggedIn && (
+                                <Link href="/signin" className="text-[var(--cl-white)] text-sm uppercase">
+                                    Sign in
+                                </Link>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-[var(--cl-white)] hover:bg-[var(--cl-four)]"
+                                onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+                                aria-label="Toggle navigation menu"
+                            >
+                                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            </Button>
+                        </div>
                     </div>
+                </div>
+            </div>
+            {/* Mobile navigation drawer */}
+            <div
+                className={`lg:hidden bg-[var(--cl-pri)] text-[var(--cl-white)] transition-max-height duration-300 overflow-hidden ${isMobileMenuOpen ? "max-h-[40rem]" : "max-h-0"
+                    }`}
+            >
+                <div className="container pb-4">
+                    <nav className="flex flex-col gap-y-2 pt-2">
+                        {menuLists.map((menuList, index) => (
+                            <Link
+                                key={index}
+                                href={menuList.path}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className={`py-2 text-sm font-medium uppercase border-b border-white/10 last:border-b-0 ${router === menuList.path ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"
+                                    }`}
+                            >
+                                {menuList.title}
+                            </Link>
+                        ))}
+
+                        {hydrated && (
+                            isLoggedIn ? (
+                                <div className="mt-2 border-t border-white/10 pt-2 flex flex-col gap-y-2">
+                                    <p className="text-xs uppercase text-white/80 flex items-center gap-x-2">
+                                        <Image src="/icAva.png" alt="icAva" width={20} height={20} className="flex-shrink-0" priority unoptimized />
+                                        {user?.fullname}
+                                    </p>
+                                    <Link
+                                        href="/my-tickets"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-four)]"
+                                    >
+                                        Vé của tôi
+                                    </Link>
+                                    <Link
+                                        href="/my-journey"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-four)]"
+                                    >
+                                        Hành trình của tôi
+                                    </Link>
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        className="mt-1 self-start"
+                                        onClick={handleLogout}
+                                    >
+                                        Logout
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="mt-2 border-t border-white/10 pt-2 flex flex-col gap-y-2">
+                                    <Link
+                                        href="/signin"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className={`text-sm uppercase ${router === "/signin" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`}
+                                    >
+                                        Sign in
+                                    </Link>
+                                    <Button
+                                        asChild
+                                        size="sm"
+                                        className="bg-[var(--cl-four)] text-[var(--cl-white)] hover:bg-[var(--cl-white)] hover:text-[var(--cl-pri)]"
+                                    >
+                                        <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)} className="uppercase text-sm">
+                                            Sign up
+                                        </Link>
+                                    </Button>
+                                </div>
+                            )
+                        )}
+                    </nav>
                 </div>
             </div>
         </header>

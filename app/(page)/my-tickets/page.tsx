@@ -360,19 +360,19 @@ const MyTicketsPage = () => {
   return (
     <main className="pt-[var(--hd)] min-h-screen bg-gray-50">
       <Breadcrumb />
-      <div className="container py-[4rem]">
-        <div className="mb-[3rem]">
-          <h1 className="text-6xl font-bold text-[var(--cl-pri)] mb-2">Vé của tôi</h1>
-          <p className="text-xl text-gray-600">Tổng số vé: {data.totalItems}</p>
+      <div className="container py-6 sm:py-8 lg:py-[4rem]">
+        <div className="mb-6 sm:mb-8 lg:mb-[3rem]">
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-[var(--cl-pri)] mb-2">Vé của tôi</h1>
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600">Tổng số vé: {data.totalItems}</p>
         </div>
 
         {/* Cancellation Policy Section */}
-        <div className="mb-8 p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-          <h2 className="text-2xl font-bold text-[var(--cl-pri)] mb-5">Quy định hủy vé Wanderlust Airways</h2>
-          <div className="space-y-4 text-base text-gray-700">
+        <div className="mb-6 sm:mb-8 p-4 sm:p-5 md:p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <h2 className="text-xl sm:text-2xl font-bold text-[var(--cl-pri)] mb-4 sm:mb-5">Quy định hủy vé Wanderlust Airways</h2>
+          <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-gray-700">
             <div>
-              <p className="font-semibold text-lg mb-3">Thời gian hủy vé:</p>
-              <ul className="list-disc list-inside space-y-2 ml-2">
+              <p className="font-semibold text-base sm:text-lg mb-2 sm:mb-3">Thời gian hủy vé:</p>
+              <ul className="list-disc list-inside space-y-1.5 sm:space-y-2 ml-2">
                 <li>
                   <strong>Chặng bay nội địa:</strong> Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng.
                 </li>
@@ -382,36 +382,36 @@ const MyTicketsPage = () => {
               </ul>
             </div>
             <div>
-              <p className="font-semibold text-lg mb-2">Hạng vé được phép hoàn:</p>
+              <p className="font-semibold text-base sm:text-lg mb-2">Hạng vé được phép hoàn:</p>
               <p className="ml-2">Economy Smart, Economy Flex, Premium Smart, Premium Flex, Business Smart, Business Flex.</p>
             </div>
             <div>
-              <p className="font-semibold text-lg mb-2">Hạng vé không được hoàn:</p>
+              <p className="font-semibold text-base sm:text-lg mb-2">Hạng vé không được hoàn:</p>
               <p className="ml-2">Economy Saver Max, Economy Saver (Wanderlust Eco) - các hạng vé siêu tiết kiệm thông thường không được phép hoàn/hủy vé.</p>
             </div>
-            <div className="mt-5 p-4 bg-blue-50 rounded border-l-4 border-blue-400">
-              <p className="text-blue-800 text-sm italic">
+            <div className="mt-4 sm:mt-5 p-3 sm:p-4 bg-blue-50 rounded border-l-4 border-blue-400">
+              <p className="text-blue-800 text-xs sm:text-sm italic">
                 <strong>Lưu ý:</strong> Bạn luôn nên kiểm tra lại Điều kiện giá vé (Fare Rules) cụ thể của vé máy bay bạn đã mua để biết chính xác quy định áp dụng.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="grid gap-6">
+        <div className="grid gap-4 md:gap-6">
           {data.tickets.map((ticket) => (
-            <Card key={ticket.ticketId} className="p-6 hover:shadow-lg transition-shadow">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <Card key={ticket.ticketId} className="p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
                 {/* Left: Flight Info */}
                 <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-4">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 mb-3 sm:mb-4">
                     <div className="flex items-center gap-2">
                       <Plane className="w-5 h-5 text-[var(--cl-pri)]" />
-                      <span className="font-bold text-lg">{ticket.flightNumber}</span>
+                      <span className="font-bold text-base sm:text-lg">{ticket.flightNumber}</span>
                     </div>
-                    <div className="px-3 py-1 rounded-full bg-[var(--cl-pri)] text-white text-sm font-medium">
+                    <div className="px-3 py-1 rounded-full bg-[var(--cl-pri)] text-white text-xs sm:text-sm font-medium">
                       {ticket.pnrCode}
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    <div className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
                       ticket.bookingStatus === 'confirmed' 
                         ? 'bg-green-100 text-green-800' 
                         : ticket.bookingStatus === 'pending'
@@ -430,13 +430,13 @@ const MyTicketsPage = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <MapPin className="w-4 h-4 text-[var(--cl-pri)]" />
                         <span className="text-sm text-gray-600">Điểm đi</span>
                       </div>
-                      <p className="font-semibold text-lg">{ticket.originCity}</p>
+                      <p className="font-semibold text-base sm:text-lg">{ticket.originCity}</p>
                       <p className="text-sm text-gray-600">{ticket.originAirportName}</p>
                       <p className="text-sm text-gray-500">({ticket.originAirport})</p>
                     </div>
@@ -452,13 +452,13 @@ const MyTicketsPage = () => {
                         <MapPin className="w-4 h-4 text-[var(--cl-pri)]" />
                         <span className="text-sm text-gray-600">Điểm đến</span>
                       </div>
-                      <p className="font-semibold text-lg">{ticket.destinationCity}</p>
+                      <p className="font-semibold text-base sm:text-lg">{ticket.destinationCity}</p>
                       <p className="text-sm text-gray-600">{ticket.destinationAirportName}</p>
                       <p className="text-sm text-gray-500">({ticket.destinationAirport})</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                     <div>
                       <p className="text-gray-600 mb-1">Ngày khởi hành</p>
                       <p className="font-semibold">{convertToDMY(ticket.departureDateTime)}</p>
@@ -481,7 +481,7 @@ const MyTicketsPage = () => {
                 </div>
 
                 {/* Right: Ticket Details */}
-                <div className="md:w-[20rem] border-l-0 md:border-l md:pl-6 pt-4 md:pt-0">
+                <div className="md:w-[20rem] border-t mt-4 pt-4 md:mt-0 md:border-t-0 md:border-l md:pl-6 md:pt-0">
                   <div className="space-y-4">
                     {/* Ticket Code */}
                     <div className="bg-gray-50 p-3 rounded-lg">
@@ -497,7 +497,7 @@ const MyTicketsPage = () => {
                     </div>
                     
                     {/* Total Amount */}
-                    <div className="bg-[var(--cl-pri)]/5 p-4 rounded-lg border-2 border-[var(--cl-pri)]/20">
+                    <div className="bg-[var(--cl-pri)]/5 p-3 sm:p-4 rounded-lg border-2 border-[var(--cl-pri)]/20">
                       <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Tổng tiền</p>
                       <p className="text-xl font-bold text-[var(--cl-pri)]">{FormatPrice(ticket.totalAmount)}</p>
                     </div>

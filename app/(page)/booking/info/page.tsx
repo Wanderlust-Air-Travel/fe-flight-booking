@@ -103,15 +103,16 @@ const BookingInfoContent = () => {
     }
 
     return (
-        <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+        <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)] bg-[var(--cl-six)]/40">
             <Breadcrumb />
             <InfoTicketBox />
 
             <section className="py-4 md:py-6 lg:py-8">
-                <div className="container max-w-[160rem]">
-                    <div className="flex flex-wrap -mx-2 md:-mx-4 lg:-mx-8">
-                        <div className="px-2 md:px-4 lg:px-8 w-full lg:w-[70%]">
-                            <div className="bg-white rounded-lg md:rounded-xl lg:rounded-2xl p-4 md:p-6 lg:p-8 xl:p-12 border border-[var(--cl-third)] shadow-md">
+                <div className="container max-w-6xl px-2 sm:px-4">
+                    <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-8">
+                        {/* Left: Form */}
+                        <div className="w-full lg:w-[70%]">
+                            <div className="bg-white rounded-lg md:rounded-xl lg:rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 border border-[var(--cl-third)] shadow-md">
                                 <h2 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-[var(--cl-pri)] mb-4 md:mb-6 lg:mb-8 uppercase tracking-wide">
                                     Passenger Information
                                 </h2>
@@ -355,7 +356,7 @@ const BookingInfoContent = () => {
                                                                                     }
                                                                                 }}
                                                                             >
-                                                                                <SelectTrigger className="w-full sm:w-[180px] md:w-[220px] h-12 md:h-14 lg:h-16 text-sm md:text-base border border-[var(--cl-third)] focus:ring-2 focus:ring-[var(--cl-pri)]">
+                                                                                <SelectTrigger className="w-full sm:w-[180px] md:w-[220px] h-12 md:h-14 lg:h-16 px-3 text-sm md:text-base lg:text-lg font-semibold border border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]">
                                                                                     <SelectValue placeholder="Select type" />
                                                                                 </SelectTrigger>
                                                                                 <SelectContent>
@@ -436,16 +437,16 @@ const BookingInfoContent = () => {
                                                                             const newMonth = part === "month" ? value : monthPart;
                                                                             const newYear = part === "year" ? value : yearPart;
 
-                                                                            const newDobString =
-                                                                                newYear && newMonth && newDay
-                                                                                    ? `${newYear}-${newMonth}-${newDay}`
-                                                                                    : "";
-
+                                                                            // Luôn lưu lại phần đã chọn để Select hiển thị value,
+                                                                            // kể cả khi chưa đủ ngày-tháng-năm
+                                                                            const newDobString = `${newYear}-${newMonth}-${newDay}`;
                                                                             form.setFieldValue(field.name, newDobString);
 
-                                                                            if (newDobString) {
+                                                                            // Chỉ auto-detect passenger type khi đủ 3 phần hợp lệ
+                                                                            if (newYear && newMonth && newDay) {
+                                                                                const fullDob = `${newYear}-${newMonth}-${newDay}`;
                                                                                 const determinedType = determinePassengerType(
-                                                                                    newDobString,
+                                                                                    fullDob,
                                                                                     flightDate
                                                                                 );
                                                                                 if (
@@ -472,10 +473,10 @@ const BookingInfoContent = () => {
                                                                                     >
                                                                                         <SelectTrigger
                                                                                             className={cn(
-                                                                                                "flex-1 h-12 md:h-14 lg:h-16 text-sm md:text-base border-2 focus:ring-2",
+                                                                                                "flex-1 min-w-[7rem] h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]",
                                                                                                 isError
                                                                                                     ? "border-destructive focus:ring-destructive/20"
-                                                                                                    : "border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-[var(--cl-pri)]"
+                                                                                                    : ""
                                                                                             )}
                                                                                         >
                                                                                             <SelectValue placeholder="Day" />
@@ -501,10 +502,10 @@ const BookingInfoContent = () => {
                                                                                     >
                                                                                         <SelectTrigger
                                                                                             className={cn(
-                                                                                                "flex-1 h-12 md:h-14 lg:h-16 text-sm md:text-base border-2 focus:ring-2",
+                                                                                                "flex-1 min-w-[7rem] h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]",
                                                                                                 isError
                                                                                                     ? "border-destructive focus:ring-destructive/20"
-                                                                                                    : "border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-[var(--cl-pri)]"
+                                                                                                    : ""
                                                                                             )}
                                                                                         >
                                                                                             <SelectValue placeholder="Month" />
@@ -530,10 +531,10 @@ const BookingInfoContent = () => {
                                                                                     >
                                                                                         <SelectTrigger
                                                                                             className={cn(
-                                                                                                "flex-1 h-12 md:h-14 lg:h-16 text-sm md:text-base border-2 focus:ring-2",
+                                                                                                "flex-1 min-w-[7rem] h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold border border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]",
                                                                                                 isError
                                                                                                     ? "border-destructive focus:ring-destructive/20"
-                                                                                                    : "border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-[var(--cl-pri)]"
+                                                                                                    : ""
                                                                                             )}
                                                                                         >
                                                                                             <SelectValue placeholder="Year" />
@@ -675,14 +676,14 @@ const BookingInfoContent = () => {
                                                     type="button"
                                                     variant="outline"
                                                     onClick={() => router.back()}
-                                                    className="h-12 md:h-14 lg:h-16 px-4 md:px-6 lg:px-8 text-sm md:text-base lg:text-lg font-bold border border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white transition-all order-2 sm:order-1"
+                                                    className="h-11 md:h-12 lg:h-14 px-4 md:px-6 lg:px-8 text-sm md:text-base font-bold border border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white transition-all order-2 sm:order-1"
                                                 >
                                                     Back
                                                 </Button>
                                                 <Button
                                                     type="submit"
                                                     disabled={isCreatingBooking}
-                                                    className="h-12 md:h-14 lg:h-16 px-4 md:px-6 lg:px-8 text-sm md:text-base lg:text-lg font-bold bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white uppercase tracking-wide transition-all shadow-lg order-1 sm:order-2 flex-1 sm:flex-initial"
+                                                    className="h-11 md:h-12 lg:h-14 px-4 md:px-6 lg:px-8 text-sm md:text-base font-bold bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white uppercase tracking-wide transition-all shadow-lg order-1 sm:order-2 flex-1 sm:flex-initial"
                                                 >
                                                     {isCreatingBooking
                                                         ? "Creating Booking..."
@@ -695,8 +696,9 @@ const BookingInfoContent = () => {
                             </div>
                         </div>
 
-                        <div className="px-2 md:px-4 lg:px-8 w-full lg:w-[30%] mt-6 lg:mt-0">
-                            <div className="lg:sticky lg:top-[calc(var(--hd)+1rem)] bg-gradient-to-br from-white to-blue-50/30 rounded-lg md:rounded-xl lg:rounded-2xl p-4 md:p-6 lg:p-8 border border-[var(--cl-third)] shadow-md">
+                        {/* Right: Summary */}
+                        <div className="w-full lg:w-[30%] mt-2 lg:mt-0">
+                            <div className="lg:sticky lg:top-[calc(var(--hd)+1rem)] bg-gradient-to-br from-white to-blue-50/30 rounded-lg md:rounded-xl lg:rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 border border-[var(--cl-third)] shadow-md">
                                 <h3 className="text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-[var(--cl-pri)] mb-4 md:mb-6 lg:mb-8 uppercase tracking-wide border-b-2 border-[var(--cl-pri)] pb-3 md:pb-4 lg:pb-6">
                                     Booking Summary
                                 </h3>

@@ -104,27 +104,27 @@ const MyJourneyPage = () => {
   return (
     <main className="pt-[var(--hd)] min-h-screen bg-gray-50">
       <Breadcrumb />
-      <div className="container py-[4rem]">
-        <div className="mb-[3rem]">
-          <h1 className="text-6xl font-bold text-[var(--cl-pri)] mb-2">Hành trình của tôi</h1>
-          <p className="text-xl text-gray-600">Tổng số hành trình: {data.totalJourneys}</p>
+      <div className="container py-6 sm:py-8 lg:py-[4rem]">
+        <div className="mb-6 sm:mb-8 lg:mb-[3rem]">
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-[var(--cl-pri)] mb-2">Hành trình của tôi</h1>
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600">Tổng số hành trình: {data.totalJourneys}</p>
         </div>
 
-        <div className="grid gap-6">
+        <div className="grid gap-4 md:gap-6">
           {data.journeys.map((journey) => (
-            <Card key={journey.journeyId} className="p-6 hover:shadow-lg transition-shadow">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <Card key={journey.journeyId} className="p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
                 {/* Left: Journey Info */}
                 <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-4">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 mb-3 sm:mb-4">
                     <div className="flex items-center gap-2">
                       <Plane className="w-5 h-5 text-[var(--cl-pri)]" />
                       <span className="font-bold text-lg">{journey.flightNumber}</span>
                     </div>
-                    <div className="px-3 py-1 rounded-full bg-[var(--cl-pri)] text-white text-sm font-medium">
+                    <div className="px-3 py-1 rounded-full bg-[var(--cl-pri)] text-white text-xs sm:text-sm font-medium">
                       {journey.pnrCode}
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    <div className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
                       journey.status === 'confirmed' 
                         ? 'bg-green-100 text-green-800' 
                         : journey.status === 'pending'
@@ -135,19 +135,19 @@ const MyJourneyPage = () => {
                        journey.status === 'pending' ? 'Đang chờ' : journey.status}
                     </div>
                     {journey.isDomestic && (
-                      <div className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
+                      <div className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs sm:text-sm font-medium">
                         Nội địa
                       </div>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <MapPin className="w-4 h-4 text-[var(--cl-pri)]" />
                         <span className="text-sm text-gray-600">Điểm đi</span>
                       </div>
-                      <p className="font-semibold text-lg">{journey.originCity}</p>
+                      <p className="font-semibold text-base sm:text-lg">{journey.originCity}</p>
                       <p className="text-sm text-gray-600">{journey.originAirportName}</p>
                       <p className="text-sm text-gray-500">({journey.originAirport})</p>
                     </div>
@@ -163,13 +163,13 @@ const MyJourneyPage = () => {
                         <MapPin className="w-4 h-4 text-[var(--cl-pri)]" />
                         <span className="text-sm text-gray-600">Điểm đến</span>
                       </div>
-                      <p className="font-semibold text-lg">{journey.destinationCity}</p>
+                      <p className="font-semibold text-base sm:text-lg">{journey.destinationCity}</p>
                       <p className="text-sm text-gray-600">{journey.destinationAirportName}</p>
                       <p className="text-sm text-gray-500">({journey.destinationAirport})</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <Calendar className="w-4 h-4 text-gray-600" />
@@ -204,7 +204,7 @@ const MyJourneyPage = () => {
                 </div>
 
                 {/* Right: Actions */}
-                <div className="md:w-[15rem] border-t md:border-t-0 md:border-l md:pl-6 pt-4 md:pt-0">
+                <div className="md:w-[15rem] border-t mt-4 pt-4 md:mt-0 md:border-t-0 md:border-l md:pl-6 md:pt-0">
                   {(journey.status === 'confirmed' || journey.status === 'pending') && (
                     <Button
                       variant="destructive"

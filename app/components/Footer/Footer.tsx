@@ -66,8 +66,8 @@ const Footer = () => {
             <div  className="flex flex-col">
                 <div className="bg-[var(--cl-pri)]">
                     <div className="container">
-                        <div className="flex py-[4rem] -mx-[-1.2rem] w-full">
-                            <div className="w-[20%] px-[1.2rem]">
+                        <div className="flex flex-col gap-y-[3.2rem] md:flex-row md:flex-wrap py-[4rem] -mx-[-1.2rem] w-full">
+                            <div className="w-full md:w-1/2 lg:w-1/4 xl:w-[20%] px-[1.2rem]">
                                 <Link
                                     className="group max-w-[18rem] block w-full !h-auto overflow-hidden"
                                     href="/"
@@ -86,7 +86,7 @@ const Footer = () => {
                             {
                                 dataFooters.map((dataFooter, index) => {
                                     return (
-                                        <div key={index} className="w-[20%] px-[1.2rem] flex justify-center">
+                                        <div key={index} className="w-full md:w-1/2 lg:w-1/4 xl:w-[20%] px-[1.2rem] flex justify-center">
                                             <div className="flex flex-col gap-y-[2rem]">
                                                 <div className="flex flex-col gap-y-[0.8rem]">
                                                     <p className="text-base cl-white font-bold">
@@ -126,8 +126,8 @@ const Footer = () => {
                 </div>
                 <div className="bg-white">
                     <div className="container">
-                        <div className="flex py-[1.6rem] justify-between items-center gap-x-[2rem]">
-                            <ul className="flex items-center gap-x-[1.2rem]">
+                        <div className="flex flex-col-reverse gap-y-[1.6rem] py-[1.6rem] md:flex-row md:justify-between md:items-center md:gap-x-[2rem]">
+                            <ul className="flex items-center gap-x-[1.2rem] justify-center md:justify-start">
                                 <li>
                                     <Link className="hover:scale-[1.2] block transition ease-linear" href="/">
                                         <Image src="/facebook.svg" alt="facebook" width={24} height={24} priority />
@@ -144,7 +144,7 @@ const Footer = () => {
                                     </Link>
                                 </li>
                             </ul>
-                            <p className="text-base text-[var(--cl-pri)]">© 2025 Wanderlust incorporated</p>
+                            <p className="text-base text-[var(--cl-pri)] text-center md:text-right">© 2025 Wanderlust incorporated</p>
                         </div>
                     </div>
                 </div>
