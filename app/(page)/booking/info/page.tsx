@@ -469,7 +469,6 @@ const BookingInfoContent = () => {
                                                                                         onValueChange={(value) =>
                                                                                             handleDateChange("day", value)
                                                                                         }
-                                                                                        disabled={passenger.isCurrentUser && !!user}
                                                                                     >
                                                                                         <SelectTrigger
                                                                                             className={cn(
@@ -498,7 +497,6 @@ const BookingInfoContent = () => {
                                                                                         onValueChange={(value) =>
                                                                                             handleDateChange("month", value)
                                                                                         }
-                                                                                        disabled={passenger.isCurrentUser && !!user}
                                                                                     >
                                                                                         <SelectTrigger
                                                                                             className={cn(
@@ -527,7 +525,6 @@ const BookingInfoContent = () => {
                                                                                         onValueChange={(value) =>
                                                                                             handleDateChange("year", value)
                                                                                         }
-                                                                                        disabled={passenger.isCurrentUser && !!user}
                                                                                     >
                                                                                         <SelectTrigger
                                                                                             className={cn(
