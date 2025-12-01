@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Form, Formik, Field, ErrorMessage } from "formik";
@@ -28,6 +27,7 @@ import { useReservationCountdown } from "@/app/hooks/use-reservation-countdown";
 import { useBookingInfo } from "@/app/hooks/use-booking-info";
 import { createBookingSchema } from "@/lib/validation/booking-validation";
 import { getDefaultDOB } from "@/lib/utils/booking-utils";
+import { getDays, getMonths, getYears } from "@/lib/utils/date-select-utils";
 
 const BookingInfoContent = () => {
     const searchParams = useSearchParams();
@@ -418,91 +418,152 @@ const BookingInfoContent = () => {
                                                                     label="Date of Birth"
                                                                     required
                                                                 >
-                                                                    {({ field, form, isError, className }) => {
-                                                                        const dobValue = field.value ? new Date(field.value) : undefined;
-                                                                        
+                                                                    {({ field, form, isError }) => {
+                                                                        const dobValue: string | undefined = field.value;
+                                                                        const [yearPart, monthPart, dayPart] = dobValue
+                                                                            ? dobValue.split("-")
+                                                                            : ["", "", ""];
+
+                                                                        const days = getDays();
+                                                                        const months = getMonths();
+                                                                        const years = getYears();
+
+                                                                        const handleDateChange = (
+                                                                            part: "day" | "month" | "year",
+                                                                            value: string
+                                                                        ) => {
+                                                                            const newDay = part === "day" ? value : dayPart;
+                                                                            const newMonth = part === "month" ? value : monthPart;
+                                                                            const newYear = part === "year" ? value : yearPart;
+
+                                                                            const newDobString =
+                                                                                newYear && newMonth && newDay
+                                                                                    ? `${newYear}-${newMonth}-${newDay}`
+                                                                                    : "";
+
+                                                                            form.setFieldValue(field.name, newDobString);
+
+                                                                            if (newDobString) {
+                                                                                const determinedType = determinePassengerType(
+                                                                                    newDobString,
+                                                                                    flightDate
+                                                                                );
+                                                                                if (
+                                                                                    determinedType &&
+                                                                                    determinedType !== passenger.passengerType
+                                                                                ) {
+                                                                                    form.setFieldValue(
+                                                                                        `passengers.${index}.passengerType`,
+                                                                                        determinedType
+                                                                                    );
+                                                                                }
+                                                                            }
+                                                                        };
+
                                                                         return (
-                                                                            <div className="relative">
-                                                                                <Popover>
-                                                                                    <PopoverTrigger asChild>
-                                                                                        <Button
-                                                                                            variant="outline"
-                                                                                            type="button"
-                                                                                            aria-invalid={isError}
+                                                                            <div className="flex flex-col gap-2">
+                                                                                <div className="flex gap-2 relative">
+                                                                                    <Select
+                                                                                        value={dayPart}
+                                                                                        onValueChange={(value) =>
+                                                                                            handleDateChange("day", value)
+                                                                                        }
+                                                                                        disabled={passenger.isCurrentUser && !!user}
+                                                                                    >
+                                                                                        <SelectTrigger
                                                                                             className={cn(
-                                                                                                "w-full h-12 md:h-14 lg:h-16 text-sm md:text-base lg:text-lg font-semibold justify-start text-left border-2 pr-10",
-                                                                                                !dobValue && "text-muted-foreground",
-                                                                                                isError 
-                                                                                                    ? "border-destructive focus:border-destructive focus:ring-destructive/20" 
-                                                                                                    : "border-[var(--cl-third)] hover:border-[var(--cl-pri)] focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]",
-                                                                                                className
+                                                                                                "flex-1 h-12 md:h-14 lg:h-16 text-sm md:text-base border-2 focus:ring-2",
+                                                                                                isError
+                                                                                                    ? "border-destructive focus:ring-destructive/20"
+                                                                                                    : "border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-[var(--cl-pri)]"
                                                                                             )}
                                                                                         >
-                                                                                            <svg
-                                                                                                className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-[var(--cl-pri)] flex-shrink-0"
-                                                                                                fill="none"
-                                                                                                stroke="currentColor"
-                                                                                                viewBox="0 0 24 24"
-                                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                                            >
-                                                                                                <path
-                                                                                                    strokeLinecap="round"
-                                                                                                    strokeLinejoin="round"
-                                                                                                    strokeWidth={2}
-                                                                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                                                                />
-                                                                                            </svg>
-                                                                                            {dobValue ? (
-                                                                                                format(dobValue, "PPP")
-                                                                                            ) : (
-                                                                                                <span>Pick a date</span>
-                                                                                            )}
-                                                                                        </Button>
-                                                                                    </PopoverTrigger>
-                                                                                    <PopoverContent 
-                                                                                        className="w-auto min-w-[340px] sm:min-w-[380px] md:min-w-[420px] max-w-[95vw] sm:max-w-none overflow-hidden p-0" 
-                                                                                        align="start" 
-                                                                                        sideOffset={8}
+                                                                                            <SelectValue placeholder="Day" />
+                                                                                        </SelectTrigger>
+                                                                                        <SelectContent className="max-h-[250px] overflow-y-auto">
+                                                                                            {days.map((item) => (
+                                                                                                <SelectItem
+                                                                                                    key={item.value}
+                                                                                                    value={item.value}
+                                                                                                >
+                                                                                                    {item.label}
+                                                                                                </SelectItem>
+                                                                                            ))}
+                                                                                        </SelectContent>
+                                                                                    </Select>
+
+                                                                                    <Select
+                                                                                        value={monthPart}
+                                                                                        onValueChange={(value) =>
+                                                                                            handleDateChange("month", value)
+                                                                                        }
+                                                                                        disabled={passenger.isCurrentUser && !!user}
                                                                                     >
-                                                                                        <Calendar
-                                                                                            mode="single"
-                                                                                            selected={dobValue}
-                                                                                            onSelect={(date) => {
-                                                                                                if (date) {
-                                                                                                    const dobString = format(date, "yyyy-MM-dd");
-                                                                                                    form.setFieldValue(field.name, dobString);
-                                                                                                    
-                                                                                                    // Auto-determine passenger type based on DOB
-                                                                                                    const determinedType = determinePassengerType(dobString, flightDate);
-                                                                                                    
-                                                                                                    if (determinedType && determinedType !== passenger.passengerType) {
-                                                                                                        form.setFieldValue(`passengers.${index}.passengerType`, determinedType);
-                                                                                                        
-                                                                                                        const age = calculateAge(dobString, flightDate);
-                                                                                                        if (age >= 0) {
-                                                                                                            console.log(`Auto-determined passenger type: ${determinedType} (Age: ${age} at flight date)`);
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                            }}
-                                                                                            disabled={(date) => date > flightDate}
-                                                                                            initialFocus
-                                                                                            captionLayout="dropdown"
-                                                                                            fromYear={1900}
-                                                                                            toYear={new Date().getFullYear()}
-                                                                                            className="rounded-md border shadow-sm"
-                                                                                            classNames={{
-                                                                                                day_selected: "bg-[var(--cl-pri)] text-white hover:bg-[var(--cl-pri)] hover:text-white",
-                                                                                                day_today: "bg-[var(--cl-four)]/20 text-[var(--cl-pri)] font-bold",
-                                                                                            }}
-                                                                                        />
-                                                                                    </PopoverContent>
-                                                                                </Popover>
-                                                                                {isError && (
-                                                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                                                        <AlertCircle className="h-5 w-5 text-destructive" aria-hidden="true" />
-                                                                                    </div>
-                                                                                )}
+                                                                                        <SelectTrigger
+                                                                                            className={cn(
+                                                                                                "flex-1 h-12 md:h-14 lg:h-16 text-sm md:text-base border-2 focus:ring-2",
+                                                                                                isError
+                                                                                                    ? "border-destructive focus:ring-destructive/20"
+                                                                                                    : "border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-[var(--cl-pri)]"
+                                                                                            )}
+                                                                                        >
+                                                                                            <SelectValue placeholder="Month" />
+                                                                                        </SelectTrigger>
+                                                                                        <SelectContent className="max-h-[250px] overflow-y-auto">
+                                                                                            {months.map((item) => (
+                                                                                                <SelectItem
+                                                                                                    key={item.value}
+                                                                                                    value={item.value}
+                                                                                                >
+                                                                                                    {item.label}
+                                                                                                </SelectItem>
+                                                                                            ))}
+                                                                                        </SelectContent>
+                                                                                    </Select>
+
+                                                                                    <Select
+                                                                                        value={yearPart}
+                                                                                        onValueChange={(value) =>
+                                                                                            handleDateChange("year", value)
+                                                                                        }
+                                                                                        disabled={passenger.isCurrentUser && !!user}
+                                                                                    >
+                                                                                        <SelectTrigger
+                                                                                            className={cn(
+                                                                                                "flex-1 h-12 md:h-14 lg:h-16 text-sm md:text-base border-2 focus:ring-2",
+                                                                                                isError
+                                                                                                    ? "border-destructive focus:ring-destructive/20"
+                                                                                                    : "border-[var(--cl-third)] focus:border-[var(--cl-pri)] focus:ring-[var(--cl-pri)]"
+                                                                                            )}
+                                                                                        >
+                                                                                            <SelectValue placeholder="Year" />
+                                                                                        </SelectTrigger>
+                                                                                        <SelectContent className="max-h-[250px] overflow-y-auto">
+                                                                                            {years.map((item) => (
+                                                                                                <SelectItem
+                                                                                                    key={item.value}
+                                                                                                    value={item.value}
+                                                                                                >
+                                                                                                    {item.label}
+                                                                                                </SelectItem>
+                                                                                            ))}
+                                                                                        </SelectContent>
+                                                                                    </Select>
+
+                                                                                    {isError && (
+                                                                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                                                                            <AlertCircle
+                                                                                                className="h-5 w-5 text-destructive"
+                                                                                                aria-hidden="true"
+                                                                                            />
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+                                                                                <ErrorMessage
+                                                                                    name={`passengers.${index}.dob`}
+                                                                                    component="p"
+                                                                                    className="text-destructive text-xs italic mt-1"
+                                                                                />
                                                                             </div>
                                                                         );
                                                                     }}
