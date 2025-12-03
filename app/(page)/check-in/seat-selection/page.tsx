@@ -255,17 +255,31 @@ const CheckInSeatSelectionPage = () => {
             });
 
             if (response.status === 200 || response.status === 201) {
-                // Navigate to confirmation page
-                router.push(`/check-in/confirmation?bookingCode=${encodeURIComponent(bookingCode)}&ticketCount=${response.data.ticketCount || 0}`);
+                // Check if booking was already checked in (idempotent operation)
+                if (response.data?.alreadyCheckedIn) {
+                    // Booking was already checked in, redirect to confirmation with appropriate message
+                    router.push(`/check-in/confirmation?bookingCode=${encodeURIComponent(bookingCode)}&ticketCount=${response.data.ticketCount || 0}&alreadyCheckedIn=true`);
+                } else {
+                    // New check-in completed successfully
+                    router.push(`/check-in/confirmation?bookingCode=${encodeURIComponent(bookingCode)}&ticketCount=${response.data.ticketCount || 0}`);
+                }
             } else {
                 setSubmitError(response.data?.message || "Làm thủ tục thất bại. Vui lòng thử lại.");
             }
         } catch (err: any) {
             console.error("Error checking in:", err);
-            const errorMessage = err.response?.data?.message || 
-                                err.message || 
-                                "Làm thủ tục thất bại. Vui lòng thử lại.";
-            setSubmitError(errorMessage);
+            
+            // Check if error is about already checked in (for backward compatibility)
+            const errorMessage = err.response?.data?.message || err.message || "";
+            if (errorMessage.includes("already been checked in") || errorMessage.includes("Tickets have already been issued")) {
+                // If booking was already checked in, try to get ticket count from booking data
+                // and redirect to confirmation page
+                const ticketCount = bookingData?.tickets?.length || bookingData?.passengers?.filter((p: any) => p.passengerType !== 'INF').length || 0;
+                router.push(`/check-in/confirmation?bookingCode=${encodeURIComponent(bookingCode)}&ticketCount=${ticketCount}&alreadyCheckedIn=true`);
+                return;
+            }
+            
+            setSubmitError(errorMessage || "Làm thủ tục thất bại. Vui lòng thử lại.");
         } finally {
             setIsSubmitting(false);
         }
