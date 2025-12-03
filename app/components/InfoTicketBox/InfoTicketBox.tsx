@@ -1,6 +1,7 @@
 "use client"
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
+import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 import { Check, ChevronDown, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -13,8 +14,12 @@ const InfoTicketBox = () => {
     const { data, isHydrated } = useInfoTicket();
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const { data: dataPerson } = useInfoTicket();
+    const { data: searchBarData, isHydrated: isSearchBarHydrated } = useFightSearchBarStore();
     const { user, accessToken } = useUserStore();
     const isLoggedIn = Boolean(accessToken || user?.id);
+    
+    // Get total person count from search bar data (adults + children + infants)
+    const totalPerson = searchBarData?.totalPerson || data.totalPerson || 1;
 
     const handleOpen = () => {
         setIsOpen(!isOpen)
@@ -147,7 +152,7 @@ const InfoTicketBox = () => {
                                                                 {data.typeTicket}
                                                             </p>
                                                             <p className="text-base text-white font-bold text-center">
-                                                                {FormatPrice(Number(data.price))} x {data.totalPerson} Person
+                                                                {FormatPrice(Number(data.price))} x {totalPerson} {totalPerson === 1 ? 'Person' : 'People'}
                                                             </p>
                                                             <ChevronDown className={`w-[1.2=4rem] h-[1.4rem] text-white transition-[rotate] ease-linear ${isOpen && "rotate-[180deg]"}`} />
                                                         </div>
