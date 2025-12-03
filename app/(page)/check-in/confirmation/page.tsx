@@ -10,6 +10,7 @@ const CheckInConfirmationPage = () => {
     const router = useRouter();
     const bookingCode = searchParams.get("bookingCode");
     const ticketCount = searchParams.get("ticketCount") || "0";
+    const alreadyCheckedIn = searchParams.get("alreadyCheckedIn") === "true";
 
     return (
         <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
@@ -22,11 +23,14 @@ const CheckInConfirmationPage = () => {
                         </div>
                         
                         <h1 className="text-2xl md:text-3xl font-bold mb-4">
-                            Làm thủ tục thành công!
+                            {alreadyCheckedIn ? "Đặt chỗ đã được làm thủ tục" : "Làm thủ tục thành công!"}
                         </h1>
                         
                         <p className="text-base md:text-lg text-gray-600 mb-6">
-                            Vé máy bay của bạn đã được tạo thành công.
+                            {alreadyCheckedIn 
+                                ? "Đặt chỗ này đã được làm thủ tục trước đó. Vé máy bay đã được phát hành."
+                                : "Vé máy bay của bạn đã được tạo thành công."
+                            }
                         </p>
 
                         {bookingCode && (
