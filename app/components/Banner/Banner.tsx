@@ -3,7 +3,7 @@ import axios from "axios";
 import { showError, getErrorMessage } from "@/lib/toast";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import FlightSearchBar from "../FlightSearchBar/FlightSearchBar";
+import EnhancedFlightSearchBar from "../FlightSearchBar/EnhancedFlightSearchBar";
 import { BannerApi } from "@/types/banner";
 
 const BannerHome = () => {
@@ -52,7 +52,7 @@ const BannerHome = () => {
                         data-aos-delay="500"
                         suppressHydrationWarning
                     >
-                        <FlightSearchBar />
+                        <EnhancedFlightSearchBar showTabs={true} />
                     </div>
                 </div>
             </div>

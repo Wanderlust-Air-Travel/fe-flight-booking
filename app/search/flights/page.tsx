@@ -1,6 +1,6 @@
 "use client";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
-import FlightSearchBar from "@/app/components/FlightSearchBar/FlightSearchBar";
+import EnhancedFlightSearchBar from "@/app/components/FlightSearchBar/EnhancedFlightSearchBar";
 import ServiceSlide from "@/app/components/Services/ServiceSlide";
 import TripList from "@/app/components/TripList/TripList";
 import { TripListProps } from "@/types/trip-list-type";
@@ -91,7 +91,7 @@ const ServiceDetailsResultSearchContent = () => {
       <Breadcrumb />
       <section className="w-full">
         <div className="container">
-          <FlightSearchBar />
+          <EnhancedFlightSearchBar showTabs={false} />
         </div>
       </section>
       <section className="">
