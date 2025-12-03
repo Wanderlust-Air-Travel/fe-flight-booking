@@ -13,8 +13,8 @@ const openSans = Open_Sans({
 
 
 export const metadata: Metadata = {
-  title: "Bammboo",
-  description: "Booking ticket",
+  title: "Wanderlust",
+  description: "Wanderlust Airways",
 };
 
 export default function RootLayout({
