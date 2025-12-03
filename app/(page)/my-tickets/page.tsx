@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb"
 import axiosInstance from "@/lib/axios-instance"
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice"
@@ -31,7 +32,8 @@ import type { MyTicketsResponse } from "@/types/my-tickets-type"
 import useUserStore from "@/app/zustand/storeUser"
 
 const MyTicketsPage = () => {
-  const { user } = useUserStore()
+  const { user, accessToken, hydrated } = useUserStore()
+  const router = useRouter()
   const [data, setData] = useState<MyTicketsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -45,7 +47,23 @@ const MyTicketsPage = () => {
   const [otpSent, setOtpSent] = useState<string | null>(null)
   const pageSize = 10
 
+  // Check authentication before fetching
+  useEffect(() => {
+    if (hydrated && !accessToken && !user?.id) {
+      // User is not logged in, redirect to login
+      router.push(`/signin?redirect=${encodeURIComponent('/my-tickets')}`)
+      return
+    }
+  }, [hydrated, accessToken, user?.id, router])
+
   const fetchTickets = async (page: number) => {
+    // Don't fetch if not authenticated
+    if (!accessToken && !user?.id) {
+      setError("Vui lòng đăng nhập để xem vé của bạn.")
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       setError(null)
@@ -53,15 +71,31 @@ const MyTicketsPage = () => {
       setData(response.data)
     } catch (err: any) {
       console.error("Error fetching tickets:", err)
-      setError(err.response?.data?.message || "Không thể tải danh sách vé. Vui lòng thử lại sau.")
+      const status = err?.response?.status
+      
+      // Handle 401 Unauthorized - redirect to login
+      if (status === 401) {
+        setError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.")
+        setTimeout(() => {
+          router.push(`/signin?redirect=${encodeURIComponent('/my-tickets')}`)
+        }, 2000)
+      } else {
+        setError(err.response?.data?.message || "Không thể tải danh sách vé. Vui lòng thử lại sau.")
+      }
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchTickets(currentPage)
-  }, [currentPage])
+    // Only fetch if user is authenticated
+    if (hydrated && (accessToken || user?.id)) {
+      fetchTickets(currentPage)
+    } else if (hydrated) {
+      // Not authenticated, stop loading
+      setLoading(false)
+    }
+  }, [currentPage, hydrated, accessToken, user?.id])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)

@@ -33,6 +33,13 @@ export function useRealtime() {
 		// Get session ID from sessionStorage (for guest users)
 		const sessionId = typeof window !== 'undefined' ? sessionStorage.getItem('guest_session_id') : null;
 
+		// Check if we've exceeded max reconnection attempts
+		if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+			console.warn('[Realtime] Max reconnection attempts reached. Skipping connection.');
+			setError('WebSocket connection unavailable. Please refresh the page.');
+			return;
+		}
+
 		// Create socket connection
 		const newSocket = io(socketUrl, {
 			auth: {
@@ -44,35 +51,63 @@ export function useRealtime() {
 			reconnectionAttempts: maxReconnectAttempts,
 			reconnectionDelay: 1000,
 			reconnectionDelayMax: 5000,
+			timeout: 10000,
 		});
 
 		// Connection event handlers
 		newSocket.on('connect', () => {
 			setIsConnected(true);
 			setError(null);
-			reconnectAttemptsRef.current = 0;
+			reconnectAttemptsRef.current = 0; // Reset on successful connection
 			console.log('[Realtime] Connected to WebSocket server');
 		});
 
 		newSocket.on('disconnect', (reason) => {
 			setIsConnected(false);
+			// Only try to reconnect if it's not a client-side disconnect
 			if (reason === 'io server disconnect') {
-				// Server disconnected, try to reconnect
-				newSocket.connect();
+				// Server disconnected, socket.io will auto-reconnect
+				console.log('[Realtime] Server disconnected, will attempt to reconnect');
+			} else if (reason === 'io client disconnect') {
+				// Client manually disconnected, don't reconnect
+				console.log('[Realtime] Client disconnected');
+			} else {
+				// Network error or other, socket.io will auto-reconnect
+				console.log('[Realtime] Disconnected:', reason);
 			}
-			console.log('[Realtime] Disconnected from WebSocket server:', reason);
 		});
 
 		newSocket.on('connect_error', (err) => {
-			setError(err.message);
 			reconnectAttemptsRef.current += 1;
+			const attemptsLeft = maxReconnectAttempts - reconnectAttemptsRef.current;
+			
 			if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
-				console.error('[Realtime] Max reconnection attempts reached');
+				// Disable reconnection after max attempts
+				newSocket.io.opts.reconnection = false;
+				setError('WebSocket connection failed. Real-time features are unavailable.');
+				console.error('[Realtime] Max reconnection attempts reached. Disabling reconnection.');
+			} else {
+				// Still attempting to reconnect
+				setError(`Connecting... (${attemptsLeft} attempts remaining)`);
+				console.warn(`[Realtime] Connection error (attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts}):`, err.message);
 			}
 		});
 
+		newSocket.on('reconnect_attempt', (attemptNumber) => {
+			console.log(`[Realtime] Reconnection attempt ${attemptNumber}`);
+		});
+
+		newSocket.on('reconnect_failed', () => {
+			console.error('[Realtime] Reconnection failed after all attempts');
+			setError('WebSocket connection unavailable. Real-time features are disabled.');
+			newSocket.io.opts.reconnection = false;
+		});
+
 		newSocket.on('error', (err) => {
-			setError(err.message || 'WebSocket error');
+			// Only set error if not already at max attempts
+			if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+				setError(err.message || 'WebSocket error');
+			}
 			console.error('[Realtime] Error:', err);
 		});
 
@@ -84,7 +119,10 @@ export function useRealtime() {
 
 		// Cleanup on unmount
 		return () => {
-			newSocket.close();
+			if (newSocket) {
+				newSocket.removeAllListeners();
+				newSocket.close();
+			}
 		};
 	}, [accessToken]);
 
