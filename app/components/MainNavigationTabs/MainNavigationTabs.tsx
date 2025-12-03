@@ -1,71 +1,63 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
 import { Plane, Ticket, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { TabItem } from "@/types/main-navigation-tabs-type";
 
-const tabs: TabItem[] = [
+type MainTab = "book-ticket" | "check-in" | "my-bookings";
+
+interface MainNavigationTabsProps {
+  activeTab: MainTab;
+  onTabChange: (tab: MainTab) => void;
+}
+
+const tabs: Array<{ id: MainTab; label: string; icon: typeof Plane }> = [
   {
     id: "book-ticket",
     label: "Đặt Vé",
-    path: "/",
     icon: Plane,
-    paths: ["/", "/search", "/booking", "/choosecabin", "/service"],
   },
   {
     id: "check-in",
     label: "Làm Thủ Tục",
-    path: "/check-in",
     icon: Ticket,
-    paths: ["/check-in"],
   },
   {
     id: "my-bookings",
     label: "Đặt Chỗ Của Tôi",
-    path: "/my-bookings",
     icon: Calendar,
-    paths: ["/my-bookings", "/my-tickets", "/my-journey"],
   },
 ];
 
-const MainNavigationTabs = () => {
-  const pathname = usePathname();
-  const router = useRouter();
-
-  const isActive = (tab: TabItem): boolean => {
-    return tab.paths.some((path) => pathname.startsWith(path));
-  };
-
-  const activeTab = tabs.find((tab) => isActive(tab)) || tabs[0];
-
+const MainNavigationTabs = ({ activeTab, onTabChange }: MainNavigationTabsProps) => {
   return (
-    <div className="w-full bg-white border-b border-gray-200">
-      <div className="container">
-        <div className="flex items-center gap-0">
+    <div className="w-full">
+      <div className="container px-0">
+        <div className="flex items-end gap-0">
           {tabs.map((tab, index) => {
             const Icon = tab.icon;
-            const active = isActive(tab);
+            const active = activeTab === tab.id;
             
             return (
-              <Link
+              <button
                 key={tab.id}
-                href={tab.path}
+                type="button"
+                onClick={() => onTabChange(tab.id)}
                 className={cn(
-                  "flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors relative",
-                  "hover:bg-gray-50",
+                  "flex-1 flex items-center justify-center gap-2 px-4 py-5 text-base md:text-lg font-semibold transition-all duration-300 relative",
                   active
-                    ? "bg-white text-[var(--cl-pri)] border-b-2 border-[var(--cl-pri)]"
-                    : "text-gray-600 hover:text-[var(--cl-pri)]",
-                  index === 0 && "rounded-tl-lg",
-                  index === tabs.length - 1 && "rounded-tr-lg"
+                    ? "bg-transparent text-[var(--cl-pri)]"
+                    : "bg-gradient-to-r from-[var(--cl-pri)]/90 to-[var(--cl-pri)] text-white hover:from-[var(--cl-pri)] hover:to-[var(--cl-four)]",
+                  index === 0 && active && "rounded-tl-lg",
+                  index === tabs.length - 1 && active && "rounded-tr-lg"
                 )}
+                style={{
+                  marginBottom: active ? 0 : undefined,
+                }}
               >
-                <Icon className={cn("w-5 h-5", active ? "text-[var(--cl-pri)]" : "text-gray-500")} />
+                <Icon className={cn("w-5 h-5 md:w-6 md:h-6 flex-shrink-0", active ? "text-[var(--cl-pri)]" : "text-white")} />
                 <span className="hidden sm:inline">{tab.label}</span>
                 <span className="sm:hidden">{tab.label.split(" ")[0]}</span>
-              </Link>
+              </button>
             );
           })}
         </div>

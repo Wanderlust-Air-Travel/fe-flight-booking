@@ -25,7 +25,18 @@ const MyBookingsPage = () => {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"booking-code" | "ticket-number">("booking-code");
+  const [activeTab, setActiveTab] = useState<"booking-code-ticket" | "membership">("booking-code-ticket");
+  const [activeMainTab, setActiveMainTab] = useState<"book-ticket" | "check-in" | "my-bookings">("my-bookings");
+
+  const handleMainTabChange = (tab: "book-ticket" | "check-in" | "my-bookings") => {
+    setActiveMainTab(tab);
+    if (tab === "book-ticket") {
+      router.push("/");
+    } else if (tab === "check-in") {
+      router.push("/check-in");
+    }
+    // If tab is "my-bookings", stay on current page
+  };
 
   useEffect(() => {
     if (bookingCode && searchParams.get("bookingCode")) {
@@ -67,7 +78,7 @@ const MyBookingsPage = () => {
 
   return (
     <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)] min-h-screen bg-gray-50">
-      <MainNavigationTabs />
+      <MainNavigationTabs activeTab={activeMainTab} onTabChange={handleMainTabChange} />
       <Breadcrumb />
       
       <div className="container py-8">
@@ -83,35 +94,51 @@ const MyBookingsPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-2 border-b mb-4">
+              <div className="flex items-center gap-1 border-b-2 border-[var(--cl-pri)]/10 bg-gradient-to-r from-white to-blue-50/20 rounded-t-lg overflow-hidden shadow-sm mb-6">
                 <button
                   type="button"
-                  onClick={() => setActiveTab("booking-code")}
-                  className={`px-4 py-2 text-sm font-medium transition-colors ${
-                    activeTab === "booking-code"
-                      ? "text-[var(--cl-pri)] border-b-2 border-[var(--cl-pri)]"
-                      : "text-gray-600 hover:text-[var(--cl-pri)]"
+                  onClick={() => setActiveTab("booking-code-ticket")}
+                  className={`relative px-6 py-3 text-base font-semibold transition-all duration-300 flex items-center justify-center ${
+                    activeTab === "booking-code-ticket"
+                      ? "text-[var(--cl-pri)] bg-gradient-to-b from-[var(--cl-pri)]/10 to-transparent shadow-sm"
+                      : "text-gray-600 hover:text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/5"
                   }`}
                 >
-                  Mã Đặt Chỗ
+                  {activeTab === "booking-code-ticket" && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--cl-pri)] to-[var(--cl-third)] rounded-t-full" />
+                  )}
+                  <span className="relative z-10">Mã Đặt Chỗ/Số Vé</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("ticket-number")}
-                  className={`px-4 py-2 text-sm font-medium transition-colors ${
-                    activeTab === "ticket-number"
-                      ? "text-[var(--cl-pri)] border-b-2 border-[var(--cl-pri)]"
-                      : "text-gray-600 hover:text-[var(--cl-pri)]"
+                  onClick={() => setActiveTab("membership")}
+                  className={`relative px-6 py-3 text-base font-semibold transition-all duration-300 flex items-center justify-center ${
+                    activeTab === "membership"
+                      ? "text-[var(--cl-pri)] bg-gradient-to-b from-[var(--cl-pri)]/10 to-transparent shadow-sm"
+                      : "text-gray-600 hover:text-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/5"
                   }`}
                 >
-                  Số Vé
+                  {activeTab === "membership" && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--cl-pri)] to-[var(--cl-third)] rounded-t-full" />
+                  )}
+                  <span className="relative z-10">Hội Viên Bamboo Club</span>
                 </button>
               </div>
 
-              {activeTab === "booking-code" ? (
-                <div className="space-y-4">
+              {activeTab === "booking-code-ticket" ? (
+                <div className="space-y-6">
+                  <div className="text-center mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--cl-pri)]/10 mb-3">
+                      <svg className="w-8 h-8 text-[var(--cl-pri)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <Label htmlFor="bookingCode" className="text-lg font-semibold text-[var(--cl-pri)]">
+                      Mã Đặt Chỗ (PNR Code)
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">Nhập mã đặt chỗ 6 ký tự để tra cứu</p>
+                  </div>
                   <div>
-                    <Label htmlFor="bookingCode">Mã Đặt Chỗ (PNR Code)</Label>
                     <Input
                       id="bookingCode"
                       type="text"
@@ -121,7 +148,7 @@ const MyBookingsPage = () => {
                         setBookingCode(e.target.value.toUpperCase());
                         setError(null);
                       }}
-                      className="mt-2 text-center text-lg font-mono tracking-wider"
+                      className="text-center text-xl font-mono tracking-widest border-2 border-[var(--cl-pri)]/30 focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]/20 h-14 transition-all"
                       maxLength={10}
                       disabled={isLoading}
                       onKeyDown={(e) => {
@@ -134,43 +161,41 @@ const MyBookingsPage = () => {
                   <Button
                     onClick={handleSearch}
                     disabled={isLoading || !bookingCode.trim()}
-                    className="w-full bg-[var(--cl-pri)] hover:bg-[var(--cl-four)]"
+                    className="w-full bg-gradient-to-r from-[var(--cl-pri)] to-[var(--cl-third)] hover:from-[var(--cl-four)] hover:to-[var(--cl-five)] text-white font-semibold py-6 text-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Search className="w-4 h-4 mr-2" />
-                    {isLoading ? "Đang tìm kiếm..." : "Tìm Kiếm"}
+                    {isLoading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Đang tìm kiếm...
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        <Search className="w-5 h-5" />
+                        Tìm Kiếm
+                      </span>
+                    )}
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="ticketNumber">Số Vé</Label>
-                    <Input
-                      id="ticketNumber"
-                      type="text"
-                      placeholder="Nhập số vé"
-                      className="mt-2"
-                      disabled={true}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Tính năng tìm kiếm theo số vé đang được phát triển
-                    </p>
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">Họ</Label>
-                    <Input
-                      id="lastName"
-                      type="text"
-                      placeholder="NGUYEN"
-                      className="mt-2"
-                      disabled={true}
-                    />
+                <div className="space-y-6">
+                  <div className="text-center mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--cl-pri)]/10 mb-3">
+                      <svg className="w-8 h-8 text-[var(--cl-pri)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <Label className="text-lg font-semibold text-[var(--cl-pri)]">
+                      Hội Viên Bamboo Club
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">Đăng nhập vào Bamboo Club để xem chuyến bay sắp tới của bạn</p>
                   </div>
                   <Button
-                    disabled={true}
-                    className="w-full bg-gray-400 cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-[var(--cl-four)] to-[var(--cl-five)] hover:from-[var(--cl-five)] hover:to-[var(--cl-four)] text-white font-semibold py-6 text-lg shadow-md hover:shadow-lg transition-all duration-300"
                   >
-                    <Search className="w-4 h-4 mr-2" />
-                    Tìm Kiếm
+                    Login
                   </Button>
                 </div>
               )}
@@ -289,7 +314,7 @@ const MyBookingsPage = () => {
                 <div className="flex justify-between items-center pt-4 border-t">
                   <span className="text-lg font-semibold">Tổng tiền:</span>
                   <span className="text-2xl font-bold text-[var(--cl-pri)]">
-                    <FormatPrice price={booking.totalAmount} currency={booking.currency} />
+                    {FormatPrice(booking.totalAmount)}
                   </span>
                 </div>
 

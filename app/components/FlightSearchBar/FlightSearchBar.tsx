@@ -241,8 +241,8 @@ const FlightSearchBar = () => {
               type="checkbox"
               className="peer hidden"
             />
-            <div className="hidden peer-checked:block fixed inset-0 z-10 w-[100vw] h-[100vh]" />
-            <div className="absolute top-[calc(100%+0.5rem)] left-0 z-20 shadow2 opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto">
+            <div className="hidden peer-checked:block fixed inset-0 z-[100] w-[100vw] h-[100vh]" />
+            <div className="absolute top-[calc(100%+0.5rem)] left-0 z-[101] shadow2 opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto">
               <FlightDatePicker />
             </div>
           </label>
@@ -271,8 +271,8 @@ const FlightSearchBar = () => {
               type="checkbox"
               className="peer hidden"
             />
-            <div className="hidden peer-checked:block fixed inset-0 z-10 w-[100vw] h-[100vh]" />
-            <div className="absolute z-20 top-[calc(100%+0.5rem)] shadow2 left-0 right-0 md:left-auto md:right-auto md:w-auto w-[calc(100vw-3.2rem)] md:min-w-[18rem] md:max-w-[20rem] opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto bg-white rounded-md">
+            <div className="hidden peer-checked:block fixed inset-0 z-[100] w-[100vw] h-[100vh]" />
+            <div className="absolute z-[101] top-[calc(100%+0.5rem)] shadow2 left-0 right-0 md:left-auto md:right-auto md:w-auto w-[calc(100vw-3.2rem)] md:min-w-[18rem] md:max-w-[20rem] opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto bg-white rounded-md">
               <Person />
             </div>
           </label>
