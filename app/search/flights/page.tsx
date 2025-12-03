@@ -95,9 +95,9 @@ const ServiceDetailsResultSearchContent = () => {
         </div>
       </section>
       <section className="">
-        <div className="container">
-          <div className="flex flex-col gap-y-[2rem]">
-            <h2 className="text-lg text-[var(--cl-pri)] font-bold uppercase">
+        <div className="container px-[1.2rem] sm:px-[2rem]">
+          <div className="flex flex-col gap-y-[1.6rem] sm:gap-y-[2rem]">
+            <h2 className="text-base sm:text-lg text-[var(--cl-pri)] font-bold uppercase">
               Trip list
             </h2>
             {trips && <TripList trips={trips} loading={loading} />}

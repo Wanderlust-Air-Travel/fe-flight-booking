@@ -436,7 +436,7 @@ const CheckInSeatSelectionPage = () => {
                                 <Button
                                     onClick={handleCheckIn}
                                     disabled={isSubmitting || selectedSeatsForCurrentFlight.length < Array.from(passengersNeedingSeatsByFlight.values()).reduce((a, b) => a + b, 0)}
-                                    className="w-full"
+                                    className="w-full bg-[var(--cl-pri)] text-white hover:bg-[var(--cl-pri)]/90 disabled:opacity-50 disabled:cursor-not-allowed py-5 md:py-6 text-base md:text-lg font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                                 >
                                     {isSubmitting ? "Đang xử lý..." : "Hoàn tất làm thủ tục"}
                                 </Button>

@@ -197,7 +197,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
     return (
         <ul className="border-[var(--cl-third)] border-[0.1rem] rounded-[1rem] overflow-hidden">
-            <li className="flex gap-x-[1.2rem] items-center p-[1.6rem] bg-[var(--cl-pri)]">
+            <li className="hidden md:flex gap-x-[1.2rem] items-center p-[1.2rem] sm:p-[1.6rem] bg-[var(--cl-pri)]">
                 <div className="w-[5%]">
                     <p className="text-white font-bold text-base uppercase">Logo</p>
                 </div>
@@ -260,66 +260,73 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                             key={index}
                                             className="flex flex-col w-full border-b-[0.1rem] border-[var(--cl-third)] last:border-none"
                                         >
-                                            <div className="flex gap-x-[1.2rem] items-center p-[1.6rem] w-full">
-                                                <div className="w-[5%]">
+                                            <div className="flex flex-col md:flex-row gap-y-[1.2rem] md:gap-y-0 md:gap-x-[1.2rem] items-start md:items-center p-[1.2rem] md:p-[1.6rem] w-full">
+                                                {/* Logo - Hidden on mobile, visible on tablet+ */}
+                                                <div className="hidden md:block w-[5%] flex-shrink-0">
                                                     <Image src="/logoBrand.png" alt="logoBrand" width={40} height={40} unoptimized priority />
                                                 </div>
 
-                                                <div className="w-[20%]">
+                                                {/* Time & Brand */}
+                                                <div className="w-full md:w-[20%] flex-shrink-0">
                                                     <div className="flex flex-col gap-y-[0.2rem]">
-                                                        <p className="text-[var(--cl-five)] font-bold text-base">{convertToLocalTime(trip.departureLocal)}AM - {convertToLocalTime(trip.arrivalLocal)}PM</p>
-                                                        <p className="text-[var(--cl-third)] text-base">Wanderlust</p>
+                                                        <p className="text-[var(--cl-five)] font-bold text-sm md:text-base">{convertToLocalTime(trip.departureLocal)}AM - {convertToLocalTime(trip.arrivalLocal)}PM</p>
+                                                        <p className="text-[var(--cl-third)] text-xs md:text-base">Wanderlust</p>
                                                     </div>
                                                 </div>
 
-                                                <div className="w-[20%]">
+                                                {/* Route Info */}
+                                                <div className="w-full md:w-[20%] flex-shrink-0">
                                                     <div className="flex flex-col gap-y-[0.2rem]">
-                                                        <p className="text-[var(--cl-five)] font-bold text-base">
+                                                        <p className="text-[var(--cl-five)] font-bold text-sm md:text-base">
                                                             {trip.origin?.iata || 'N/A'} - {trip.destination?.iata || 'N/A'}
                                                         </p>
-                                                        {trip.departureLocal && <p className="text-[var(--cl-third)] text-mn">Start date: {convertToDMY(trip.departureLocal)}</p>}
-                                                        {trip.arrivalLocal && <p className="text-[var(--cl-third)] text-mn">end date: {convertToDMY(trip.arrivalLocal)}</p>}
+                                                        {trip.departureLocal && <p className="text-[var(--cl-third)] text-xs md:text-sm">Start: {convertToDMY(trip.departureLocal)}</p>}
+                                                        {trip.arrivalLocal && <p className="text-[var(--cl-third)] text-xs md:text-sm">End: {convertToDMY(trip.arrivalLocal)}</p>}
                                                     </div>
                                                 </div>
 
-                                                <div className="w-[15%]">
+                                                {/* Transit Info - Hidden on mobile */}
+                                                <div className="hidden md:flex md:w-[15%] flex-shrink-0">
                                                     <div className="flex flex-col gap-y-[0.2rem]">
                                                         <p className="text-[var(--cl-five)] font-bold text-base">{trip.stopCount || 0}</p>
                                                         <p className="text-[var(--cl-third)] text-base">{trip.stopDuration || "None"}</p>
                                                     </div>
                                                 </div>
 
-                                                <div className="w-[10%]">
+                                                {/* Trip Type - Hidden on mobile */}
+                                                <div className="hidden md:block md:w-[10%] flex-shrink-0">
                                                     <p className="text-[var(--cl-five)] font-bold text-base">{trips.tripType}</p>
                                                 </div>
 
-                                                <div className="w-full flex-1">
-                                                    <div className="flex gap-x-[1rem] items-center">
+                                                {/* Cabin Selection Buttons */}
+                                                <div className="w-full md:w-auto md:flex-1">
+                                                    <div className="flex flex-col sm:flex-row gap-y-[0.8rem] sm:gap-y-0 sm:gap-x-[1rem] items-stretch sm:items-center">
                                                         {trip.cabinTypes && trip.cabinTypes.length > 0 ? (
                                                             trip.cabinTypes.map((cabinInfo, cabinIndex) => {
                                                                 const displayInfo = getCabinDisplayInfo(cabinInfo.cabinType);
                                                                 const cabinTypesLength = trip.cabinTypes?.length || 0;
+                                                                // Responsive width: full width on mobile, auto on larger screens
                                                                 const widthClass = cabinTypesLength === 1 
-                                                                    ? 'w-full' 
+                                                                    ? 'w-full sm:w-full' 
                                                                     : cabinTypesLength === 2 
-                                                                    ? 'w-[50%]' 
-                                                                    : 'w-[33.333%]';
+                                                                    ? 'w-full sm:w-[calc(50%-0.5rem)]' 
+                                                                    : 'w-full sm:w-[calc(33.333%-0.67rem)]';
                                                                 
                                                                 return (
                                                                     <div
                                                                         key={`${trip.flightInstanceId}-${cabinInfo.cabinType}-${cabinIndex}`}
-                                                                        className={`${displayInfo.bgColor} ${displayInfo.hoverColor} flex flex-col items-center p-[1.2rem] ${widthClass} rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
+                                                                        className={`${displayInfo.bgColor} ${displayInfo.hoverColor} flex flex-col items-center justify-center p-[1rem] sm:p-[1.2rem] ${widthClass} rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear min-h-[8rem] sm:min-h-auto`}
                                                                         onClick={() => {
                                                                             handleCabinClick(trip.flightInstanceId, cabinInfo.cabinType, index);
                                                                         }}
                                                                     >
-                                                                        <p className="text-base text-white font-bold text-center">
+                                                                        <p className="text-sm sm:text-base text-white font-bold text-center">
                                                                             {displayInfo.name}
                                                                         </p>
-                                                                        <span className="text-sm text-white text-center">
+                                                                        <span className="text-xs sm:text-sm text-white text-center">
                                                                             Total seats: {cabinInfo.availableSeats}
                                                                         </span>
-                                                                        <ChevronDown className="w-[1.2rem] h-[1.4rem] text-white" />
+                                                                        <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
                                                                     </div>
                                                                 );
                                                             })
@@ -327,28 +334,28 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                             // Fallback: Show default Economy and Business if cabinTypes is not available (backward compatibility)
                                                             <>
                                                                 <div
-                                                                    className={`bg-[var(--cl-five)] hover:bg-green-700 flex flex-col items-center p-[1.2rem] w-[50%] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
+                                                                    className={`bg-[var(--cl-five)] hover:bg-green-700 flex flex-col items-center justify-center p-[1rem] sm:p-[1.2rem] w-full sm:w-[calc(50%-0.5rem)] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear min-h-[8rem] sm:min-h-auto`}
                                                                     onClick={() => {
                                                                         handleCabinClick(trip.flightInstanceId, 'economy', index);
                                                                     }}
                                                                 >
-                                                                    <p className="text-base text-white font-bold text-center">
+                                                                    <p className="text-sm sm:text-base text-white font-bold text-center">
                                                                         Economy
                                                                     </p>
-                                                                    <span className="text-sm text-white text-center">Total seats: {trip.availableSeats}</span>
-                                                                    <ChevronDown className="w-[1.2rem] h-[1.4rem] text-white" />
+                                                                    <span className="text-xs sm:text-sm text-white text-center">Total seats: {trip.availableSeats}</span>
+                                                                    <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
                                                                 </div>
                                                                 <div
-                                                                    className={`bg-[var(--cl-pri)] hover:bg-blue-950 flex flex-col items-center p-[1.2rem] w-[50%] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
+                                                                    className={`bg-[var(--cl-pri)] hover:bg-blue-950 flex flex-col items-center justify-center p-[1rem] sm:p-[1.2rem] w-full sm:w-[calc(50%-0.5rem)] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear min-h-[8rem] sm:min-h-auto`}
                                                                     onClick={() => {
                                                                         handleCabinClick(trip.flightInstanceId, 'business', index);
                                                                     }}
                                                                 >
-                                                                    <p className="text-base text-white font-bold text-center">
+                                                                    <p className="text-sm sm:text-base text-white font-bold text-center">
                                                                         Business
                                                                     </p>
-                                                                    <span className="text-sm text-white text-center">Total seats: {trip.availableSeats}</span>
-                                                                    <ChevronDown className="w-[1.2rem] h-[1.4rem] text-white" />
+                                                                    <span className="text-xs sm:text-sm text-white text-center">Total seats: {trip.availableSeats}</span>
+                                                                    <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
                                                                 </div>
                                                             </>
                                                         )}
@@ -367,22 +374,22 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                         : 'max-h-0 opacity-0'
                                                 }`}
                                             >
-                                                <div className="flex flex-col justify-center items-center gap-y-[1.2rem] p-[1.6rem] w-full border-t-[0.1rem] border-[var(--cl-third)]">
+                                                <div className="flex flex-col justify-center items-center gap-y-[1.2rem] p-[1.2rem] sm:p-[1.6rem] w-full border-t-[0.1rem] border-[var(--cl-third)]">
                                                     <p className={`${type === "economy"
                                                         ? "text-[var(--cl-five)]"
                                                         : "text-[var(--cl-pri)]"
-                                                        } uppercase font-bold text-center text-[2.4rem]`}
+                                                        } uppercase font-bold text-center text-xl sm:text-2xl md:text-[2.4rem]`}
                                                     >
                                                         Choose Cabin
                                                     </p>
 
-
-                                                    <ul className="flex justify-center -mx-[1.2rem] w-full">
+                                                    {/* Responsive grid: 1 column on mobile, 2 on tablet, 3 on desktop */}
+                                                    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.2rem] sm:gap-[1.6rem] w-full">
                                                         {tickets?.map((ticket, index2) => {
                                                             console.log("trip", trip)
                                                             console.log("ticket", ticket);
                                                             return (
-                                                                <li key={index2} className="w-[calc(100%/3)] block px-[1.2rem]">
+                                                                <li key={index2} className="w-full">
                                                                     <Ticket
                                                                         type={type}
                                                                         tickets={ticket}
@@ -405,7 +412,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                             className={`${type === "economy"
                                                                 ? "bg-[var(--cl-five)] hover:bg-green-700"
                                                                 : "bg-[var(--cl-pri)] hover:bg-blue-900"
-                                                                } w-fit h-[4.4rem] text-[1.6rem] px-[2rem] uppercase disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                                } w-full sm:w-fit h-[4rem] sm:h-[4.4rem] text-sm sm:text-base md:text-[1.6rem] px-[1.6rem] sm:px-[2rem] uppercase disabled:opacity-50 disabled:cursor-not-allowed`}
                                                         >
                                                             {isSaving ? 'Saving...' : 'Accept'}
                                                         </Button>
