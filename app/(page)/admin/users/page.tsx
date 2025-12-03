@@ -32,19 +32,7 @@ import {
 import { Plus, X } from "lucide-react";
 import axiosInstance from "@/lib/axios-instance";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-interface Role {
-    roleCode: string;
-    name: string;
-    description: string | null;
-}
-
-interface User {
-    userId: string;
-    email: string;
-    fullname: string;
-    roles?: Role[];
-}
+import { Role, User } from "@/types/admin/user-type";
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);

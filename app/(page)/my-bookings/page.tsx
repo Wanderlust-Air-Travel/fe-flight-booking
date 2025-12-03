@@ -15,30 +15,7 @@ import { showError, showLoading, dismissToast, showSuccess } from "@/lib/toast";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import { convertToDMY, convertToLocalTime } from "@/app/components/FormatDate/FormatDate";
 import Link from "next/link";
-
-interface BookingSegment {
-  segmentId: string;
-  flightNumber: string;
-  origin: string;
-  destination: string;
-  departureDateTime: string;
-  arrivalDateTime: string;
-  cabinClass: string;
-  fareClass: string;
-}
-
-interface Booking {
-  bookingId: string;
-  pnrCode: string;
-  bookingDate: string;
-  status: string;
-  totalAmount: number;
-  currency: string;
-  contactName: string;
-  contactEmail: string;
-  contactPhone: string;
-  segments: BookingSegment[];
-}
+import { Booking, BookingSegment } from "@/types/my-bookings-type";
 
 const MyBookingsPage = () => {
   const searchParams = useSearchParams();

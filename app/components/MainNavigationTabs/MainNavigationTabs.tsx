@@ -4,14 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plane, Ticket, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface TabItem {
-  id: string;
-  label: string;
-  path: string;
-  icon: React.ComponentType<{ className?: string }>;
-  paths: string[]; // Paths that should highlight this tab
-}
+import { TabItem } from "@/types/main-navigation-tabs-type";
 
 const tabs: TabItem[] = [
   {

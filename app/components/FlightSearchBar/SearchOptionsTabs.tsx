@@ -1,13 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-
-export type SearchOption = "flight" | "booking-code" | "ticket-number" | "membership";
-
-interface SearchOptionsTabsProps {
-  activeOption: SearchOption;
-  onOptionChange: (option: SearchOption) => void;
-}
+import { SearchOption, SearchOptionsTabsProps } from "@/types/search-options-tabs-type";
 
 const SearchOptionsTabs = ({ activeOption, onOptionChange }: SearchOptionsTabsProps) => {
   const options: { value: SearchOption; label: string }[] = [

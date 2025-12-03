@@ -26,18 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import axiosInstance from "@/lib/axios-instance";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-interface FareClass {
-    fareClassCode: string;
-    cabinClassCode: string;
-    cabinClass?: {
-        cabinClassCode: string;
-        name: string;
-    };
-    description: string | null;
-    changeRule: string | null;
-    refundRule: string | null;
-}
+import { FareClass } from "@/types/admin/fare-class-type";
 
 export default function FareClassesPage() {
     const [fareClasses, setFareClasses] = useState<FareClass[]>([]);

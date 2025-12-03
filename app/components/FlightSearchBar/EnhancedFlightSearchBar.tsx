@@ -3,16 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import FlightSearchBar from "./FlightSearchBar";
-import SearchOptionsTabs, { SearchOption } from "./SearchOptionsTabs";
+import SearchOptionsTabs from "./SearchOptionsTabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { axiosPublic } from "@/lib/axios-instance";
 import { showError, showLoading, dismissToast, showSuccess } from "@/lib/toast";
-
-interface EnhancedFlightSearchBarProps {
-  showTabs?: boolean;
-}
+import { EnhancedFlightSearchBarProps, SearchOption } from "@/types/enhanced-flight-search-bar-type";
 
 const EnhancedFlightSearchBar = ({ showTabs = true }: EnhancedFlightSearchBarProps) => {
   const [activeOption, setActiveOption] = useState<SearchOption>("flight");

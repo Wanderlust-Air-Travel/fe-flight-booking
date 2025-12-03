@@ -25,23 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Pencil, Trash2, Calendar } from "lucide-react";
 import axiosInstance from "@/lib/axios-instance";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-interface FlightSchedule {
-    flightScheduleId: string;
-    flightNumber: string;
-    route?: {
-        routeId: string;
-        originAirport?: { iataCode: string; name: string };
-        destinationAirport?: { iataCode: string; name: string };
-    };
-    aircraftType?: { code: string; model: string };
-    departureTime: string;
-    arrivalTime: string;
-    operatingDays: string;
-    effectiveFrom: string;
-    effectiveTo: string;
-    status: string;
-}
+import { FlightSchedule } from "@/types/admin/flight-schedule-type";
 
 export default function FlightSchedulesPage() {
     const [schedules, setSchedules] = useState<FlightSchedule[]>([]);

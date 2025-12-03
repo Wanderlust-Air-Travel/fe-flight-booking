@@ -3,7 +3,6 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import useUserStore from "@/app/zustand/storeUser";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { 
     LayoutDashboard, 
@@ -11,7 +10,10 @@ import {
     Plane, 
     Users, 
     LogOut,
-    Home
+    Home,
+    TrendingUp,
+    Luggage,
+    Sparkles
 } from "lucide-react";
 
 export default function AdminLayout({
@@ -31,7 +33,10 @@ export default function AdminLayout({
 
     const menuItems = [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-        { href: "/admin/fare-classes", label: "Quản lý giá vé", icon: DollarSign },
+        { href: "/admin/route-fare-prices", label: "Quản lý giá vé theo route", icon: TrendingUp },
+        { href: "/admin/baggage-allowances", label: "Quản lý quy định hành lý", icon: Luggage },
+        { href: "/admin/cabin-services", label: "Quản lý dịch vụ cabin", icon: Sparkles },
+        { href: "/admin/fare-classes", label: "Quản lý hạng vé", icon: DollarSign },
         { href: "/admin/flight-schedules", label: "Quản lý lịch chuyến bay", icon: Plane },
         { href: "/admin/users", label: "Quản lý người dùng", icon: Users },
     ];
