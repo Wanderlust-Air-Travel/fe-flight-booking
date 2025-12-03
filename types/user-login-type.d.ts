@@ -1,8 +1,15 @@
+export interface Role {
+  roleCode: string;
+  name: string;
+  description: string | null;
+}
+
 interface User {
   id: string;
   email: string;
   fullname: string;
   phone: number;
+  roles?: Role[];
 }
 
 export interface AuthState {
@@ -21,6 +28,8 @@ export interface AuthState {
   logout: () => void;
 
   refreshAccessToken: (refreshToken: string, userId: string) => Promise<string>;
+
+  setUserRoles: (roles: Role[]) => void;
 
   hydrated: boolean;
 }

@@ -1,13 +1,14 @@
 "use client"
 import useIsActiveStore from "@/app/zustand/storeHeader";
 import useUserStore from "@/app/zustand/storeUser";
-import { ChevronDown, CircleUserRound, X, Menu } from "lucide-react";
+import { ChevronDown, CircleUserRound, X, Menu, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { MenuListsInterface } from "@/types/header-type"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import axiosInstance from "@/lib/axios-instance";
 const menuLists: MenuListsInterface[] = [
     {
         title: "Home",
@@ -38,17 +39,57 @@ const menuLists: MenuListsInterface[] = [
 ];
 
 
-const Header = () => {
+// Management roles - không cần "Vé của tôi" và "Hành trình của tôi"
+const MANAGEMENT_ROLES = [
+    'ADMIN',
+    'SCHEDULE_PLANNER',
+    'REVENUE_ANALYST',
+    'ANCILLARY_MANAGER',
+    'CALL_CENTER',
+    'ACCOUNTING_STAFF',
+    'DISTRIBUTION_MANAGER',
+    'FRAUD_ANALYST',
+    'FLIGHT_MANAGER',
+    'FARE_MANAGER',
+    'OPERATIONS',
+];
 
-    const { isLoggedIn, user ,logout } = useUserStore();
+const Header = () => {
+    const { isLoggedIn, user, logout, setUserRoles, accessToken } = useUserStore();
     const router = usePathname();
+    const navigation = useRouter();
     const hydrated = useUserStore((state) => state.hydrated);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [userRoles, setUserRolesState] = useState<Array<{ roleCode: string; name: string; description: string | null }>>([]);
 
-    console.log(hydrated)
+    // Check if user has management roles
+    const hasManagementRole = userRoles.some(role => MANAGEMENT_ROLES.includes(role.roleCode));
+    const isRegularUser = !hasManagementRole && userRoles.length > 0;
 
-    const handleLogout = () =>{
+    // Fetch user roles when logged in
+    useEffect(() => {
+        const fetchUserRoles = async () => {
+            if (isLoggedIn && accessToken && user?.id) {
+                try {
+                    const response = await axiosInstance.get('/api/auth/me');
+                    if (response.data && response.data.roles) {
+                        setUserRolesState(response.data.roles);
+                        setUserRoles(response.data.roles);
+                    }
+                } catch (error) {
+                    console.error('Error fetching user roles:', error);
+                }
+            }
+        };
+
+        if (hydrated && isLoggedIn) {
+            fetchUserRoles();
+        }
+    }, [hydrated, isLoggedIn, accessToken, user?.id, setUserRoles]);
+
+    const handleLogout = () => {
         logout();
+        setUserRolesState([]);
         setIsMobileMenuOpen(false);
     }
 
@@ -63,7 +104,7 @@ const Header = () => {
                     <div className="flex h-full items-center justify-between gap-x-[1.6rem]">
                         <Link
                             className="group max-w-[16rem] w-full !h-auto overflow-hidden block"
-                            href="/"
+                            href={hasManagementRole ? "/admin" : "/"}
                         >
                             <Image
                                 src="/logoHD.png"
@@ -75,9 +116,10 @@ const Header = () => {
                                 className="w-full h-full object-contain transition ease-linear xl:group-hover:scale-95 filter-white"
                             />
                         </Link>
-                        {/* Desktop navigation */}
-                        <ul className="hidden lg:flex gap-x-[1.2rem] items-center ">
-                            {menuLists.map((menuList, index) => {
+                        {/* Desktop navigation - Ẩn menu cho management roles */}
+                        {!hasManagementRole && (
+                            <ul className="hidden lg:flex gap-x-[1.2rem] items-center ">
+                                {menuLists.map((menuList, index) => {
                                 return (
                                     <li
                                         key={index}
@@ -141,22 +183,36 @@ const Header = () => {
                                         <ul
                                             className="absolute top-[100%] right-0 w-full min-w-[16rem] shadow-bg-dark-900 shadow-lg bg-white opacity-0 pointer-events-none transition translate-y-[5%] group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-[0%]"
                                         >
-                                            <li>
-                                                <Link
-                                                    className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
-                                                    href="/my-tickets"
-                                                >
-                                                    Vé của tôi
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
-                                                    href="/my-journey"
-                                                >
-                                                    Hành trình của tôi
-                                                </Link>
-                                            </li>
+                                            {hasManagementRole ? (
+                                                <li>
+                                                    <Link
+                                                        className="p-[1rem] text-base flex items-center gap-2 text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
+                                                        href="/admin"
+                                                    >
+                                                        <Settings className="w-4 h-4" />
+                                                        Quản lý
+                                                    </Link>
+                                                </li>
+                                            ) : (
+                                                <>
+                                                    <li>
+                                                        <Link
+                                                            className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
+                                                            href="/my-tickets"
+                                                        >
+                                                            Vé của tôi
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link
+                                                            className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
+                                                            href="/my-journey"
+                                                        >
+                                                            Hành trình của tôi
+                                                        </Link>
+                                                    </li>
+                                                </>
+                                            )}
                                             <li>
                                                 <button onClick={handleLogout}
                                                     className="p-[1rem] text-base flex items-center text-[var(--cl-red)] text-base hover:text-[var(--cl-white)] hover:bg-[var(--cl-red)] w-full transition ease-linear uppercase text-nowrap cursor-pointer"
@@ -193,7 +249,8 @@ const Header = () => {
 
                                 )
                             }
-                        </ul>
+                            </ul>
+                        )}
                         {/* Mobile actions */}
                         <div className="flex items-center gap-x-2 lg:hidden ml-auto">
                             {hydrated && !isLoggedIn && (
@@ -221,7 +278,7 @@ const Header = () => {
             >
                 <div className="container pb-4">
                     <nav className="flex flex-col gap-y-2 pt-2">
-                        {menuLists.map((menuList, index) => (
+                        {!hasManagementRole && menuLists.map((menuList, index) => (
                             <Link
                                 key={index}
                                 href={menuList.path}
@@ -240,20 +297,33 @@ const Header = () => {
                                         <Image src="/icAva.png" alt="icAva" width={20} height={20} className="flex-shrink-0" priority unoptimized />
                                         {user?.fullname}
                                     </p>
-                                    <Link
-                                        href="/my-tickets"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-four)]"
-                                    >
-                                        Vé của tôi
-                                    </Link>
-                                    <Link
-                                        href="/my-journey"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-four)]"
-                                    >
-                                        Hành trình của tôi
-                                    </Link>
+                                    {hasManagementRole ? (
+                                        <Link
+                                            href="/admin"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-four)] flex items-center gap-2"
+                                        >
+                                            <Settings className="w-4 h-4" />
+                                            Quản lý
+                                        </Link>
+                                    ) : (
+                                        <>
+                                            <Link
+                                                href="/my-tickets"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                                className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-four)]"
+                                            >
+                                                Vé của tôi
+                                            </Link>
+                                            <Link
+                                                href="/my-journey"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                                className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-four)]"
+                                            >
+                                                Hành trình của tôi
+                                            </Link>
+                                        </>
+                                    )}
                                     <Button
                                         variant="destructive"
                                         size="sm"

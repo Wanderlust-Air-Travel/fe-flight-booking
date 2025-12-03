@@ -23,6 +23,12 @@ const useUserStore = create<AuthState>()(
                 });
             },
 
+            setUserRoles: (roles) => {
+                set((state) => ({
+                    user: state.user ? { ...state.user, roles } : null,
+                }));
+            },
+
             logout: () => {
                 set({
                     user: null,
