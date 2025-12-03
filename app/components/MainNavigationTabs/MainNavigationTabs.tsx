@@ -30,9 +30,9 @@ const tabs: Array<{ id: MainTab; label: string; icon: typeof Plane }> = [
 
 const MainNavigationTabs = ({ activeTab, onTabChange }: MainNavigationTabsProps) => {
   return (
-    <div className="w-full">
+    <div className="w-full bg-white rounded-t-lg border-b border-gray-200">
       <div className="container px-0">
-        <div className="flex items-end gap-0">
+        <div className="flex items-center gap-0">
           {tabs.map((tab, index) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
@@ -43,20 +43,21 @@ const MainNavigationTabs = ({ activeTab, onTabChange }: MainNavigationTabsProps)
                 type="button"
                 onClick={() => onTabChange(tab.id)}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 px-4 py-5 text-base md:text-lg font-semibold transition-all duration-300 relative",
+                  "flex-1 flex items-center justify-center gap-2 px-4 py-4 md:py-5 text-base md:text-lg font-semibold transition-all duration-200 relative",
+                  "border-b-2",
                   active
-                    ? "bg-transparent text-[var(--cl-pri)]"
-                    : "bg-gradient-to-r from-[var(--cl-pri)]/90 to-[var(--cl-pri)] text-white hover:from-[var(--cl-pri)] hover:to-[var(--cl-four)]",
-                  index === 0 && active && "rounded-tl-lg",
-                  index === tabs.length - 1 && active && "rounded-tr-lg"
+                    ? "bg-white text-[var(--cl-pri)] border-[var(--cl-pri)]"
+                    : "bg-gray-50 text-gray-600 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100",
+                  index === 0 && "rounded-tl-lg",
+                  index === tabs.length - 1 && "rounded-tr-lg"
                 )}
-                style={{
-                  marginBottom: active ? 0 : undefined,
-                }}
               >
-                <Icon className={cn("w-5 h-5 md:w-6 md:h-6 flex-shrink-0", active ? "text-[var(--cl-pri)]" : "text-white")} />
-                <span className="hidden sm:inline">{tab.label}</span>
-                <span className="sm:hidden">{tab.label.split(" ")[0]}</span>
+                <Icon className={cn(
+                  "w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-colors duration-200",
+                  active ? "text-[var(--cl-pri)]" : "text-gray-600"
+                )} />
+                <span className="hidden sm:inline font-medium">{tab.label}</span>
+                <span className="sm:hidden font-medium">{tab.label.split(" ")[0]}</span>
               </button>
             );
           })}

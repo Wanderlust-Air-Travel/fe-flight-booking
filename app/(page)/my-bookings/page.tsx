@@ -121,7 +121,7 @@ const MyBookingsPage = () => {
                   {activeTab === "membership" && (
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--cl-pri)] to-[var(--cl-third)] rounded-t-full" />
                   )}
-                  <span className="relative z-10">Hội Viên Bamboo Club</span>
+                  <span className="relative z-10">Hội Viên Wanderlust Club</span>
                 </button>
               </div>
 
@@ -161,7 +161,7 @@ const MyBookingsPage = () => {
                   <Button
                     onClick={handleSearch}
                     disabled={isLoading || !bookingCode.trim()}
-                    className="w-full bg-gradient-to-r from-[var(--cl-pri)] to-[var(--cl-third)] hover:from-[var(--cl-four)] hover:to-[var(--cl-five)] text-white font-semibold py-6 text-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-[var(--cl-pri)] to-[var(--cl-third)] hover:from-[var(--cl-four)] hover:to-[var(--cl-five)] text-white font-semibold py-6 text-base shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading ? (
                       <span className="flex items-center justify-center gap-2">
@@ -173,7 +173,6 @@ const MyBookingsPage = () => {
                       </span>
                     ) : (
                       <span className="flex items-center justify-center gap-2">
-                        <Search className="w-5 h-5" />
                         Tìm Kiếm
                       </span>
                     )}
@@ -188,9 +187,9 @@ const MyBookingsPage = () => {
                       </svg>
                     </div>
                     <Label className="text-lg font-semibold text-[var(--cl-pri)]">
-                      Hội Viên Bamboo Club
+                      Hội Viên Wander Club
                     </Label>
-                    <p className="text-sm text-gray-600 mt-1">Đăng nhập vào Bamboo Club để xem chuyến bay sắp tới của bạn</p>
+                    <p className="text-sm text-gray-600 mt-1">Đăng nhập vào Wanderlust Club để xem chuyến bay sắp tới của bạn</p>
                   </div>
                   <Button
                     className="w-full bg-gradient-to-r from-[var(--cl-four)] to-[var(--cl-five)] hover:from-[var(--cl-five)] hover:to-[var(--cl-four)] text-white font-semibold py-6 text-lg shadow-md hover:shadow-lg transition-all duration-300"

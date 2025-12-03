@@ -154,7 +154,7 @@ const CheckInPage = () => {
                                         disabled={isLoading}
                                         autoFocus
                                     />
-                                    <p className="text-xs text-[var(--cl-pri)] text-center mt-2">
+                                    <p className="text-sm text-[var(--cl-pri)] text-center mt-2">
                                         Vui lòng nhập đúng mã đặt chỗ như trên email xác nhận
                                     </p>
                                 </div>
