@@ -33,12 +33,42 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
     const { accessToken, isLoggedIn } = useUserStore()
     const [loadingChild, setLoadingChild] = useState(false);
 
-    // Khi click cabin
-    const handleCabinEconomy = useCallback((code: string, index: number) => {
-        setActiveIndex(null);
-        setType("economy");
+    // Helper function to get cabin display info
+    const getCabinDisplayInfo = (cabinType: string) => {
+        switch (cabinType.toLowerCase()) {
+            case 'economy':
+                return {
+                    name: 'Economy',
+                    bgColor: 'bg-[var(--cl-five)]',
+                    hoverColor: 'hover:bg-green-700',
+                };
+            case 'business':
+                return {
+                    name: 'Business',
+                    bgColor: 'bg-[var(--cl-pri)]',
+                    hoverColor: 'hover:bg-blue-950',
+                };
+            case 'first':
+                return {
+                    name: 'First',
+                    bgColor: 'bg-purple-600',
+                    hoverColor: 'hover:bg-purple-800',
+                };
+            default:
+                return {
+                    name: cabinType,
+                    bgColor: 'bg-gray-600',
+                    hoverColor: 'hover:bg-gray-800',
+                };
+        }
+    };
 
-        axiosPublic.get(`/api/search/fare-options?flightInstanceId=${code}&cabinType=economy`)
+    // Khi click cabin - generic handler
+    const handleCabinClick = useCallback((code: string, cabinType: string, index: number) => {
+        setActiveIndex(null);
+        setType(cabinType);
+
+        axiosPublic.get(`/api/search/fare-options?flightInstanceId=${code}&cabinType=${cabinType}`)
             .then((res) => {
                 console.log(res);
                 // Backend returns FareOptionsResponseDto with fareOptions array
@@ -46,35 +76,12 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
                 // Open the clicked panel and close others
                 setOpenPanelIndex(index);
-
-
-
             })
             .catch((err) => {
                 console.log(err);
-
             })
             .finally(() => {
-
-            })
-    }, []);
-
-    const handleCabinBusiness = useCallback((code: string, index: number) => {
-
-        setActiveIndex(null);
-        setType("business");
-
-
-        axiosPublic.get(`/api/search/fare-options?flightInstanceId=${code}&cabinType=business`)
-            .then((res) => {
-                // Backend returns FareOptionsResponseDto with fareOptions array
-                setTickets(res.data?.fareOptions || res.data || []);
-
-                // Open the clicked panel and close others
-                setOpenPanelIndex(index);
-            })
-            .catch((err) => {
-                console.log(err);
+                setLoadingChild(false);
             });
     }, []);
 
@@ -288,35 +295,63 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
                                                 <div className="w-full flex-1">
                                                     <div className="flex gap-x-[1rem] items-center">
-                                                        <div
-
-                                                            className={`bg-[var(--cl-five)] hover:bg-green-700 flex flex-col items-center p-[1.2rem] w-[50%] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
-                                                            onClick={() => {
-                                                                handleCabinEconomy(trip.flightInstanceId, index);
-                                                            }}
-                                                        >
-                                                            <p className="text-base text-white font-bold text-center">
-                                                                Economy
-                                                            </p>
-                                                            <span className="text-sm cl-white text-center">Total seats: {trip.availableSeats}</span>
-
-                                                            <ChevronDown className="w-[1.2=4rem] h-[1.4rem] text-white" />
-                                                        </div>
-
-                                                        <div
-
-                                                            className={`bg-[var(--cl-pri)] hover:bg-blue-950 flex flex-col items-center p-[1.2rem] w-[50%] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
-                                                            onClick={() => {
-                                                                handleCabinBusiness(trip.flightInstanceId, index);
-                                                            }}
-                                                        >
-                                                            <p className="text-base text-white font-bold text-center">
-                                                                Business
-                                                            </p>
-                                                            <span className="text-sm cl-white text-center">Total seats: {trip.availableSeats}</span>
-
-                                                            <ChevronDown className="w-[1.2=4rem] h-[1.4rem] text-white" />
-                                                        </div>
+                                                        {trip.cabinTypes && trip.cabinTypes.length > 0 ? (
+                                                            trip.cabinTypes.map((cabinInfo, cabinIndex) => {
+                                                                const displayInfo = getCabinDisplayInfo(cabinInfo.cabinType);
+                                                                const cabinTypesLength = trip.cabinTypes?.length || 0;
+                                                                const widthClass = cabinTypesLength === 1 
+                                                                    ? 'w-full' 
+                                                                    : cabinTypesLength === 2 
+                                                                    ? 'w-[50%]' 
+                                                                    : 'w-[33.333%]';
+                                                                
+                                                                return (
+                                                                    <div
+                                                                        key={`${trip.flightInstanceId}-${cabinInfo.cabinType}-${cabinIndex}`}
+                                                                        className={`${displayInfo.bgColor} ${displayInfo.hoverColor} flex flex-col items-center p-[1.2rem] ${widthClass} rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
+                                                                        onClick={() => {
+                                                                            handleCabinClick(trip.flightInstanceId, cabinInfo.cabinType, index);
+                                                                        }}
+                                                                    >
+                                                                        <p className="text-base text-white font-bold text-center">
+                                                                            {displayInfo.name}
+                                                                        </p>
+                                                                        <span className="text-sm text-white text-center">
+                                                                            Total seats: {cabinInfo.availableSeats}
+                                                                        </span>
+                                                                        <ChevronDown className="w-[1.2rem] h-[1.4rem] text-white" />
+                                                                    </div>
+                                                                );
+                                                            })
+                                                        ) : (
+                                                            // Fallback: Show default Economy and Business if cabinTypes is not available (backward compatibility)
+                                                            <>
+                                                                <div
+                                                                    className={`bg-[var(--cl-five)] hover:bg-green-700 flex flex-col items-center p-[1.2rem] w-[50%] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
+                                                                    onClick={() => {
+                                                                        handleCabinClick(trip.flightInstanceId, 'economy', index);
+                                                                    }}
+                                                                >
+                                                                    <p className="text-base text-white font-bold text-center">
+                                                                        Economy
+                                                                    </p>
+                                                                    <span className="text-sm text-white text-center">Total seats: {trip.availableSeats}</span>
+                                                                    <ChevronDown className="w-[1.2rem] h-[1.4rem] text-white" />
+                                                                </div>
+                                                                <div
+                                                                    className={`bg-[var(--cl-pri)] hover:bg-blue-950 flex flex-col items-center p-[1.2rem] w-[50%] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear`}
+                                                                    onClick={() => {
+                                                                        handleCabinClick(trip.flightInstanceId, 'business', index);
+                                                                    }}
+                                                                >
+                                                                    <p className="text-base text-white font-bold text-center">
+                                                                        Business
+                                                                    </p>
+                                                                    <span className="text-sm text-white text-center">Total seats: {trip.availableSeats}</span>
+                                                                    <ChevronDown className="w-[1.2rem] h-[1.4rem] text-white" />
+                                                                </div>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>

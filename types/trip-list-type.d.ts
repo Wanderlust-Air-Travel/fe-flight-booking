@@ -5,6 +5,11 @@ export interface AirportInfo {
     name?: string;
 }
 
+export interface CabinTypeInfo {
+    cabinType: string; // 'economy' | 'business' | 'first'
+    availableSeats: number;
+}
+
 export interface TripListType {
     flightInstanceId: string;
     flightNumber: string;
@@ -15,6 +20,7 @@ export interface TripListType {
     destination: AirportInfo;
     stopCount?: number;
     stopDuration?: string;
+    cabinTypes?: CabinTypeInfo[]; // Available cabin types with seat counts
 }
 
 // Backend API Response Format (matching SearchFlightsResponseDto from backend)
