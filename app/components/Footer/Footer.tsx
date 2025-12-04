@@ -13,7 +13,7 @@ const Footer = () => {
     }
 
     return (
-        <footer className="mt-auto border-t border-[var(--cl-pri)]/20 bg-[var(--cl-pri)] text-white">
+        <footer className="mt-auto border-t border-[var(--cl-pri)]/20 bg-[var(--cl-pri)] text-white py-6">
             <div className="container py-2.5 md:py-3">
                 <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                     {/* Logo + short text */}

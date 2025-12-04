@@ -1,8 +1,9 @@
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb"
 import ServiceAll from "@/app/components/Services/ServiceAll"
+import ServiceSlide from "@/app/components/Services/ServiceSlide"
 
-const ServicePage = () =>{
-    return(
+const ServicePage = () => {
+    return (
         <main className="pt-[var(--hd)] flex flex-col gap-y-[2rem]">
             <Breadcrumb />
             <section>
@@ -13,6 +14,8 @@ const ServicePage = () =>{
                     </div>
                 </div>
             </section>
+            <ServiceSlide />
+
         </main>
     )
 }

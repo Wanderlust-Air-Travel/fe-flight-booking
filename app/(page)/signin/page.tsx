@@ -66,13 +66,13 @@ const SignInPage = () => {
                 <div className="container">
                     <div className="flex h-full -mx-[1.2rem]">
                         {/* Left side image area - 70% width */}
-                        <div className="w-[70%] px-[1.2rem]">
-                            <div className="-ml-[calc((100vw-140rem)/2)] h-full">
+                        <div className="xl:w-[65%] w-[60%] px-[1.2rem]">
+                            <div className="-ml-[calc((100vw-140rem)/2)] bg-sign h-full">
                                 <Image src="/loginBg.png" alt="loginBg" unoptimized priority width={100} height={100} className="object-cover w-full h-full" />
                             </div>
                         </div>
                         {/* Right side login form - 30% width and centered */}
-                        <div className="w-[30%] px-[1.2rem] flex items-center">
+                        <div className="flex-1 w-full px-[1.2rem] flex items-center">
                             <div className="w-full max-w-[40rem] mx-auto flex flex-col justify-center gap-y-[1.2rem] py-[var(--rowY)]">
                                 <h2 className="text-center text-lg font-bold text-[var(--cl-pri)] uppercase">Login</h2>
 

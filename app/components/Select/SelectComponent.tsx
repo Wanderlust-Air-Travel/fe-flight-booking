@@ -17,7 +17,7 @@ export function SelectComponent({ placeholder, icon, data, value, onChange, disa
 
     return (
         <Select value={value} onValueChange={onChange} disabled={disabled}>
-            <SelectTrigger className="w-full border-none outline-none text-start !h-[4.8rem] shadow-none text-sm sm:text-base md:text-[1.4rem] !text-[var(--cl-pri)] px-2 sm:px-3 md:px-[1rem] select-none" disabled={disabled}>
+            <SelectTrigger className="w-full  border-none outline-none text-start !h-[4.8rem] shadow-none text-sm sm:text-base md:text-[1.4rem] !text-[var(--cl-pri)] px-2 sm:px-3 md:px-[1rem] select-none" disabled={disabled}>
                 <div className="flex gap-x-2 sm:gap-x-[0.8rem] w-full items-center custom-sl">
                     <Image className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" src={icon} alt="icon" width={32} height={32} priority />
                     <SelectValue className="!w-full text-sm sm:text-base md:text-[1.4rem]" placeholder={placeholder} />

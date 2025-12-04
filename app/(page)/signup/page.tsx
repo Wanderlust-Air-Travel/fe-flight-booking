@@ -59,14 +59,14 @@ const SignUpPage = () => {
                 <div className="container">
                     <div className="flex h-full -mx-[1.2rem]">
                         {/* Left side image area - 70% width (same as Sign In) */}
-                        <div className="w-[70%] px-[1.2rem]">
-                            <div className="-ml-[calc((100vw-140rem)/2)] h-full">
+                        <div className="xl:w-[65%] w-[60%] px-[1.2rem]">
+                            <div className="-ml-[calc((100vw-140rem)/2)] bg-sign h-full">
                                 <Image src="/resBg.png" alt="registerBg" unoptimized priority width={100} height={100} className="object-cover w-full h-full" />
                             </div>
                         </div>
                         {/* Right side register form - 30% width and centered (same as Sign In) */}
-                        <div className="w-[30%] px-[1.2rem] flex items-center">
-                            <div className="w-full max-w-[40rem] mx-auto flex flex-col justify-center gap-y-[1.2rem] py-[var(--rowY)]">
+                        <div className="w-full flex-1 px-[1.2rem] flex items-center">
+                            <div className="w-full  mx-auto flex flex-col justify-center gap-y-[1.2rem] py-[var(--rowY)]">
                                 <h2 className="text-center text-lg font-bold text-[var(--cl-pri)] uppercase">Register</h2>
 
                                 <Formik
@@ -82,16 +82,16 @@ const SignUpPage = () => {
                                                         <div className="w-full px-[0.6rem]">
                                                             <InputFormat name="fullname" placeholder="Enter fullname" label="Fullname" formatName />
                                                         </div>
-                                                        <div className="w-[50%] px-[0.6rem]">
+                                                        <div className="md:w-[50%] w-full px-[0.6rem]">
                                                             <InputFormat name="email" placeholder="Enter email" label="Email" />
                                                         </div>
-                                                        <div className="w-[50%] px-[0.6rem]">
+                                                        <div className="md:w-[50%] w-full px-[0.6rem]">
                                                             <InputFormat name="phone" placeholder="Enter phone" label="Phone" formatPhone />
                                                         </div>
-                                                        <div className="w-[50%] px-[0.6rem]">
+                                                        <div className="md:w-[50%] w-full px-[0.6rem]">
                                                             <InputFormat password={true} name="password" placeholder="Enter password" label="Password" />
                                                         </div>
-                                                        <div className="w-[50%] px-[0.6rem]">
+                                                        <div className="md:w-[50%] w-full px-[0.6rem]">
                                                             <InputFormat password={true} name="rePassword" placeholder="Enter repassword" label="Re Password" />
                                                         </div>
                                                     </div>

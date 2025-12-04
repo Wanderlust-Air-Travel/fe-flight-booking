@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "aos/dist/aos.css";
+@import "swiper/css";
+@import "swiper/css/navigation";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -109,7 +111,7 @@ html {
 }
 
 body {
-  font-family: var(--font-pri);
+  font-family: var(--font-tiktok-sans);
   line-height: 1.5;
   color: #000000;
 }
@@ -421,14 +423,11 @@ main {
   background: var(--cl-pri) !important;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-
-  }
-  body {
-    @apply bg-background text-foreground;
+@media screen and (max-width: 1460px){
+  .bg-sign{
+    margin-left: -1.6rem !important;
   }
 }
+
 
 /* (removed react-toastify specific styles; SweetAlert2 toasts are inline-styled) */

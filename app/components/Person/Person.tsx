@@ -106,7 +106,7 @@ const Person = ({classNameParent,classNameChild}:any) => {
 
 
     return (
-        <div className={`${classNameParent} flex flex-col bg-white gap-y-[0.6rem] p-3 rounded-sm overflow-hidden`}>
+        <div className={`${classNameParent} w-full flex flex-col bg-white gap-y-[0.6rem] p-3 rounded-sm overflow-hidden`}>
             <div className="flex gap-x-[0.8rem] justify-between items-center">
                 <p className={`text-[1.4rem] text-[var(--cl-pri)]  ${classNameChild}`}>Adults:</p>
                 <div className="flex items-center gap-x-[0.6rem]">

@@ -185,7 +185,7 @@ const FlightSearchBar = () => {
   return (
     <>
       <div className="flex flex-col md:flex-row w-full items-stretch bg-white rounded-md border-[#CBD4E6] border-[0.1rem]">
-        <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6]">
+        <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6] relative">
           <SelectComponent
             value={from}
             onChange={handleChangeForm}
@@ -195,10 +195,10 @@ const FlightSearchBar = () => {
             disabled={loadingAirports || !!airportsError}
           />
           {airportsError && (
-            <p className="text-xs text-red-500 mt-1 px-2">Failed to load airports. Please refresh the page.</p>
+            <p className="text-xs text-red-500  px-4 absolute top-[105%] line-clamp-1 left-0 w-full">Failed to load airports. Please refresh the page.</p>
           )}
         </div>
-        <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6]">
+        <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6] relative">
           <SelectComponent
             value={to}
             onChange={handleChangeTo}
@@ -208,7 +208,7 @@ const FlightSearchBar = () => {
             disabled={loadingAirports || !!airportsError}
           />
           {airportsError && (
-            <p className="text-xs text-red-500 mt-1 px-2">Failed to load airports. Please refresh the page.</p>
+            <p className="text-xs text-red-500  px-4 absolute top-[105%] left-0 w-full line-clamp-1">Failed to load airports. Please refresh the page.</p>
           )}
         </div>
         <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6]">
@@ -272,14 +272,14 @@ const FlightSearchBar = () => {
               className="peer hidden"
             />
             <div className="hidden peer-checked:block fixed inset-0 z-[100] w-[100vw] h-[100vh]" />
-            <div className="absolute z-[101] top-[calc(100%+0.5rem)] shadow2 left-0 right-0 md:left-auto md:right-auto md:w-auto w-[calc(100vw-3.2rem)] md:min-w-[18rem] md:max-w-[20rem] opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto bg-white rounded-md">
+            <div className="absolute w-full! z-[101] top-[calc(100%+0.5rem)] shadow2 left-0 right-0 md:left-auto md:right-auto md:w-auto  opacity-0 pointer-events-none translate-y-[5%] transition peer-checked:opacity-100 peer-checked:translate-y-[0%] peer-checked:pointer-events-auto bg-white rounded-md">
               <Person />
             </div>
           </label>
         </div>
-        <div className="w-full md:w-[20%] p-2 flex justify-center">
+        <div className="w-full md:w-[20%] p-2 flex justify-center items-center">
           <Button
-            className="w-full h-[4.4rem] bg-[var(--cl-pri)] text-sm sm:text-base md:text-[1.6rem] uppercase hover:bg-[var(--cl-four)] transition-colors duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[var(--cl-pri)]"
+            className="w-full h-[3.6rem]! bg-[var(--cl-pri)] text-sm sm:text-base md:text-[1.6rem] uppercase hover:bg-[var(--cl-four)] transition-colors duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[var(--cl-pri)]"
             onClick={handleSearch}
             disabled={!isFormValid()}
           >

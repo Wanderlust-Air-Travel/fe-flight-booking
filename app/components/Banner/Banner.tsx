@@ -23,7 +23,7 @@ const BannerHome = () => {
     const [activeMainTab, setActiveMainTab] = useState<MainTab>("book-ticket");
     const [activeCheckInTab, setActiveCheckInTab] = useState<CheckInTab>("booking-code");
     const [activeMyBookingsTab, setActiveMyBookingsTab] = useState<MyBookingsTab>("booking-code-ticket");
-    
+
     // Check-in form states
     const [bookingCode, setBookingCode] = useState("");
     const [ticketNumber, setTicketNumber] = useState("");
@@ -31,12 +31,12 @@ const BannerHome = () => {
     const [lastName, setLastName] = useState("");
     const [checkInError, setCheckInError] = useState<string | null>(null);
     const [isCheckInLoading, setIsCheckInLoading] = useState(false);
-    
+
     // My bookings form states
     const [myBookingCode, setMyBookingCode] = useState("");
     const [myBookingError, setMyBookingError] = useState<string | null>(null);
     const [isMyBookingLoading, setIsMyBookingLoading] = useState(false);
-    
+
     const router = useRouter();
 
 
@@ -53,7 +53,7 @@ const BannerHome = () => {
 
     const handleCheckInSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!bookingCode.trim()) {
             setCheckInError("Vui lòng nhập mã đặt chỗ (PNR code)");
             return;
@@ -64,7 +64,7 @@ const BannerHome = () => {
 
         try {
             const response = await axiosPublic.get(`/api/bookings/code/${bookingCode.trim()}`);
-            
+
             if (response.status === 200 && response.data) {
                 router.push(`/check-in/seat-selection?bookingCode=${encodeURIComponent(bookingCode.trim())}`);
             } else {
@@ -72,9 +72,9 @@ const BannerHome = () => {
             }
         } catch (err: any) {
             console.error("Error fetching booking:", err);
-            const errorMessage = err.response?.data?.message || 
-                                err.message || 
-                                "Không tìm thấy đặt chỗ với mã này. Vui lòng kiểm tra lại.";
+            const errorMessage = err.response?.data?.message ||
+                err.message ||
+                "Không tìm thấy đặt chỗ với mã này. Vui lòng kiểm tra lại.";
             setCheckInError(errorMessage);
         } finally {
             setIsCheckInLoading(false);
@@ -93,7 +93,7 @@ const BannerHome = () => {
 
         try {
             const response = await axiosPublic.get(`/api/bookings/code/${myBookingCode.trim()}`);
-            
+
             if (response.data) {
                 dismissToast(loadingToastId);
                 showSuccess("Đã tìm thấy đặt chỗ. Đang chuyển hướng...");
@@ -101,8 +101,8 @@ const BannerHome = () => {
             }
         } catch (err: any) {
             dismissToast(loadingToastId);
-            const errorMessage = err.response?.data?.message || 
-                            "Không tìm thấy đặt chỗ với mã này. Vui lòng kiểm tra lại.";
+            const errorMessage = err.response?.data?.message ||
+                "Không tìm thấy đặt chỗ với mã này. Vui lòng kiểm tra lại.";
             setMyBookingError(errorMessage);
             showError(errorMessage);
         } finally {
@@ -118,62 +118,59 @@ const BannerHome = () => {
                         <FlightSearchBar />
                     </div>
                 );
-            
+
             case "check-in":
                 return (
-                    <div className="w-full p-4 md:p-6 rounded-b-lg bg-white">
-                        <div className="flex items-center gap-0 border-b border-gray-200 mb-6 bg-gray-50 rounded-t-lg">
+                    <div className="w-full rounded-b-lg bg-white">
+                        <div className="flex items-center gap-0 border-b border-gray-200 bg-gray-50 rounded-t-lg">
                             <button
                                 type="button"
                                 onClick={() => setActiveCheckInTab("booking-code")}
-                                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${
-                                    activeCheckInTab === "booking-code"
-                                        ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
-                                        : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
-                                }`}
+                                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${activeCheckInTab === "booking-code"
+                                    ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
+                                    : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
+                                    }`}
                             >
                                 <span className="font-medium">Mã Đặt Chỗ</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setActiveCheckInTab("ticket-number")}
-                                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${
-                                    activeCheckInTab === "ticket-number"
-                                        ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
-                                        : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
-                                }`}
+                                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${activeCheckInTab === "ticket-number"
+                                    ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
+                                    : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
+                                    }`}
                             >
                                 <span className="font-medium">Số Vé</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setActiveCheckInTab("membership")}
-                                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${
-                                    activeCheckInTab === "membership"
-                                        ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
-                                        : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
-                                }`}
+                                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${activeCheckInTab === "membership"
+                                    ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
+                                    : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
+                                    }`}
                             >
                                 <span className="font-medium">Số Hội Viên</span>
                             </button>
                         </div>
 
                         {activeCheckInTab === "booking-code" && (
-                            <form onSubmit={handleCheckInSubmit} className="bg-white rounded-lg p-6 md:p-8">
-                                <div className="max-w-md mx-auto space-y-6">
+                            <form onSubmit={handleCheckInSubmit} className="bg-white rounded-lg">
+                                <div className="flex justify-between gap-x-[2rem] p-6">
                                     {/* Header Section */}
-                                    <div className="text-center space-y-2 pb-4 border-b border-gray-200">
-                                        <h3 className="text-2xl md:text-3xl font-bold text-[var(--cl-pri)]">
-                                            Mã Đặt Chỗ
-                                        </h3>
+                                    <div className="flex flex-col gap-y-[0.4rem]  w-fit">
                                         <p className="text-base text-gray-700 font-medium">
                                             Nhập mã đặt chỗ 6 ký tự để làm thủ tục
+                                        </p>
+                                        <p className="text-sm  text-gray-600 font-medium">
+                                            <strong className="text-red-600 ">*</strong> Vui lòng nhập đúng mã đặt chỗ như trên email xác nhận
                                         </p>
                                     </div>
 
                                     {/* Input Section */}
-                                    <div className="space-y-4">
-                                        <div>
+                                    <div className="w-[50%] relative">
+                                        <div className="">
                                             <Input
                                                 id="bookingCode"
                                                 type="text"
@@ -183,29 +180,28 @@ const BannerHome = () => {
                                                     setBookingCode(e.target.value.toUpperCase());
                                                     setCheckInError(null);
                                                 }}
-                                                className="text-center text-xl md:text-2xl font-mono tracking-[0.2em] border-2 border-gray-300 focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]/20 h-14 md:h-16 transition-all duration-200 rounded-lg bg-white"
+                                                className="h-[4.8rem]! text-center text-xl md:text-2xl font-mono tracking-[0.2em] border-2 border-gray-300 focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]/20 h-14 md:h-16 transition-all duration-200 rounded-lg bg-white"
                                                 maxLength={10}
                                                 disabled={isCheckInLoading}
                                                 autoFocus
                                             />
                                         </div>
-                                        <p className="text-sm text-center text-gray-600 font-medium">
-                                            Vui lòng nhập đúng mã đặt chỗ như trên email xác nhận
-                                        </p>
+
+                                        {/* Error Message */}
+                                        {checkInError && (
+                                            <Alert variant="destructive" className="border-red-300 bg-red-50 rounded-lg absolute left-0 w-full top-[105%]">
+                                                <AlertCircle className="h-4 w-4" />
+                                                <AlertDescription className="text-sm font-medium">{checkInError}</AlertDescription>
+                                            </Alert>
+                                        )}
                                     </div>
 
-                                    {/* Error Message */}
-                                    {checkInError && (
-                                        <Alert variant="destructive" className="border-red-300 bg-red-50 rounded-lg">
-                                            <AlertCircle className="h-4 w-4" />
-                                            <AlertDescription className="text-sm font-medium">{checkInError}</AlertDescription>
-                                        </Alert>
-                                    )}
+
 
                                     {/* Submit Button */}
                                     <Button
                                         type="submit"
-                                        className="w-full bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
+                                        className="w-full h-[4.8rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md flex-1"
                                         disabled={isCheckInLoading || !bookingCode.trim()}
                                     >
                                         {isCheckInLoading ? (
@@ -225,22 +221,22 @@ const BannerHome = () => {
                         )}
 
                         {activeCheckInTab === "ticket-number" && (
-                            <div className="bg-white rounded-lg p-6 md:p-8">
-                                <div className="max-w-md mx-auto space-y-6">
+                            <div className="bg-white rounded-lg ">
+                                <div className="flex justify-between gap-x-[2rem] p-6">
                                     {/* Header Section */}
-                                    <div className="text-center space-y-2 pb-4 border-b border-gray-200">
-                                        <h3 className="text-2xl md:text-3xl font-bold text-[var(--cl-pri)]">
-                                            Số Vé
-                                        </h3>
-                                        <p className="text-base text-gray-700 font-medium">
+                                    <div className=" w-fit flex flex-col gap-y-[0.4rem]">
+                                        <p className="text-base text-gray-700 font-medium ">
                                             Nhập số vé và họ để tra cứu
+                                        </p>
+                                        <p className="text-sm  text-gray-600 font-medium">
+                                            <strong className="text-red-600 ">*</strong> Tính năng đang được phát triển
                                         </p>
                                     </div>
 
                                     {/* Input Section */}
-                                    <div className="space-y-4">
-                                        <div>
-                                            <Label htmlFor="ticketNumber" className="text-sm font-semibold text-gray-700 mb-2 block">Số Vé</Label>
+                                    <div className="w-[55%] flex gap-x-[0.8rem] h-full">
+                                        <div className="flex-1 flex items-center gap-x-[0.8rem]">
+                                            <Label htmlFor="ticketNumber" className="text-mn font-semibold text-gray-70 block text-nowrap">Số Vé</Label>
                                             <Input
                                                 id="ticketNumber"
                                                 type="text"
@@ -248,11 +244,11 @@ const BannerHome = () => {
                                                 value={ticketNumber}
                                                 onChange={(e) => setTicketNumber(e.target.value)}
                                                 disabled={true}
-                                                className="text-base border-2 border-gray-300 bg-gray-100 cursor-not-allowed h-14 md:h-16 rounded-lg"
+                                                className="text-base h-[4.8rem]! border-2 border-gray-300 bg-gray-100 cursor-not-allowed h-14 md:h-16 rounded-lg"
                                             />
                                         </div>
-                                        <div>
-                                            <Label htmlFor="lastName" className="text-sm font-semibold text-gray-700 mb-2 block">Họ</Label>
+                                        <div className="flex-1 flex items-center gap-x-[0.8rem]">
+                                            <Label htmlFor="lastName" className="text-mn font-semibold text-gray-700 mb-2 block">Họ</Label>
                                             <Input
                                                 id="lastName"
                                                 type="text"
@@ -260,19 +256,17 @@ const BannerHome = () => {
                                                 value={lastName}
                                                 onChange={(e) => setLastName(e.target.value.toUpperCase())}
                                                 disabled={true}
-                                                className="text-base border-2 border-gray-300 bg-gray-100 cursor-not-allowed h-14 md:h-16 rounded-lg uppercase"
+                                                className="text-base h-[4.8rem]! border-2 border-gray-300 bg-gray-100 cursor-not-allowed h-14 md:h-16 rounded-lg uppercase"
                                             />
                                         </div>
-                                        <p className="text-sm text-center text-gray-600 font-medium">
-                                            Tính năng đang được phát triển
-                                        </p>
+
                                     </div>
 
                                     {/* Submit Button */}
                                     <Button
                                         onClick={() => showError("Tính năng tìm kiếm theo số vé đang được phát triển")}
                                         disabled={isCheckInLoading || !ticketNumber.trim() || !lastName.trim()}
-                                        className="w-full bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-xl rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
+                                        className="w-full flex-1 h-[4.8rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-xl rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
                                     >
                                         {isCheckInLoading ? (
                                             <span className="flex items-center justify-center gap-2">
@@ -293,20 +287,20 @@ const BannerHome = () => {
                         )}
 
                         {activeCheckInTab === "membership" && (
-                            <div className="bg-white rounded-lg p-6 md:p-8">
-                                <div className="max-w-md mx-auto space-y-6">
+                            <div className="bg-white rounded-lg">
+                                <div className="flex justify-between gap-x-[2rem] p-6">
                                     {/* Header Section */}
-                                    <div className="text-center space-y-2 pb-4 border-b border-gray-200">
-                                        <h3 className="text-2xl md:text-3xl font-bold text-[var(--cl-pri)]">
-                                            Số Hội Viên
-                                        </h3>
+                                    <div className="flex flex-col gap-y-[0.4rem] w-fit">
                                         <p className="text-base text-gray-700 font-medium">
                                             Nhập số hội viên để tra cứu
+                                        </p>
+                                        <p className="text-sm  text-gray-600 font-medium">
+                                            <strong className="text-red-600 ">*</strong> Tính năng đang được phát triển
                                         </p>
                                     </div>
 
                                     {/* Input Section */}
-                                    <div className="space-y-4">
+                                    <div className="w-[55%]">
                                         <Input
                                             id="membershipNumber"
                                             type="text"
@@ -314,18 +308,16 @@ const BannerHome = () => {
                                             value={membershipNumber}
                                             onChange={(e) => setMembershipNumber(e.target.value)}
                                             disabled={true}
-                                            className="text-base border-2 border-gray-300 bg-gray-100 cursor-not-allowed h-14 md:h-16 rounded-lg"
+                                            className="text-base border-2 border-gray-300 bg-gray-100 cursor-not-allowed md:h-16 rounded-lg h-[4.8rem]!"
                                         />
-                                        <p className="text-sm text-center text-gray-600 font-medium">
-                                            Tính năng đang được phát triển
-                                        </p>
+
                                     </div>
 
                                     {/* Submit Button */}
                                     <Button
                                         onClick={() => showError("Tính năng tìm kiếm theo số hội viên đang được phát triển")}
                                         disabled={isCheckInLoading || !membershipNumber.trim()}
-                                        className="w-full bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-xl rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
+                                        className="w-full flex-1 bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-xl rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md h-[4.8rem]!"
                                     >
                                         {isCheckInLoading ? (
                                             <span className="flex items-center justify-center gap-2">
@@ -346,50 +338,48 @@ const BannerHome = () => {
                         )}
                     </div>
                 );
-            
+
             case "my-bookings":
                 return (
-                    <div className="w-full p-4 md:p-6 rounded-b-lg bg-white">
-                        <div className="flex items-center gap-0 border-b border-gray-200 mb-6 bg-gray-50 rounded-t-lg">
+                    <div className="w-full rounded-b-lg bg-white">
+                        <div className="flex items-center gap-0 border-b border-gray-200  bg-gray-50 rounded-t-lg">
                             <button
                                 type="button"
                                 onClick={() => setActiveMyBookingsTab("booking-code-ticket")}
-                                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${
-                                    activeMyBookingsTab === "booking-code-ticket"
-                                        ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
-                                        : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
-                                }`}
+                                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${activeMyBookingsTab === "booking-code-ticket"
+                                    ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
+                                    : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
+                                    }`}
                             >
                                 <span className="font-medium">Mã Đặt Chỗ/Số Vé</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setActiveMyBookingsTab("membership")}
-                                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${
-                                    activeMyBookingsTab === "membership"
-                                        ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
-                                        : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
-                                }`}
+                                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${activeMyBookingsTab === "membership"
+                                    ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
+                                    : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
+                                    }`}
                             >
                                 <span className="font-medium">Hội Viên Wanderlust Club</span>
                             </button>
                         </div>
 
                         {activeMyBookingsTab === "booking-code-ticket" && (
-                            <div className="bg-white rounded-lg p-6 md:p-8">
-                                <div className="max-w-md mx-auto space-y-6">
+                            <div className="bg-white rounded-lg">
+                                <div className="flex justify-between gap-x-[2rem] p-6">
                                     {/* Header Section */}
-                                    <div className="text-center space-y-2 pb-4 border-b border-gray-200">
-                                        <h3 className="text-2xl md:text-3xl font-bold text-[var(--cl-pri)]">
-                                            Mã Đặt Chỗ
-                                        </h3>
+                                    <div className=" w-fit flex flex-col gap-y-[0.4rem]">
                                         <p className="text-base text-gray-700 font-medium">
                                             Nhập mã đặt chỗ 6 ký tự để tra cứu
+                                        </p>
+                                        <p className="text-sm  text-gray-600 font-medium">
+                                            <strong className="text-red-600 ">*</strong> Vui lòng nhập đúng mã đặt chỗ như trên email xác nhận
                                         </p>
                                     </div>
 
                                     {/* Input Section */}
-                                    <div className="space-y-4">
+                                    <div className="w-[50%] relative">
                                         <div>
                                             <Input
                                                 id="myBookingCode"
@@ -400,7 +390,7 @@ const BannerHome = () => {
                                                     setMyBookingCode(e.target.value.toUpperCase());
                                                     setMyBookingError(null);
                                                 }}
-                                                className="text-center text-xl md:text-2xl font-mono tracking-[0.2em] border-2 border-gray-300 focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]/20 h-14 md:h-16 transition-all duration-200 rounded-lg bg-white"
+                                                className="text-center text-xl md:text-2xl font-mono tracking-[0.2em] border-2 border-gray-300 focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]/20 h-[4.8rem]! md:h-16 transition-all duration-200 rounded-lg bg-white"
                                                 maxLength={10}
                                                 disabled={isMyBookingLoading}
                                                 autoFocus
@@ -411,24 +401,22 @@ const BannerHome = () => {
                                                 }}
                                             />
                                         </div>
-                                        <p className="text-sm text-center text-gray-600 font-medium">
-                                            Vui lòng nhập đúng mã đặt chỗ như trên email xác nhận
-                                        </p>
+                                        {/* Error Message */}
+                                        {myBookingError && (
+                                            <Alert variant="destructive" className="border-red-300 bg-red-50 rounded-lg absolute left-0 w-full top-[105%]">
+                                                <AlertCircle className="h-4 w-4" />
+                                                <AlertDescription className="text-sm font-medium">{myBookingError}</AlertDescription>
+                                            </Alert>
+                                        )}
                                     </div>
 
-                                    {/* Error Message */}
-                                    {myBookingError && (
-                                        <Alert variant="destructive" className="border-red-300 bg-red-50 rounded-lg">
-                                            <AlertCircle className="h-4 w-4" />
-                                            <AlertDescription className="text-sm font-medium">{myBookingError}</AlertDescription>
-                                        </Alert>
-                                    )}
+
 
                                     {/* Submit Button */}
                                     <Button
                                         onClick={handleMyBookingsSearch}
                                         disabled={isMyBookingLoading || !myBookingCode.trim()}
-                                        className="w-full bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
+                                        className="w-full flex-1 bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md h-[4.8rem]!"
                                     >
                                         {isMyBookingLoading ? (
                                             <span className="flex items-center justify-center gap-2">
@@ -447,13 +435,10 @@ const BannerHome = () => {
                         )}
 
                         {activeMyBookingsTab === "membership" && (
-                            <div className="bg-white rounded-lg p-6 md:p-8">
-                                <div className="max-w-md mx-auto space-y-6">
+                            <div className="bg-white rounded-lg">
+                                <div className="p-6 flex flex-col  gap-y-[1.2rem]">
                                     {/* Header Section */}
-                                    <div className="text-center space-y-2 pb-4 border-b border-gray-200">
-                                        <h3 className="text-2xl md:text-3xl font-bold text-[var(--cl-pri)]">
-                                            Hội Viên Wanderlust Club
-                                        </h3>
+                                    <div className="text-center">
                                         <p className="text-base text-gray-700 font-medium">
                                             Đăng nhập vào Wanderlust Club để xem chuyến bay sắp tới của bạn
                                         </p>
@@ -461,7 +446,7 @@ const BannerHome = () => {
 
                                     {/* Submit Button */}
                                     <Button
-                                        className="w-full bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                                        className="w-full max-w-[20rem] mx-auto flex-1 h-[4rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
                                     >
                                         Login
                                     </Button>
@@ -484,11 +469,11 @@ const BannerHome = () => {
                 )
             }
             <div className="container">
-                <div className="flex flex-col items-center justify-center z-10 h-full relative gap-y-[2rem]" >
+                <div className="flex flex-col items-start justify-end z-10 h-full relative gap-y-[1.6rem] py-[4rem]" >
                     {
                         data && (
-                            <h1 
-                                className="text-center text-white text-[8rem] uppercase font-medium" 
+                            <h1
+                                className="text-start text-white text-[4rem] uppercase font-medium"
                                 data-aos="fade-up"
                                 suppressHydrationWarning
                             >
@@ -496,9 +481,9 @@ const BannerHome = () => {
                             </h1>
                         )
                     }
-                    <div 
+                    <div
                         className="w-full z-10 relative"
-                        data-aos="fade-up" 
+                        data-aos="fade-up"
                         data-aos-delay="500"
                         suppressHydrationWarning
                     >

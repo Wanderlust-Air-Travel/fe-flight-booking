@@ -1,29 +1,32 @@
-import ItemService from "../ItemService/ItemService"
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+"use client"
 import { useDeals } from "@/app/hooks/useDeals"
 import { generateServiceKey } from "@/app/utils/key-utils"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { Navigation } from "swiper/modules"
+import { Swiper, SwiperSlide } from "swiper/react"
+import ItemService from "../ItemService/ItemService"
+
 
 const ServiceSlide = () => {
     const { services, loading } = useDeals()
 
     return (
 
-        <section className="flex w-full">
+        <section className="flex w-full overflow-hidden">
             <div className="container">
                 <div className="flex flex-col gap-y-[2rem]">
                     <div className="flex justify-between items-center">
-                        <h2 
-                            className="text-lg text-[var(--cl-pri)] uppercase font-bold" 
+                        <h2
+                            className="text-lg text-[var(--cl-pri)] uppercase font-bold"
                             data-aos="fade-right"
                             suppressHydrationWarning
                         >
-                            Services
+                            Services Other
                         </h2>
-                        <Link 
-                            className="block" 
-                            href="/" 
+                        <Link
+                            className="block"
+                            href="/"
                             data-aos="fade-left"
                             suppressHydrationWarning
                         >
@@ -37,9 +40,9 @@ const ServiceSlide = () => {
                                 (
                                     Array.from({ length: 4 }).map((_, i) => {
                                         return (
-                                            <div 
-                                                key={i} 
-                                                className="w-[calc(100%/4)] px-[1.2rem]" 
+                                            <div
+                                                key={i}
+                                                className="w-[calc(100%/4)] px-[1.2rem]"
                                                 data-aos="fade-up"
                                                 suppressHydrationWarning
                                             >
@@ -71,34 +74,35 @@ const ServiceSlide = () => {
                                         )
                                     })
                                 )
-
-
-
                                 :
                                 (
 
 
-                                    <Carousel
-                                        opts={{
-                                            align: "start",
-                                        }}
-                                        className="w-full "
-                                    >
-                                        <CarouselContent className="-mx-[1.2rem]">
-
-                                            {
-                                                services.map((service, index) => {
-                                                    return (
-                                                        <CarouselItem key={generateServiceKey(service.link, index)} className="w-[calc(100%/4)] px-[1.2rem]">
-                                                            <ItemService image={service.image} title={service.title} service={service.service} startDate={service.startDate} endDate={service.endDate} price={service.price} link={service.link} />
-                                                        </CarouselItem>
-                                                    )
-                                                })
-                                            }
-                                        </CarouselContent>
-                                        <CarouselPrevious />
-                                        <CarouselNext />
-                                    </Carousel>
+                                    <div className="-mx-[1.2rem]">
+                                        <Swiper
+                                            modules={[Navigation]}
+                                            navigation
+                                            spaceBetween={0}
+                                            slidesPerView="auto"
+                                        >
+                                            {services.map((service, index) => (
+                                                <SwiperSlide
+                                                    key={generateServiceKey(service.link, index)}
+                                                    className="w-[calc(100%/4)]! px-[1.2rem]"
+                                                >
+                                                    <ItemService
+                                                        image={service.image}
+                                                        title={service.title}
+                                                        service={service.service}
+                                                        startDate={service.startDate}
+                                                        endDate={service.endDate}
+                                                        price={service.price}
+                                                        link={service.link}
+                                                    />
+                                                </SwiperSlide>
+                                            ))}
+                                        </Swiper>
+                                    </div>
                                 )
                         }
                     </div>

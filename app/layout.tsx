@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Open_Sans } from "next/font/google";
+import { Open_Sans, TikTok_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 import AOSWrapper from "./components/Aos/AOSWrapper";
 
-const openSans = Open_Sans({
-  variable: "--font-open-sans",
+const tiktokSans = TikTok_Sans({
+  variable: "--font-tiktok-sans",
   subsets: ["latin", "vietnamese"],
 });
 
@@ -26,7 +26,7 @@ export default function RootLayout({
     <html lang="en">
 
       <body
-        className={`${openSans.variable} antialiased`}
+        className={`${tiktokSans.variable} antialiased`}
       >
         <Header />
         {children}
