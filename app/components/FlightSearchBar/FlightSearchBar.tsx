@@ -184,7 +184,7 @@ const FlightSearchBar = () => {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row w-full items-stretch bg-white rounded-md border-[#CBD4E6] border-[0.1rem]">
+      <div className="flex flex-col md:flex-row w-full items-stretch bg-white border-[#CBD4E6] border-[0.1rem]">
         <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6] relative">
           <SelectComponent
             value={from}

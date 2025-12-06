@@ -30,9 +30,9 @@ const tabs: Array<{ id: MainTab; label: string; icon: typeof Plane }> = [
 
 const MainNavigationTabs = ({ activeTab, onTabChange }: MainNavigationTabsProps) => {
   return (
-    <div className="w-full bg-white rounded-t-lg border-b border-gray-200">
-      <div className="container px-0">
-        <div className="flex items-center gap-0">
+    <div className="w-full  overflow-hidden border-b border-gray-200">
+     
+        <div className="flex items-center gap-0 rounded-t-2xl overflow-hidden!">
           {tabs.map((tab, index) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
@@ -44,9 +44,9 @@ const MainNavigationTabs = ({ activeTab, onTabChange }: MainNavigationTabsProps)
                 onClick={() => onTabChange(tab.id)}
                 className={cn(
                   "flex-1 flex items-center justify-center gap-2 px-4 py-4 md:py-5 text-base md:text-lg font-semibold transition-all duration-200 relative",
-                  "border-b-2",
+                  "border-b-2 rounded-tl-none! rounded-tr-none!",
                   active
-                    ? "bg-white text-[var(--cl-pri)] border-[var(--cl-pri)]"
+                    ? "bg-[var(--cl-pri)] text-[var(--cl-white)] border-[var(--cl-pri)]"
                     : "bg-gray-50 text-gray-600 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100",
                   index === 0 && "rounded-tl-lg",
                   index === tabs.length - 1 && "rounded-tr-lg"
@@ -54,7 +54,7 @@ const MainNavigationTabs = ({ activeTab, onTabChange }: MainNavigationTabsProps)
               >
                 <Icon className={cn(
                   "w-5 h-5 md:w-6 md:h-6 flex-shrink-0 transition-colors duration-200",
-                  active ? "text-[var(--cl-pri)]" : "text-gray-600"
+                  active ? "text-[var(--cl-white)]" : "text-gray-600"
                 )} />
                 <span className="hidden sm:inline font-medium">{tab.label}</span>
                 <span className="sm:hidden font-medium">{tab.label.split(" ")[0]}</span>
@@ -62,7 +62,7 @@ const MainNavigationTabs = ({ activeTab, onTabChange }: MainNavigationTabsProps)
             );
           })}
         </div>
-      </div>
+     
     </div>
   );
 };

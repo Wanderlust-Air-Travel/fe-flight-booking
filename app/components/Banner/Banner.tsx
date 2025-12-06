@@ -487,7 +487,7 @@ const BannerHome = () => {
                         data-aos-delay="500"
                         suppressHydrationWarning
                     >
-                        <div className="bg-white rounded-lg shadow-lg">
+                        <div className="bg-white rounded-2xl">
                             <MainNavigationTabs activeTab={activeMainTab} onTabChange={setActiveMainTab} />
                             <div className="w-full relative">
                                 {renderFormContent()}
