@@ -32,6 +32,8 @@ export default function FlightSchedulesPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [editingSchedule, setEditingSchedule] = useState<FlightSchedule | null>(null);
     const [formData, setFormData] = useState({
         flightNumber: "",
         routeId: "",
@@ -51,7 +53,7 @@ export default function FlightSchedulesPage() {
     const fetchSchedules = async () => {
         try {
             setLoading(true);
-            const response = await axiosInstance.get("/api/v1/admin/flight-schedules");
+            const response = await axiosInstance.get("/api/admin/flight-schedules");
             setSchedules(response.data);
             setError(null);
         } catch (err: any) {
@@ -64,23 +66,73 @@ export default function FlightSchedulesPage() {
 
     const handleCreate = async () => {
         try {
-            await axiosInstance.post("/api/v1/admin/flight-schedules", formData);
+            await axiosInstance.post("/api/admin/flight-schedules", formData);
             setIsCreateDialogOpen(false);
-            setFormData({
-                flightNumber: "",
-                routeId: "",
-                aircraftTypeId: "",
-                departureTime: "",
-                arrivalTime: "",
-                operatingDays: "1111111",
-                effectiveFrom: "",
-                effectiveTo: "",
-                status: "active",
-            });
+            resetForm();
             fetchSchedules();
         } catch (err: any) {
             setError(err.response?.data?.message || "Không thể tạo lịch chuyến bay");
         }
+    };
+
+    const handleEdit = (schedule: FlightSchedule) => {
+        setEditingSchedule(schedule);
+        setFormData({
+            flightNumber: schedule.flightNumber,
+            routeId: schedule.routeId || "",
+            aircraftTypeId: schedule.aircraftTypeId || "",
+            departureTime: schedule.departureTime || "",
+            arrivalTime: schedule.arrivalTime || "",
+            operatingDays: schedule.operatingDays || "1111111",
+            effectiveFrom: schedule.effectiveFrom ? new Date(schedule.effectiveFrom).toISOString().split('T')[0] : "",
+            effectiveTo: schedule.effectiveTo ? new Date(schedule.effectiveTo).toISOString().split('T')[0] : "",
+            status: schedule.status || "active",
+        });
+        setIsEditDialogOpen(true);
+    };
+
+    const handleUpdate = async () => {
+        if (!editingSchedule) return;
+        try {
+            await axiosInstance.put(`/api/admin/flight-schedules/${editingSchedule.flightScheduleId}`, {
+                departureTime: formData.departureTime,
+                arrivalTime: formData.arrivalTime,
+                operatingDays: formData.operatingDays,
+                effectiveFrom: formData.effectiveFrom,
+                effectiveTo: formData.effectiveTo,
+                status: formData.status,
+            });
+            setIsEditDialogOpen(false);
+            setEditingSchedule(null);
+            resetForm();
+            fetchSchedules();
+        } catch (err: any) {
+            setError(err.response?.data?.message || "Không thể cập nhật lịch chuyến bay");
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Bạn có chắc muốn xóa lịch chuyến bay này?")) return;
+        try {
+            await axiosInstance.delete(`/api/admin/flight-schedules/${id}`);
+            fetchSchedules();
+        } catch (err: any) {
+            setError(err.response?.data?.message || "Không thể xóa lịch chuyến bay");
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({
+            flightNumber: "",
+            routeId: "",
+            aircraftTypeId: "",
+            departureTime: "",
+            arrivalTime: "",
+            operatingDays: "1111111",
+            effectiveFrom: "",
+            effectiveTo: "",
+            status: "active",
+        });
     };
 
     if (loading) {
@@ -96,7 +148,7 @@ export default function FlightSchedulesPage() {
                 </div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button>
+                        <Button onClick={resetForm}>
                             <Plus className="h-4 w-4 mr-2" />
                             Thêm lịch chuyến bay
                         </Button>
@@ -239,12 +291,13 @@ export default function FlightSchedulesPage() {
                                 <TableHead>Ngày hoạt động</TableHead>
                                 <TableHead>Hiệu lực</TableHead>
                                 <TableHead>Trạng thái</TableHead>
+                                <TableHead className="text-right">Thao tác</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {schedules.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center text-gray-500">
+                                    <TableCell colSpan={9} className="text-center text-gray-500">
                                         Chưa có lịch chuyến bay nào
                                     </TableCell>
                                 </TableRow>
@@ -281,6 +334,24 @@ export default function FlightSchedulesPage() {
                                                 {schedule.status}
                                             </span>
                                         </TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleEdit(schedule)}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(schedule.flightScheduleId)}
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
                                     </TableRow>
                                 ))
                             )}
@@ -288,6 +359,103 @@ export default function FlightSchedulesPage() {
                     </Table>
                 </CardContent>
             </Card>
+
+            {/* Edit Dialog */}
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Chỉnh sửa lịch chuyến bay</DialogTitle>
+                        <DialogDescription>
+                            Cập nhật thông tin lịch chuyến bay {editingSchedule?.flightNumber}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <Label htmlFor="edit-departureTime">Giờ khởi hành (HH:mm)</Label>
+                                <Input
+                                    id="edit-departureTime"
+                                    type="time"
+                                    value={formData.departureTime}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, departureTime: e.target.value })
+                                    }
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="edit-arrivalTime">Giờ đến (HH:mm)</Label>
+                                <Input
+                                    id="edit-arrivalTime"
+                                    type="time"
+                                    value={formData.arrivalTime}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, arrivalTime: e.target.value })
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <Label htmlFor="edit-operatingDays">Ngày hoạt động (7 ký tự)</Label>
+                            <Input
+                                id="edit-operatingDays"
+                                value={formData.operatingDays}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, operatingDays: e.target.value })
+                                }
+                                placeholder="1111111"
+                                maxLength={7}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                Ví dụ: 1111111 = Tất cả các ngày, 1111100 = Thứ 2-6
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <Label htmlFor="edit-effectiveFrom">Có hiệu lực từ</Label>
+                                <Input
+                                    id="edit-effectiveFrom"
+                                    type="date"
+                                    value={formData.effectiveFrom}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, effectiveFrom: e.target.value })
+                                    }
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="edit-effectiveTo">Có hiệu lực đến</Label>
+                                <Input
+                                    id="edit-effectiveTo"
+                                    type="date"
+                                    value={formData.effectiveTo}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, effectiveTo: e.target.value })
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <Label htmlFor="edit-status">Trạng thái</Label>
+                            <select
+                                id="edit-status"
+                                value={formData.status}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, status: e.target.value })
+                                }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                            Hủy
+                        </Button>
+                        <Button onClick={handleUpdate}>Cập nhật</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

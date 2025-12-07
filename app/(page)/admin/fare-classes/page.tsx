@@ -50,7 +50,7 @@ export default function FareClassesPage() {
     const fetchFareClasses = async () => {
         try {
             setLoading(true);
-            const response = await axiosInstance.get("/api/v1/admin/fare-classes");
+            const response = await axiosInstance.get("/api/admin/fare-classes");
             setFareClasses(response.data);
             setError(null);
         } catch (err: any) {
@@ -63,7 +63,7 @@ export default function FareClassesPage() {
 
     const handleCreate = async () => {
         try {
-            await axiosInstance.post("/api/v1/admin/fare-classes", formData);
+            await axiosInstance.post("/api/admin/fare-classes", formData);
             setIsCreateDialogOpen(false);
             setFormData({
                 fareClassCode: "",
@@ -94,7 +94,7 @@ export default function FareClassesPage() {
         if (!editingFareClass) return;
         try {
             await axiosInstance.put(
-                `/api/v1/admin/fare-classes/${editingFareClass.fareClassCode}`,
+                `/api/admin/fare-classes/${editingFareClass.fareClassCode}`,
                 {
                     description: formData.description,
                     changeRule: formData.changeRule,
@@ -112,7 +112,7 @@ export default function FareClassesPage() {
     const handleDelete = async (fareClassCode: string) => {
         if (!confirm(`Bạn có chắc muốn xóa hạng vé ${fareClassCode}?`)) return;
         try {
-            await axiosInstance.delete(`/api/v1/admin/fare-classes/${fareClassCode}`);
+            await axiosInstance.delete(`/api/admin/fare-classes/${fareClassCode}`);
             fetchFareClasses();
         } catch (err: any) {
             setError(err.response?.data?.message || "Không thể xóa hạng vé");

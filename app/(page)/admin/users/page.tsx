@@ -51,8 +51,14 @@ export default function UsersPage() {
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            // Note: You'll need to create a GET /admin/users endpoint
-            // For now, this is a placeholder
+            const response = await axiosInstance.get("/api/admin/users");
+            // Transform backend response to match frontend type
+            const usersData = response.data.map((user: any) => ({
+                ...user,
+                userId: user.user_id,
+                roles: user.userRoles?.map((ur: any) => ur.role).filter((r: any) => r) || [],
+            }));
+            setUsers(usersData);
             setError(null);
         } catch (err: any) {
             console.error("Error fetching users:", err);
@@ -64,7 +70,7 @@ export default function UsersPage() {
 
     const fetchRoles = async () => {
         try {
-            const response = await axiosInstance.get("/api/v1/admin/roles");
+            const response = await axiosInstance.get("/api/admin/roles");
             setRoles(response.data);
         } catch (err: any) {
             console.error("Error fetching roles:", err);
@@ -74,7 +80,7 @@ export default function UsersPage() {
     const handleAssignRole = async () => {
         if (!selectedUser || !selectedRole) return;
         try {
-            await axiosInstance.post(`/api/v1/admin/users/${selectedUser.userId}/roles`, {
+            await axiosInstance.post(`/api/admin/users/${selectedUser.userId}/roles`, {
                 roleCode: selectedRole,
             });
             setIsRoleDialogOpen(false);
@@ -89,7 +95,7 @@ export default function UsersPage() {
     const handleRemoveRole = async (userId: string, roleCode: string) => {
         if (!confirm(`Bạn có chắc muốn xóa quyền ${roleCode}?`)) return;
         try {
-            await axiosInstance.delete(`/api/v1/admin/users/${userId}/roles/${roleCode}`);
+            await axiosInstance.delete(`/api/admin/users/${userId}/roles/${roleCode}`);
             fetchUsers();
         } catch (err: any) {
             setError(err.response?.data?.message || "Không thể xóa quyền");

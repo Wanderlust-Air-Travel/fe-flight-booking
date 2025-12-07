@@ -66,11 +66,67 @@ export default function RouteFarePricesPage() {
             setLoading(true);
             const [pricesRes, routesRes, fareClassesRes] = await Promise.all([
                 axiosInstance.get("/api/admin/route-fare-prices"),
-                axiosInstance.get("/api/v1/routes").catch(() => ({ data: [] })),
+                axiosInstance.get("/api/admin/routes").catch(() => ({ data: [] })),
                 axiosInstance.get("/api/admin/fare-classes"),
             ]);
-            setRouteFarePrices(pricesRes.data);
-            setRoutes(routesRes.data || []);
+            
+            // Transform routes data: route_id -> routeId, origin_airport -> originAirport, etc.
+            const transformedRoutes = (routesRes.data || []).map((route: any) => ({
+                routeId: route.route_id,
+                originAirport: route.origin_airport ? {
+                    iataCode: route.origin_airport.iata_code,
+                    city: route.origin_airport.city,
+                } : undefined,
+                destinationAirport: route.destination_airport ? {
+                    iataCode: route.destination_airport.iata_code,
+                    city: route.destination_airport.city,
+                } : undefined,
+            }));
+            
+            // Transform route fare prices data
+            const transformedPrices = (pricesRes.data || []).map((price: any) => {
+                // Transform route with nested airport data
+                let transformedRoute: Route | undefined;
+                if (price.route) {
+                    const originAirport = price.route.origin_airport || price.route.originAirport;
+                    const destinationAirport = price.route.destination_airport || price.route.destinationAirport;
+                    
+                    transformedRoute = {
+                        routeId: price.route.route_id || price.route.routeId,
+                        originAirport: originAirport ? {
+                            iataCode: originAirport.iata_code || originAirport.iataCode,
+                            city: originAirport.city || '',
+                        } : undefined,
+                        destinationAirport: destinationAirport ? {
+                            iataCode: destinationAirport.iata_code || destinationAirport.iataCode,
+                            city: destinationAirport.city || '',
+                        } : undefined,
+                    };
+                }
+                
+                return {
+                    ...price,
+                    routeFarePriceId: price.route_fare_price_id || price.routeFarePriceId,
+                    routeId: price.route_id || price.routeId,
+                    fareClassCode: price.fare_class_code || price.fareClassCode,
+                    basePrice: typeof price.base_price === 'number' ? price.base_price : (price.basePrice || 0),
+                    taxRate: typeof price.tax_rate === 'number' ? price.tax_rate : (price.taxRate || 0),
+                    feeRate: typeof price.fee_rate === 'number' ? price.fee_rate : (price.feeRate || 0),
+                    effectiveFrom: price.effective_from ? (typeof price.effective_from === 'string' ? price.effective_from : new Date(price.effective_from).toISOString()) : '',
+                    effectiveTo: price.effective_to ? (typeof price.effective_to === 'string' ? price.effective_to : new Date(price.effective_to).toISOString()) : null,
+                    isActive: price.is_active !== undefined ? price.is_active : price.isActive,
+                    priority: typeof price.priority === 'number' ? price.priority : (price.priority || 0),
+                    notes: price.notes || null,
+                    route: transformedRoute,
+                    fareClass: price.fare_class ? {
+                        fareClassCode: price.fare_class.fare_class_code || price.fare_class.fareClassCode,
+                        description: price.fare_class.description,
+                    } : (price.fareClass || undefined),
+                };
+            });
+            
+            setRouteFarePrices(transformedPrices);
+            setRoutes(transformedRoutes);
             setFareClasses(fareClassesRes.data || []);
             setError(null);
         } catch (err: any) {
@@ -105,16 +161,22 @@ export default function RouteFarePricesPage() {
 
     const handleEdit = (price: RouteFarePrice) => {
         setEditingPrice(price);
+        const effectiveFromDate = typeof price.effectiveFrom === 'string' 
+            ? price.effectiveFrom.split('T')[0] 
+            : '';
+        const effectiveToDate = price.effectiveTo && typeof price.effectiveTo === 'string'
+            ? price.effectiveTo.split('T')[0]
+            : "";
         setFormData({
             routeId: price.routeId,
             fareClassCode: price.fareClassCode,
-            basePrice: price.basePrice.toString(),
-            taxRate: price.taxRate.toString(),
-            feeRate: price.feeRate.toString(),
-            effectiveFrom: price.effectiveFrom.split('T')[0],
-            effectiveTo: price.effectiveTo ? price.effectiveTo.split('T')[0] : "",
-            isActive: price.isActive,
-            priority: price.priority.toString(),
+            basePrice: (price.basePrice || 0).toString(),
+            taxRate: (price.taxRate || 0).toString(),
+            feeRate: (price.feeRate || 0).toString(),
+            effectiveFrom: effectiveFromDate,
+            effectiveTo: effectiveToDate,
+            isActive: price.isActive !== undefined ? price.isActive : true,
+            priority: (price.priority || 0).toString(),
             notes: price.notes || "",
         });
         setIsEditDialogOpen(true);
@@ -384,11 +446,15 @@ export default function RouteFarePricesPage() {
                                         <TableCell className="font-mono font-bold">
                                             {price.fareClassCode}
                                         </TableCell>
-                                        <TableCell>{formatPrice(price.basePrice)}</TableCell>
-                                        <TableCell>{(price.taxRate * 100).toFixed(1)}%</TableCell>
-                                        <TableCell>{(price.feeRate * 100).toFixed(1)}%</TableCell>
+                                        <TableCell>{formatPrice(price.basePrice || 0)}</TableCell>
+                                        <TableCell>{((price.taxRate || 0) * 100).toFixed(1)}%</TableCell>
+                                        <TableCell>{((price.feeRate || 0) * 100).toFixed(1)}%</TableCell>
                                         <TableCell className="text-sm">
-                                            {new Date(price.effectiveFrom).toLocaleDateString('vi-VN')} - {price.effectiveTo ? new Date(price.effectiveTo).toLocaleDateString('vi-VN') : 'Vô thời hạn'}
+                                            {price.effectiveFrom 
+                                                ? new Date(price.effectiveFrom).toLocaleDateString('vi-VN')
+                                                : 'N/A'} - {price.effectiveTo 
+                                                    ? new Date(price.effectiveTo).toLocaleDateString('vi-VN')
+                                                    : 'Vô thời hạn'}
                                         </TableCell>
                                         <TableCell>
                                             <span className={`px-2 py-1 rounded text-xs ${price.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
