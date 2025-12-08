@@ -527,7 +527,7 @@ export default function RouteFarePricesPage() {
                                     Thêm giá vé mới
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[30vw] md:max-w-[30vw] lg:max-w-[30vw] xl:max-w-[40vw] 2xl:max-w-[50vw] 3xl:max-w-[60vw] max-w-5xl max-h-[90vh] overflow-hidden">
+                            <DialogContent className="sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] 2xl:max-w-[50vw] 3xl:max-w-[60vw] max-w-5xl max-h-[90vh] overflow-hidden">
                                 <DialogHeader>
                                     <DialogTitle className="text-3xl font-bold text-gray-900">Thêm giá vé mới</DialogTitle>
                                     <DialogDescription className="text-base text-gray-600 mt-2">
@@ -1058,7 +1058,7 @@ export default function RouteFarePricesPage() {
                     setEditingPrice(null);
                 }
             }}>
-                <DialogContent className="sm:max-w-[30vw] md:max-w-[30vw] lg:max-w-[30vw] xl:max-w-[40vw] 2xl:max-w-[50vw] 3xl:max-w-[60vw] max-w-5xl max-h-[90vh] overflow-hidden">
+                <DialogContent className="sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] 2xl:max-w-[50vw] 3xl:max-w-[60vw] max-w-5xl max-h-[90vh] overflow-hidden">
                     <DialogHeader>
                         <DialogTitle className="text-3xl font-bold text-gray-900">Chỉnh sửa giá vé</DialogTitle>
                         <DialogDescription className="text-base text-gray-600 mt-2">

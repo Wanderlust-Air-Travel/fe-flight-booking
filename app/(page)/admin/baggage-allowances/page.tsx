@@ -99,22 +99,32 @@ export default function BaggageAllowancesPage() {
         notes: "",
     });
 
+    // Fetch fare classes only once on mount (same as route-fare-prices page)
+    useEffect(() => {
+        fetchFareClasses();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Fetch data when page or pageSize changes
     useEffect(() => {
         fetchData();
-        // Fetch fare classes only once (not paginated)
-        fetchFareClasses();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, pageSize]);
     
     const fetchFareClasses = async () => {
         try {
             const fareClassesRes = await axiosInstance.get("/api/admin/fare-classes");
-            const rawFareClassesData = Array.isArray(fareClassesRes.data)
-                ? fareClassesRes.data
-                : fareClassesRes.data?.data || fareClassesRes.data?.items || [];
-            const fareClassesData = transformKeysToCamelCase<FareClass[]>(rawFareClassesData);
-            setFareClasses(fareClassesData);
+            // Transform fare classes data - normalize field names (same as route-fare-prices page)
+            const transformedFareClasses = (fareClassesRes.data || []).map((fc: any) => ({
+                fareClassCode: fc.fare_class_code || fc.fareClassCode,
+                description: fc.description || null,
+                name: fc.name || null,
+            }));
+            setFareClasses(transformedFareClasses);
         } catch (err: any) {
             console.error("Error fetching fare classes:", err);
+            // Set empty array on error to prevent UI issues
+            setFareClasses([]);
         }
     };
 
@@ -373,7 +383,7 @@ export default function BaggageAllowancesPage() {
                                     Thêm quy định hành lý
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[30vw] md:max-w-[30vw] lg:max-w-[30vw] xl:max-w-[40vw] 2xl:max-w-[50vw] 3xl:max-w-[60vw] max-w-5xl max-h-[90vh] overflow-hidden">
+                            <DialogContent className="sm:max-w-[100vw] md:max-w-[90vw] lg:max-w-[80vw] xl:max-w-[70vw] 2xl:max-w-[60vw] 3xl:max-w-[70vw] max-w-5xl max-h-[90vh] overflow-hidden">
                                 <DialogHeader>
                                     <DialogTitle className="text-3xl font-bold text-gray-900">Thêm quy định hành lý mới</DialogTitle>
                                     <DialogDescription className="text-base text-gray-600 mt-2">
@@ -776,7 +786,7 @@ export default function BaggageAllowancesPage() {
                     setEditingAllowance(null);
                 }
             }}>
-                <DialogContent className="sm:max-w-[30vw] md:max-w-[30vw] lg:max-w-[30vw] xl:max-w-[40vw] 2xl:max-w-[50vw] 3xl:max-w-[60vw] max-w-5xl max-h-[90vh] overflow-hidden">
+                <DialogContent className="sm:max-w-[100vw] md:max-w-[90vw] lg:max-w-[80vw] xl:max-w-[70vw] 2xl:max-w-[60vw] 3xl:max-w-[70vw] max-w-5xl max-h-[90vh] overflow-hidden">
                     <DialogHeader>
                         <DialogTitle className="text-3xl font-bold text-gray-900">Chỉnh sửa quy định hành lý</DialogTitle>
                         <DialogDescription className="text-base text-gray-600 mt-2">
