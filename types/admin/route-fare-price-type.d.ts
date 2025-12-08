@@ -7,6 +7,7 @@ export interface Route {
 export interface FareClass {
     fareClassCode: string;
     description: string | null;
+    name?: string | null;
 }
 
 export interface RouteFarePrice {

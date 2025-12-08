@@ -7,8 +7,8 @@ import { usePathname } from "next/navigation";
 const Footer = () => {
     const router = usePathname();
 
-    // Không dùng footer trên trang đăng nhập / đăng ký để layout full screen, không bị ảnh hoặc form tràn lên
-    if (router === "/signin" || router === "/signup") {
+    // Không dùng footer trên trang đăng nhập / đăng ký và trang admin để layout full screen
+    if (router === "/signin" || router === "/signup" || router?.startsWith("/admin")) {
         return null;
     }
 

@@ -28,6 +28,41 @@ import axiosInstance from "@/lib/axios-instance";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FareClass } from "@/types/admin/fare-class-type";
 
+/**
+ * Transform snake_case string to camelCase
+ * Examples: fare_class_code -> fareClassCode, checked_baggage_kg -> checkedBaggageKg
+ */
+function snakeToCamel(str: string): string {
+    return str.replace(/_([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+}
+
+/**
+ * Transform object keys from snake_case to camelCase recursively
+ * Handles nested objects and arrays
+ */
+function transformKeysToCamelCase<T>(obj: any): T {
+    if (obj === null || obj === undefined) {
+        return obj;
+    }
+    
+    if (Array.isArray(obj)) {
+        return obj.map(item => transformKeysToCamelCase(item)) as T;
+    }
+    
+    if (typeof obj === 'object' && obj.constructor === Object) {
+        const transformed: any = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const camelKey = snakeToCamel(key);
+                transformed[camelKey] = transformKeysToCamelCase(obj[key]);
+            }
+        }
+        return transformed as T;
+    }
+    
+    return obj;
+}
+
 export default function FareClassesPage() {
     const [fareClasses, setFareClasses] = useState<FareClass[]>([]);
     const [loading, setLoading] = useState(true);
@@ -51,7 +86,22 @@ export default function FareClassesPage() {
         try {
             setLoading(true);
             const response = await axiosInstance.get("/api/admin/fare-classes");
-            setFareClasses(response.data);
+            
+            // Handle response data - ensure it's an array
+            const rawData = Array.isArray(response.data) 
+                ? response.data 
+                : response.data?.data || response.data?.items || [];
+            
+            // Transform snake_case keys to camelCase (backend returns snake_case, frontend expects camelCase)
+            const transformedData = transformKeysToCamelCase<FareClass[]>(rawData);
+            
+            // Ensure each fare class has cabinClassCode at top level for backward compatibility
+            const fareClassesWithCabinCode = transformedData.map((fc: any) => ({
+                ...fc,
+                cabinClassCode: fc.cabinClass?.cabinClassCode || fc.cabinClassCode || '',
+            }));
+            
+            setFareClasses(fareClassesWithCabinCode);
             setError(null);
         } catch (err: any) {
             console.error("Error fetching fare classes:", err);
@@ -80,9 +130,11 @@ export default function FareClassesPage() {
 
     const handleEdit = (fareClass: FareClass) => {
         setEditingFareClass(fareClass);
+        // Get cabinClassCode from nested cabinClass if available, otherwise use top-level
+        const cabinClassCode = fareClass.cabinClass?.cabinClassCode || fareClass.cabinClassCode || '';
         setFormData({
             fareClassCode: fareClass.fareClassCode,
-            cabinClassCode: fareClass.cabinClassCode,
+            cabinClassCode: cabinClassCode,
             description: fareClass.description || "",
             changeRule: fareClass.changeRule || "",
             refundRule: fareClass.refundRule || "",

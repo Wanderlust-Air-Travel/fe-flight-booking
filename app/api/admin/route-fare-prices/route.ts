@@ -14,7 +14,14 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const response = await fetch(`${BACKEND_API_URL}/api/v1/admin/route-fare-prices`, {
+    // Extract query parameters from request URL
+    const searchParams = req.nextUrl.searchParams;
+    const queryString = searchParams.toString();
+    const backendUrl = queryString 
+      ? `${BACKEND_API_URL}/api/v1/admin/route-fare-prices?${queryString}`
+      : `${BACKEND_API_URL}/api/v1/admin/route-fare-prices`;
+
+    const response = await fetch(backendUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

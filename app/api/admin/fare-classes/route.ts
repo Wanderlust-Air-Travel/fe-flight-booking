@@ -14,7 +14,9 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const response = await fetch(`${BACKEND_API_URL}/api/v1/admin/fare-classes`, {
+    const backendUrl = `${BACKEND_API_URL}/api/v1/admin/fare-classes`;
+
+    const response = await fetch(backendUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -28,11 +30,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(data, { status: response.status });
     }
 
-    return NextResponse.json(data, { status: 200 });
+    // Ensure we return an array
+    const result = Array.isArray(data) ? data : (data?.data || data?.items || []);
+    
+    return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    console.error('Error fetching fare classes:', error);
+    console.error('[Fare Classes API] Error fetching fare classes:', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: 'Internal server error', error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

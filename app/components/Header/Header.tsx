@@ -1,7 +1,7 @@
 "use client"
 import useIsActiveStore from "@/app/zustand/storeHeader";
 import useUserStore from "@/app/zustand/storeUser";
-import { ChevronDown, CircleUserRound, X, Menu, Settings } from "lucide-react";
+import { ChevronDown, CircleUserRound, X, Menu, Settings, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -116,8 +116,28 @@ const Header = () => {
                                 className="w-full h-full object-contain transition ease-linear xl:group-hover:scale-95 filter-white"
                             />
                         </Link>
+                        {/* Logout button for admin pages */}
+                        {router?.startsWith('/admin') && hydrated && isLoggedIn && (
+                            <div className="ml-auto flex items-center gap-4">
+                                <div className="hidden lg:flex items-center gap-2 text-[var(--cl-white)]">
+                                    <Image src="/icAva.png" alt="icAva" width={24} height={24} className="flex-shrink-0 rounded-full" priority unoptimized />
+                                    <span className="text-sm uppercase font-medium">{user?.fullname}</span>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        handleLogout();
+                                        navigation.push('/');
+                                    }}
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[var(--cl-white)] hover:bg-[var(--cl-four)] rounded-lg transition-colors uppercase"
+                                    title="Đăng xuất"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    <span className="hidden lg:inline">Đăng xuất</span>
+                                </button>
+                            </div>
+                        )}
                         {/* Desktop navigation - Ẩn menu cho management roles */}
-                        {!hasManagementRole && (
+                        {!hasManagementRole && !router?.startsWith('/admin') && (
                             <ul className="hidden lg:flex gap-x-[1.2rem] items-center ">
                                 {menuLists.map((menuList, index) => {
                                 return (
@@ -253,20 +273,35 @@ const Header = () => {
                         )}
                         {/* Mobile actions */}
                         <div className="flex items-center gap-x-2 lg:hidden ml-auto">
-                            {hydrated && !isLoggedIn && (
-                                <Link href="/signin" className="text-[var(--cl-white)] text-sm uppercase">
-                                    Sign in
-                                </Link>
+                            {router?.startsWith('/admin') && hydrated && isLoggedIn ? (
+                                <button
+                                    onClick={() => {
+                                        handleLogout();
+                                        navigation.push('/');
+                                    }}
+                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cl-white)] hover:bg-[var(--cl-four)] rounded-lg transition-colors"
+                                    title="Đăng xuất"
+                                >
+                                    <LogOut className="w-5 h-5" />
+                                </button>
+                            ) : (
+                                <>
+                                    {hydrated && !isLoggedIn && (
+                                        <Link href="/signin" className="text-[var(--cl-white)] text-sm uppercase">
+                                            Sign in
+                                        </Link>
+                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-[var(--cl-white)] hover:bg-[var(--cl-four)]"
+                                        onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+                                        aria-label="Toggle navigation menu"
+                                    >
+                                        {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                                    </Button>
+                                </>
                             )}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-[var(--cl-white)] hover:bg-[var(--cl-four)]"
-                                onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-                                aria-label="Toggle navigation menu"
-                            >
-                                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                            </Button>
                         </div>
                     </div>
                 </div>
