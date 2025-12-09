@@ -12,6 +12,7 @@ import SectionNavigation from "@/app/components/SeatMap/SectionNavigation";
 import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
+import CabinServicesSelector from "@/app/components/CabinServices/CabinServicesSelector";
 
 const ChooseCabin = () => {
     const [seatBusiness, setSeatBusiness] = useState<SeatGroup | null>(null)
@@ -342,6 +343,17 @@ const ChooseCabin = () => {
                                             </li>
                                         </ul>
                                     </div>
+
+                                    {/* Cabin Services Selector */}
+                                    {data.fareClassCode && (
+                                        <div className="mt-4">
+                                            <CabinServicesSelector
+                                                flightInstanceId={flightInstanceId}
+                                                fareClassCode={data.fareClassCode}
+                                                cabinClassCode={data.type === "business" ? "J" : "Y"}
+                                            />
+                                        </div>
+                                    )}
 
                                     {/* Continue Button */}
                                     <div className="flex flex-col gap-y-[1rem]">

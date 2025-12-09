@@ -91,6 +91,8 @@ const Header = () => {
         logout();
         setUserRolesState([]);
         setIsMobileMenuOpen(false);
+        // Điều hướng về trang chủ sau khi đăng xuất
+        navigation.push("/");
     }
 
     return (

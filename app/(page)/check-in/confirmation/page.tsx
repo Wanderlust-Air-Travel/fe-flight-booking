@@ -74,12 +74,12 @@ const CheckInConfirmationPage = () => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-[1rem] sm:gap-[1.2rem] mb-[2rem]">
+                        <div className="flex flex-col sm:flex-row gap-[1rem] sm:gap-[1.2rem] mb-[2rem] sm:justify-end">
                             {/* Only show "Xem vé của tôi" if user is logged in */}
                             {isLoggedIn ? (
                                 <Button
                                     onClick={() => router.push("/my-tickets")}
-                                    className="flex-1 bg-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/90 text-white px-[2.4rem] py-[1.2rem] sm:py-[1.4rem] text-base sm:text-lg font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                                    className="flex-1 sm:flex-initial bg-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/90 text-white px-[2rem] py-[1.2rem] text-base sm:text-lg font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                                 >
                                     <span className="flex items-center justify-center gap-[0.8rem]">
                                         <Ticket className="w-[1.6rem] h-[1.6rem]" />
@@ -89,7 +89,7 @@ const CheckInConfirmationPage = () => {
                             ) : (
                                 <Button
                                     onClick={() => router.push(`/signin?redirect=${encodeURIComponent('/my-tickets')}`)}
-                                    className="flex-1 bg-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/90 text-white px-[2.4rem] py-[1.2rem] sm:py-[1.4rem] text-base sm:text-lg font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                                    className="flex-1 sm:flex-initial bg-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/90 text-white px-[2rem] py-[1.2rem] text-base sm:text-lg font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                                 >
                                     <span className="flex items-center justify-center gap-[0.8rem]">
                                         <LogIn className="w-[1.6rem] h-[1.6rem]" />
@@ -101,7 +101,7 @@ const CheckInConfirmationPage = () => {
                             <Button
                                 onClick={() => router.push("/")}
                                 variant="outline"
-                                className="flex-1 border-2 border-gray-300 hover:border-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/5 text-gray-700 hover:text-[var(--cl-pri)] px-[2.4rem] py-[1.2rem] sm:py-[1.4rem] text-base sm:text-lg font-semibold rounded-lg transition-all duration-200"
+                                className="flex-1 sm:flex-initial border-2 border-gray-300 hover:border-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/5 text-gray-700 hover:text-[var(--cl-pri)] px-[2rem] py-[1.2rem] text-base sm:text-lg font-semibold rounded-lg transition-all duration-200"
                             >
                                 Về trang chủ
                             </Button>

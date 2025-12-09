@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useUserStore from "@/app/zustand/storeUser";
 import Link from "next/link";
 import { 
@@ -16,6 +16,31 @@ import {
     Sparkles
 } from "lucide-react";
 
+interface MenuItem {
+    id: string;
+    title: string;
+    description: string;
+    href: string;
+    icon: string;
+    color: string;
+    bgColor: string;
+}
+
+interface DashboardResponse {
+    items: MenuItem[];
+    menuItems: MenuItem[];
+}
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    DollarSign,
+    Plane,
+    Users,
+    TrendingUp,
+    Luggage,
+    Sparkles,
+    LayoutDashboard,
+};
+
 export default function AdminLayout({
     children,
 }: {
@@ -23,25 +48,74 @@ export default function AdminLayout({
 }) {
     const router = useRouter();
     const pathname = usePathname();
-    const { isLoggedIn, accessToken, hydrated } = useUserStore();
+    const { isLoggedIn, accessToken, hydrated, logout } = useUserStore();
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const handleLogout = () => {
+        logout();
+        // Điều hướng về trang chủ sau khi đăng xuất
+        router.push("/");
+    };
 
     useEffect(() => {
         if (hydrated && (!isLoggedIn || !accessToken)) {
-            router.push("/login?redirect=" + encodeURIComponent(pathname));
+            // Nếu user đã logout hoặc mất token, điều hướng về trang chủ
+            router.push("/");
         }
     }, [hydrated, isLoggedIn, accessToken, router, pathname]);
 
-    const menuItems = [
-        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-        { href: "/admin/route-fare-prices", label: "Quản lý giá vé theo route", icon: TrendingUp },
-        { href: "/admin/baggage-allowances", label: "Quản lý quy định hành lý", icon: Luggage },
-        { href: "/admin/cabin-services", label: "Quản lý dịch vụ cabin", icon: Sparkles },
-        { href: "/admin/fare-classes", label: "Quản lý hạng vé", icon: DollarSign },
-        { href: "/admin/flight-schedules", label: "Quản lý lịch chuyến bay", icon: Plane },
-        { href: "/admin/users", label: "Quản lý người dùng", icon: Users },
-    ];
+    useEffect(() => {
+        const fetchMenuItems = async () => {
+            if (!accessToken) {
+                setLoading(false);
+                return;
+            }
 
-    if (!hydrated || !isLoggedIn) {
+            try {
+                const response = await fetch("/api/admin/dashboard", {
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const data: DashboardResponse = await response.json();
+                    // Add Dashboard menu item at the beginning
+                    const dashboardItem: MenuItem = {
+                        id: "dashboard",
+                        title: "Dashboard",
+                        description: "",
+                        href: "/admin",
+                        icon: "LayoutDashboard",
+                        color: "",
+                        bgColor: "",
+                    };
+                    setMenuItems([dashboardItem, ...(data.menuItems || [])]);
+                } else {
+                    console.error("Failed to fetch menu items");
+                    // Fallback to default menu items if API fails
+                    setMenuItems([
+                        { id: "dashboard", title: "Dashboard", description: "", href: "/admin", icon: "LayoutDashboard", color: "", bgColor: "" },
+                    ]);
+                }
+            } catch (error) {
+                console.error("Error fetching menu items:", error);
+                // Fallback to default menu items if API fails
+                setMenuItems([
+                    { id: "dashboard", title: "Dashboard", description: "", href: "/admin", icon: "LayoutDashboard", color: "", bgColor: "" },
+                ]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (accessToken && hydrated) {
+            fetchMenuItems();
+        }
+    }, [accessToken, hydrated]);
+
+    if (!hydrated || !isLoggedIn || loading) {
         return <div className="flex items-center justify-center min-h-screen">Đang tải...</div>;
     }
 
@@ -56,11 +130,11 @@ export default function AdminLayout({
                 
                 <nav className="mt-6">
                     {menuItems.map((item) => {
-                        const Icon = item.icon;
+                        const Icon = iconMap[item.icon] || LayoutDashboard;
                         const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                         return (
                             <Link
-                                key={item.href}
+                                key={item.id || item.href}
                                 href={item.href}
                                 className={`flex items-center gap-3 px-6 py-3 text-sm font-medium transition-colors ${
                                     isActive
@@ -69,13 +143,13 @@ export default function AdminLayout({
                                 }`}
                             >
                                 <Icon className="h-5 w-5" />
-                                {item.label}
+                                {item.title}
                             </Link>
                         );
                     })}
                 </nav>
 
-                <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200 bg-white">
+                <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200 bg-white space-y-2">
                     <Link
                         href="/"
                         className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
@@ -83,6 +157,13 @@ export default function AdminLayout({
                         <Home className="h-5 w-5" />
                         Về trang chủ
                     </Link>
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors w-full"
+                    >
+                        <LogOut className="h-5 w-5" />
+                        Đăng xuất
+                    </button>
                 </div>
             </aside>
 
