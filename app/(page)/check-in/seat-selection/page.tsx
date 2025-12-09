@@ -155,7 +155,17 @@ const CheckInSeatSelectionPage = () => {
             const seatGroups = [seatBusiness, seatEconomy].filter(Boolean) as SeatGroup[];
             const seat = findSeatBySeatId(seatId, seatGroups);
             
-            if (!seat) return;
+            if (!seat) {
+                console.warn(`[handleSeatToggle] Seat not found for seatId: ${seatId}`);
+                return;
+            }
+
+            // CRITICAL: Ensure we have flightSeatId
+            if (!seat.flightSeatId) {
+                console.error(`[handleSeatToggle] Seat ${seat.seatNumber} has no flightSeatId. Cannot proceed.`);
+                setSubmitError(`Ghế ${seat.seatNumber} không có thông tin hợp lệ. Vui lòng thử lại.`);
+                return;
+            }
 
             setSelectedSeatsByFlight((prev) => {
                 const newMap = new Map(prev);
@@ -163,8 +173,9 @@ const CheckInSeatSelectionPage = () => {
                 const passengersNeedingSeats = passengersNeedingSeatsByFlight.get(flightInstanceId) || 0;
 
                 if (checked) {
-                    // Check if seat already selected
+                    // Check if seat already selected (by flightSeatId)
                     if (currentSeats.some(s => s.flightSeatId === seat.flightSeatId)) {
+                        console.log(`[handleSeatToggle] Seat ${seat.seatNumber} (${seat.flightSeatId}) already selected`);
                         return prev;
                     }
 
@@ -174,15 +185,17 @@ const CheckInSeatSelectionPage = () => {
                         return prev;
                     }
 
-                    newMap.set(flightInstanceId, [
+                    const newSeats = [
                         ...currentSeats,
                         { flightSeatId: seat.flightSeatId, seatNumber: seat.seatNumber },
-                    ]);
+                    ];
+                    newMap.set(flightInstanceId, newSeats);
+                    console.log(`[handleSeatToggle] Selected seat ${seat.seatNumber} (${seat.flightSeatId}) for flight ${flightInstanceId}. Total: ${newSeats.length}`);
                 } else {
-                    newMap.set(
-                        flightInstanceId,
-                        currentSeats.filter(s => s.flightSeatId !== seat.flightSeatId)
-                    );
+                    // Deselect: Remove seat from selection
+                    const filteredSeats = currentSeats.filter(s => s.flightSeatId !== seat.flightSeatId);
+                    newMap.set(flightInstanceId, filteredSeats);
+                    console.log(`[handleSeatToggle] Deselected seat ${seat.seatNumber} (${seat.flightSeatId}) for flight ${flightInstanceId}. Remaining: ${filteredSeats.length}`);
                 }
 
                 setSubmitError(null);
@@ -244,10 +257,32 @@ const CheckInSeatSelectionPage = () => {
 
         try {
             // Prepare segments for check-in
-            const checkInSegments = Array.from(segmentsByFlight.entries()).map(([flightInstanceId, segments]) => ({
-                flightInstanceId,
-                seats: selectedSeatsByFlight.get(flightInstanceId) || [],
-            }));
+            // CRITICAL: Ensure flightInstanceId is string and seats have correct format
+            const checkInSegments = Array.from(segmentsByFlight.entries()).map(([flightInstanceId, segments]) => {
+                const seats = selectedSeatsByFlight.get(flightInstanceId) || [];
+                console.log(`[handleCheckIn] Preparing check-in for flight ${flightInstanceId}:`, {
+                    flightInstanceId,
+                    seatsCount: seats.length,
+                    seats: seats.map(s => ({ flightSeatId: s.flightSeatId, seatNumber: s.seatNumber })),
+                    passengersNeedingSeats: passengersNeedingSeatsByFlight.get(flightInstanceId),
+                });
+                
+                // Validate seats format
+                const validSeats = seats.filter(s => s.flightSeatId && s.seatNumber);
+                if (validSeats.length !== seats.length) {
+                    console.warn(`[handleCheckIn] Some seats have invalid format. Valid: ${validSeats.length}, Total: ${seats.length}`);
+                }
+                
+                return {
+                    flightInstanceId: String(flightInstanceId), // Ensure string
+                    seats: validSeats,
+                };
+            });
+
+            console.log(`[handleCheckIn] Sending check-in request:`, {
+                bookingCode,
+                segments: checkInSegments,
+            });
 
             const response = await axiosPublic.post("/api/bookings/check-in", {
                 bookingCode,
@@ -287,7 +322,12 @@ const CheckInSeatSelectionPage = () => {
 
     // Get cabin type from booking (use first segment's cabin type)
     const cabinType = bookingData?.segments?.[0]?.cabinType || 'economy';
-    const selectedSeatsForCurrentFlight = Array.from(selectedSeatsByFlight.values()).flat();
+    // Get selected seats for current flight (first flight in booking)
+    // CRITICAL: Get seats for the current flight instance
+    const currentFlightInstanceId = bookingData?.segments?.[0]?.flightInstanceId;
+    const selectedSeatsForCurrentFlight = currentFlightInstanceId 
+        ? (selectedSeatsByFlight.get(String(currentFlightInstanceId)) || [])
+        : Array.from(selectedSeatsByFlight.values()).flat();
 
     if (loading) {
         return (
@@ -380,7 +420,7 @@ const CheckInSeatSelectionPage = () => {
                                             seatGroup={seatBusiness}
                                             cabinType="business"
                                             selectedSeats={selectedSeatsForCurrentFlight.map(s => s.seatNumber)}
-                                            onSeatToggle={handleSeatToggle(bookingData.segments[0]?.flightInstanceId || '', "business")}
+                                            onSeatToggle={handleSeatToggle(String(bookingData.segments[0]?.flightInstanceId || ''), "business")}
                                             isSelectable={cabinType === "business"}
                                         />
                                     )}
@@ -391,7 +431,7 @@ const CheckInSeatSelectionPage = () => {
                                             seatGroup={seatEconomy}
                                             cabinType="economy"
                                             selectedSeats={selectedSeatsForCurrentFlight.map(s => s.seatNumber)}
-                                            onSeatToggle={handleSeatToggle(bookingData.segments[0]?.flightInstanceId || '', "economy")}
+                                            onSeatToggle={handleSeatToggle(String(bookingData.segments[0]?.flightInstanceId || ''), "economy")}
                                             isSelectable={cabinType === "economy"}
                                         />
                                     )}

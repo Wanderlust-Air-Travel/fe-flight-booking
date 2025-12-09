@@ -32,16 +32,44 @@ const ConfirmationPageContent = () => {
       }
 
       try {
-        const axiosClient = accessToken ? axiosInstance : axiosPublic;
+        // Try with authenticated client first if user is logged in
+        let axiosClient = accessToken ? axiosInstance : axiosPublic;
+        let bookingResponse;
+        let usedPublicClient = false;
 
-        // Fetch booking details
-        const bookingResponse = await axiosClient.get(`/api/bookings/${bookingId}`);
-        setBooking(bookingResponse.data);
+        try {
+          // Fetch booking details
+          bookingResponse = await axiosClient.get(`/api/bookings/${bookingId}`);
+          setBooking(bookingResponse.data);
+        } catch (err: any) {
+          // If error is "Booking does not belong to the current user" and user is logged in,
+          // try again with public client (for guest bookings)
+          if (
+            accessToken &&
+            (err?.response?.data?.message?.includes("Booking does not belong to the current user") ||
+             err?.response?.data?.message?.includes("does not belong"))
+          ) {
+            console.log("Retrying with public client for guest booking...");
+            try {
+              bookingResponse = await axiosPublic.get(`/api/bookings/${bookingId}`);
+              setBooking(bookingResponse.data);
+              usedPublicClient = true; // Mark that we used public client
+            } catch (retryErr: any) {
+              // If retry also fails, throw the original error
+              throw err;
+            }
+          } else {
+            // If not a "does not belong" error or user is not logged in, throw the error
+            throw err;
+          }
+        }
 
         // Fetch payment details if paymentId is provided
         if (paymentId) {
           try {
-            const paymentResponse = await axiosClient.get(`/api/payments/${paymentId}`);
+            // Use public client if we used it for booking, otherwise use the same client as booking
+            const paymentClient = usedPublicClient ? axiosPublic : axiosClient;
+            const paymentResponse = await paymentClient.get(`/api/payments/${paymentId}`);
             setPayment(paymentResponse.data);
           } catch (paymentError: any) {
             console.warn("Could not fetch payment details:", paymentError.message);
