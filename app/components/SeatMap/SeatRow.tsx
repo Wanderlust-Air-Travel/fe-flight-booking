@@ -27,7 +27,11 @@ const SeatRow = memo(function SeatRow({
     const seatSelectable = seat.isSelectable !== false && seat.isAvailable && sectionSelectable && !!seat.flightSeatId; // Disable if no flightSeatId
     // CRITICAL: Check if seat is selected by seatNumber (for display) or by flightSeatId (for logic)
     // This ensures deselect works correctly
-    const isSelected = selectedSeats.includes(seat.seatNumber) || (seat.flightSeatId && selectedSeats.includes(seat.flightSeatId));
+    // Ensure isSelected is always a boolean (not boolean | "")
+    const isSelected = Boolean(
+      selectedSeats.includes(seat.seatNumber) || 
+      (seat.flightSeatId && selectedSeats.includes(seat.flightSeatId))
+    );
     const isOccupied = !seat.isAvailable;
 
     const baseClasses = "rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase transition ease-linear";
