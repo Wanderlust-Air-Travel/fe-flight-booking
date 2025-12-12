@@ -24,8 +24,15 @@ const DevPaymentPageContent = () => {
         paymentId,
         status,
       });
-      // Sau khi webhook xử lý xong, chuyển về landing page (trang chủ)
-      router.push("/");
+      // Sau khi webhook xử lý xong, tự động đóng tab
+      // Nếu không thể đóng (e.g., không phải tab được mở bởi JavaScript), sẽ chuyển về trang chủ
+      if (window.opener) {
+        // Nếu là popup được mở bởi window.open, đóng popup này
+        window.close();
+      } else {
+        // Nếu không, chuyển về trang chủ
+        router.push("/");
+      }
     } catch (err: any) {
       console.error("Error sending dev webhook:", err);
       setError(

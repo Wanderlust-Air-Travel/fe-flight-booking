@@ -6,6 +6,37 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Mail, Ticket, LogIn } from "lucide-react";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import useUserStore from "@/app/zustand/storeUser";
+import { axiosPublic } from "@/lib/axios-instance";
+
+interface BookingSegment {
+    segmentId: string;
+    flightInstance: {
+        flightInstanceId: string;
+        departureDatetimeLocal: string;
+        arrivalDatetimeLocal: string;
+        origin: { airportCode: string; airportName: string };
+        destination: { airportCode: string; airportName: string };
+        flight: { flightNumber: string; airline: { airlineName: string } };
+    };
+    fareClass: { fareClassCode: string; fareClassName: string };
+    flightSeat?: { seatNumber: string };
+}
+
+interface BookingPassenger {
+    passengerId: string;
+    fullname: string;
+    passengerType: string;
+}
+
+interface BookingData {
+    bookingId: string;
+    pnrCode: string;
+    status: string;
+    totalAmount: number;
+    currencyCode: string;
+    segments: BookingSegment[];
+    passengers: BookingPassenger[];
+}
 
 const CheckInConfirmationPage = () => {
     const searchParams = useSearchParams();
@@ -14,6 +45,45 @@ const CheckInConfirmationPage = () => {
     const bookingCode = searchParams.get("bookingCode");
     const ticketCount = searchParams.get("ticketCount") || "0";
     const alreadyCheckedIn = searchParams.get("alreadyCheckedIn") === "true";
+    
+    const [bookingData, setBookingData] = useState<BookingData | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    
+    // Fetch booking details to display seat information
+    useEffect(() => {
+        const fetchBookingDetails = async () => {
+            if (!bookingCode) {
+                setError("Mã đặt chỗ không hợp lệ");
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                setIsLoading(true);
+                const response = await axiosPublic.get(`/api/bookings/code/${encodeURIComponent(bookingCode)}`);
+                setBookingData(response.data);
+                console.log('[CheckInConfirmation] Booking details fetched:', {
+                    bookingCode: response.data?.pnrCode,
+                    segments: response.data?.segments?.map((s: any) => ({
+                        segmentId: s.segmentId,
+                        hasFlightInstance: !!s.flightInstance,
+                        flightNumber: s?.flightInstance?.flight?.flightNumber,
+                        hasSeat: !!s.flightSeat,
+                        seatNumber: s?.flightSeat?.seatNumber,
+                    })),
+                    rawSegments: response.data?.segments,
+                });
+            } catch (err: any) {
+                console.error('[CheckInConfirmation] Error fetching booking details:', err);
+                setError("Không thể tải thông tin đặt chỗ");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBookingDetails();
+    }, [bookingCode]);
     
     // Check if user is logged in
     const isLoggedIn = Boolean(accessToken || user?.id);
@@ -53,6 +123,78 @@ const CheckInConfirmationPage = () => {
                                 <p className="text-2xl sm:text-3xl font-mono font-bold text-[var(--cl-pri)] text-center">
                                     {bookingCode}
                                 </p>
+                            </div>
+                        )}
+
+                        {/* Seat Details Section - Show if booking loaded and has seat assignments */}
+                        {!isLoading && bookingData && (
+                            <div className="mb-[2.4rem] p-[1.6rem] sm:p-[2rem] bg-blue-50 rounded-lg border border-blue-200">
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-[1.2rem]">
+                                    ✓ Thông tin chỗ ngồi
+                                </h3>
+                                
+                                {/* Group segments by flight */}
+                                {bookingData.segments && bookingData.segments.length > 0 ? (
+                                    <div className="space-y-[1.2rem]">
+                                        {bookingData.segments.map((segment, idx) => {
+                                            // Handle both nested format (flightInstance) and flat format (direct fields)
+                                            const flightNumber = 
+                                                segment?.flightInstance?.flight?.flightNumber ||  // Nested format
+                                                segment?.flightNumber ||  // Flat format from getBookingByCode
+                                                'N/A';
+                                            
+                                            const originCode = 
+                                                segment?.flightInstance?.origin?.airportCode ||  // Nested format
+                                                segment?.originAirport ||  // Flat format
+                                                '';
+                                            
+                                            const destCode = 
+                                                segment?.flightInstance?.destination?.airportCode ||  // Nested format
+                                                segment?.destinationAirport ||  // Flat format
+                                                '';
+                                            
+                                            const hasFlightData = segment?.flightInstance && segment?.flightInstance?.flight;
+                                            // Seat data: either nested (flightSeat) or flat (seatNumber)
+                                            const seatNumber = segment?.flightSeat?.seatNumber || segment?.seatNumber;
+                                            const hasSeatData = !!seatNumber;
+                                            
+                                            return (
+                                                <div key={segment.segmentId} className="bg-white p-[1.2rem] rounded-lg border border-gray-200">
+                                                    {/* Flight Info */}
+                                                    <div className="mb-[0.8rem]">
+                                                        <p className="text-sm font-medium text-gray-600">
+                                                            Chuyến bay {idx + 1}: {flightNumber}
+                                                        </p>
+                                                        {originCode && destCode && (
+                                                            <p className="text-xs text-gray-500">
+                                                                {originCode} → {destCode}
+                                                            </p>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Seat Assignment */}
+                                                    {hasSeatData ? (
+                                                        <div className="bg-green-50 p-[0.8rem] rounded border border-green-200">
+                                                            <p className="text-sm font-semibold text-green-700">
+                                                                Chỗ ngồi: <span className="text-lg">{seatNumber}</span>
+                                                            </p>
+                                                        </div>
+                                                    ) : !hasFlightData ? (
+                                                        <div className="bg-yellow-50 p-[0.8rem] rounded border border-yellow-200">
+                                                            <p className="text-sm text-yellow-700">⚠️ Thông tin chuyến bay chưa được tải. Vui lòng làm mới trang.</p>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="bg-yellow-50 p-[0.8rem] rounded border border-yellow-200">
+                                                            <p className="text-sm text-yellow-700">Chỗ ngồi chưa được ghi nhận</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-600">Không có thông tin chỗ ngồi</p>
+                                )}
                             </div>
                         )}
 

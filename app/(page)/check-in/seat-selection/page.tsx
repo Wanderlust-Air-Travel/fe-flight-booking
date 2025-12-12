@@ -254,9 +254,32 @@ const CheckInSeatSelectionPage = () => {
         }
     }, []);
 
+    // Manage which flight instance is currently being displayed
+    const [currentDisplayFlightId, setCurrentDisplayFlightId] = useState<string | null>(null);
+    
+    // Set initial flight on load
+    useEffect(() => {
+        if (currentDisplayFlightId === null && segmentsByFlight.size > 0) {
+            const firstFlightId = Array.from(segmentsByFlight.keys())[0];
+            setCurrentDisplayFlightId(String(firstFlightId));
+        }
+    }, [segmentsByFlight, currentDisplayFlightId]);
+
     // Handle check-in submission
     const handleCheckIn = useCallback(async () => {
-        if (!bookingCode || !bookingData) return;
+        console.log('[handleCheckIn] START - Check-in submission initiated', {
+            bookingCode,
+            hasBookingData: !!bookingData,
+            segmentsByFlightSize: segmentsByFlight.size,
+            selectedSeatsByFlightSize: selectedSeatsByFlight.size,
+            selectedSeatsByFlightEntries: Array.from(selectedSeatsByFlight.entries()).map(([k, v]) => ({ flightId: k, seatsCount: v.length })),
+        });
+
+        if (!bookingCode || !bookingData) {
+            console.error('[handleCheckIn] Missing bookingCode or bookingData');
+            setSubmitError('Thiếu thông tin đặt chỗ. Vui lòng quay lại và thử lại.');
+            return;
+        }
 
         // Validate all flights have seats selected
         // CRITICAL: Ensure flightInstanceId is string for Map lookup
@@ -273,9 +296,9 @@ const CheckInSeatSelectionPage = () => {
             });
 
             if (selectedSeats.length !== passengersNeedingSeats) {
-                setSubmitError(
-                    `Vui lòng chọn đủ ${passengersNeedingSeats} ghế cho chuyến bay ${segments[0]?.flightNumber || flightInstanceIdStr}`
-                );
+                const errorMsg = `Vui lòng chọn đủ ${passengersNeedingSeats} ghế cho chuyến bay ${segments[0]?.flightNumber || flightInstanceIdStr}`;
+                console.error('[handleCheckIn] Validation failed:', errorMsg);
+                setSubmitError(errorMsg);
                 return;
             }
         }
@@ -350,6 +373,12 @@ const CheckInSeatSelectionPage = () => {
                 return;
             }
 
+            // **LOG BEFORE API CALL** - CRITICAL FOR DEBUGGING
+            console.log(`[handleCheckIn] Making API call to /api/bookings/check-in with payload:`, {
+                bookingCode,
+                segments: checkInSegments,
+            });
+
             const response = await axiosPublic.post("/api/bookings/check-in", {
                 bookingCode,
                 segments: checkInSegments,
@@ -364,13 +393,17 @@ const CheckInSeatSelectionPage = () => {
                 // Check if booking was already checked in (idempotent operation)
                 if (response.data?.alreadyCheckedIn) {
                     // Booking was already checked in, redirect to confirmation with appropriate message
+                    console.log('[handleCheckIn] Booking was already checked in, redirecting to confirmation');
                     router.push(`/check-in/confirmation?bookingCode=${encodeURIComponent(bookingCode)}&ticketCount=${response.data.ticketCount || 0}&alreadyCheckedIn=true`);
                 } else {
                     // New check-in completed successfully
+                    console.log('[handleCheckIn] Check-in completed successfully, redirecting to confirmation');
                     router.push(`/check-in/confirmation?bookingCode=${encodeURIComponent(bookingCode)}&ticketCount=${response.data.ticketCount || 0}`);
                 }
             } else {
-                setSubmitError(response.data?.message || "Làm thủ tục thất bại. Vui lòng thử lại.");
+                const errorMsg = response.data?.message || "Làm thủ tục thất bại. Vui lòng thử lại.";
+                console.error('[handleCheckIn] Unexpected response status:', response.status, errorMsg);
+                setSubmitError(errorMsg);
             }
         } catch (err: any) {
             console.error("[handleCheckIn] Error checking in:", {
@@ -391,6 +424,7 @@ const CheckInSeatSelectionPage = () => {
                 // If booking was already checked in, try to get ticket count from booking data
                 // and redirect to confirmation page
                 const ticketCount = bookingData?.tickets?.length || bookingData?.passengers?.filter((p: any) => p.passengerType !== 'INF').length || 0;
+                console.log('[handleCheckIn] Booking already checked in (from error), redirecting to confirmation');
                 router.push(`/check-in/confirmation?bookingCode=${encodeURIComponent(bookingCode)}&ticketCount=${ticketCount}&alreadyCheckedIn=true`);
                 return;
             }
@@ -398,6 +432,7 @@ const CheckInSeatSelectionPage = () => {
             setSubmitError(errorMessage || "Làm thủ tục thất bại. Vui lòng thử lại.");
         } finally {
             setIsSubmitting(false);
+            console.log('[handleCheckIn] DONE - isSubmitting reset to false');
         }
     }, [bookingCode, bookingData, segmentsByFlight, selectedSeatsByFlight, passengersNeedingSeatsByFlight, router]);
 
@@ -483,6 +518,25 @@ const CheckInSeatSelectionPage = () => {
             {/* Seat Map */}
             <section className="">
                 <div className="container">
+                    {/* Flight Selection Tabs */}
+                    {segmentsByFlight.size > 1 && (
+                        <div className="mb-6 flex gap-2 flex-wrap">
+                            {Array.from(segmentsByFlight.entries()).map(([flightId, segments]) => {
+                                const flightStr = String(flightId);
+                                const segment = segments[0];
+                                return (
+                                    <Button
+                                        key={flightStr}
+                                        onClick={() => setCurrentDisplayFlightId(flightStr)}
+                                        variant={currentDisplayFlightId === flightStr ? "default" : "outline"}
+                                        className={currentDisplayFlightId === flightStr ? "bg-[var(--cl-pri)]" : ""}
+                                    >
+                                        {segment?.flightNumber || `Flight ${flightStr.substring(0, 8)}`}
+                                    </Button>
+                                );
+                            })}
+                        </div>
+                    )}
                     <div className="flex flex-wrap -mx-[1.2rem]">
                         <div className="px-[1.2rem] w-[70%]">
                             <div className="pt-[calc(100%*6000/2000)] w-full relative overflow-hidden block">
@@ -499,30 +553,34 @@ const CheckInSeatSelectionPage = () => {
                                 <div className="absolute h-[55%] w-[24%] top-[16%] left-1/2 z-10 -translate-x-1/2 flex flex-col gap-y-[2rem] overflow-y-auto max-h-full">
                                     {/* Business Section */}
                                     {seatBusiness && (() => {
-                                        // CRITICAL: Get flightInstanceId from segmentsByFlight to ensure consistency
-                                        const firstFlightInstanceId = Array.from(segmentsByFlight.keys())[0];
-                                        const flightInstanceIdStr = firstFlightInstanceId ? String(firstFlightInstanceId) : String(bookingData.segments[0]?.flightInstanceId || '');
+                                        // Use currentDisplayFlightId to determine which flight's seats to show
+                                        const flightInstanceIdStr = currentDisplayFlightId || String(Array.from(segmentsByFlight.keys())[0] || '');
+                                        const currentCabinType = bookingData?.segments?.find((s: any) => String(s.flightInstanceId) === flightInstanceIdStr)?.cabinType || 'economy';
+                                        const currentSelectedSeats = selectedSeatsByFlight.get(flightInstanceIdStr) || [];
+                                        
                                         return (
                                             <CabinSection
                                                 seatGroup={seatBusiness}
                                                 cabinType="business"
-                                                selectedSeats={selectedSeatsForCurrentFlight.map(s => s.seatNumber)}
+                                                selectedSeats={currentSelectedSeats.map(s => s.seatNumber)}
                                                 onSeatToggle={handleSeatToggle(flightInstanceIdStr, "business")}
-                                                isSelectable={cabinType === "business"}
+                                                isSelectable={currentCabinType === "business"}
                                             />
                                         );
                                     })()}
 
                                     {/* Economy Section */}
                                     {seatEconomy && (() => {
-                                        // CRITICAL: Get flightInstanceId from segmentsByFlight to ensure consistency
-                                        const firstFlightInstanceId = Array.from(segmentsByFlight.keys())[0];
-                                        const flightInstanceIdStr = firstFlightInstanceId ? String(firstFlightInstanceId) : String(bookingData.segments[0]?.flightInstanceId || '');
+                                        // Use currentDisplayFlightId to determine which flight's seats to show
+                                        const flightInstanceIdStr = currentDisplayFlightId || String(Array.from(segmentsByFlight.keys())[0] || '');
+                                        const currentCabinType = bookingData?.segments?.find((s: any) => String(s.flightInstanceId) === flightInstanceIdStr)?.cabinType || 'economy';
+                                        const currentSelectedSeats = selectedSeatsByFlight.get(flightInstanceIdStr) || [];
+                                        
                                         return (
                                             <CabinSection
                                                 seatGroup={seatEconomy}
                                                 cabinType="economy"
-                                                selectedSeats={selectedSeatsForCurrentFlight.map(s => s.seatNumber)}
+                                                selectedSeats={currentSelectedSeats.map(s => s.seatNumber)}
                                                 onSeatToggle={handleSeatToggle(flightInstanceIdStr, "economy")}
                                                 isSelectable={cabinType === "economy"}
                                             />
@@ -554,23 +612,55 @@ const CheckInSeatSelectionPage = () => {
                                     />
                                 )}
 
-                                {/* Selected Seats Info */}
-                                <div className="space-y-2">
+                                {/* Selected Seats Info - Show all flights if multi-segment */}
+                                <div className="space-y-3">
                                     <p className="text-sm font-medium">Ghế đã chọn:</p>
-                                    {selectedSeatsForCurrentFlight.length === 0 ? (
-                                        <p className="text-sm text-gray-500">Chưa chọn ghế nào</p>
+                                    
+                                    {Array.from(segmentsByFlight.entries()).length === 1 ? (
+                                        // Single flight
+                                        <>
+                                            {selectedSeatsForCurrentFlight.length === 0 ? (
+                                                <p className="text-sm text-gray-500">Chưa chọn ghế nào</p>
+                                            ) : (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {selectedSeatsForCurrentFlight.map((seat, idx) => (
+                                                        <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
+                                                            {seat.seatNumber}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            <p className="text-xs text-gray-500">
+                                                Cần chọn {Array.from(passengersNeedingSeatsByFlight.values()).reduce((a, b) => a + b, 0)} ghế cho {bookingData.passengers?.filter((p: any) => p.passengerType !== 'INF').length || 0} hành khách
+                                            </p>
+                                        </>
                                     ) : (
-                                        <div className="flex flex-wrap gap-2">
-                                            {selectedSeatsForCurrentFlight.map((seat, idx) => (
-                                                <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
-                                                    {seat.seatNumber}
-                                                </span>
-                                            ))}
-                                        </div>
+                                        // Multiple flights
+                                        Array.from(segmentsByFlight.entries()).map(([flightId, segments]) => {
+                                            const flightStr = String(flightId);
+                                            const selectedSeats = selectedSeatsByFlight.get(flightStr) || [];
+                                            const passengersNeeded = passengersNeedingSeatsByFlight.get(flightStr) || 0;
+                                            return (
+                                                <div key={flightStr} className="border-t pt-2">
+                                                    <p className="text-xs font-medium text-gray-700">{segments[0]?.flightNumber || `Flight ${flightStr.substring(0, 8)}`}</p>
+                                                    {selectedSeats.length === 0 ? (
+                                                        <p className="text-xs text-gray-500">Chưa chọn ghế</p>
+                                                    ) : (
+                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                            {selectedSeats.map((seat, idx) => (
+                                                                <span key={idx} className="px-1 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                                                                    {seat.seatNumber}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    <p className="text-xs text-gray-500 mt-1">
+                                                        {selectedSeats.length}/{passengersNeeded}
+                                                    </p>
+                                                </div>
+                                            );
+                                        })
                                     )}
-                                    <p className="text-xs text-gray-500">
-                                        Cần chọn {Array.from(passengersNeedingSeatsByFlight.values()).reduce((a, b) => a + b, 0)} ghế cho {bookingData.passengers?.filter((p: any) => p.passengerType !== 'INF').length || 0} hành khách
-                                    </p>
                                 </div>
 
                                 {submitError && (
@@ -582,7 +672,16 @@ const CheckInSeatSelectionPage = () => {
 
                                 <Button
                                     onClick={handleCheckIn}
-                                    disabled={isSubmitting || selectedSeatsForCurrentFlight.length < Array.from(passengersNeedingSeatsByFlight.values()).reduce((a, b) => a + b, 0)}
+                                    disabled={isSubmitting || (() => {
+                                        // Check if all flights have sufficient seats selected
+                                        for (const [flightId, passengersNeeded] of passengersNeedingSeatsByFlight.entries()) {
+                                            const selectedSeats = selectedSeatsByFlight.get(flightId) || [];
+                                            if (selectedSeats.length < passengersNeeded) {
+                                                return true; // Button disabled - not enough seats for this flight
+                                            }
+                                        }
+                                        return false; // Button enabled - all flights have enough seats
+                                    })()}
                                     className="w-full bg-[var(--cl-pri)] text-white hover:bg-[var(--cl-pri)]/90 disabled:opacity-50 disabled:cursor-not-allowed py-5 md:py-6 text-base md:text-lg font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                                 >
                                     {isSubmitting ? "Đang xử lý..." : "Hoàn tất làm thủ tục"}
