@@ -65,8 +65,8 @@ const SignUpPage = () => {
                             </div>
                         </div>
                         {/* Right side register form - 30% width and centered (same as Sign In) */}
-                        <div className="w-full flex-1 px-[1.2rem] flex items-center">
-                            <div className="w-full  mx-auto flex flex-col justify-center gap-y-[1.2rem] py-[var(--rowY)]">
+                        <div className="auth-form-panel w-full flex-1 px-[1.2rem] flex items-center">
+                            <div className="w-full mx-auto flex flex-col justify-center gap-y-[1.2rem] py-[var(--rowY)]">
                                 <h2 className="text-center text-lg font-bold text-[var(--cl-pri)] uppercase">Register</h2>
 
                                 <Formik

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/app/zustand/storeUser";
-import axiosInstance from "@/lib/axios-instance";
 
 // Lazy load heavy components
 const BannerHome = dynamic(() => import("./components/Banner/Banner"), {
@@ -50,31 +49,16 @@ const MANAGEMENT_ROLES = [
 
 export default function Home() {
   const router = useRouter();
-  const { isLoggedIn, user, accessToken, hydrated, setUserRoles } = useUserStore();
+  const { isLoggedIn, user, hydrated } = useUserStore();
 
-  // Redirect management roles to admin page
+  // Redirect management roles to admin (roles do Header fetch và set vào store)
   useEffect(() => {
-    const checkAndRedirect = async () => {
-      if (hydrated && isLoggedIn && accessToken && user?.id) {
-        try {
-          const response = await axiosInstance.get('/api/auth/me');
-          if (response.data && response.data.roles) {
-            setUserRoles(response.data.roles);
-            const hasManagementRole = response.data.roles.some((role: { roleCode: string }) => 
-              MANAGEMENT_ROLES.includes(role.roleCode)
-            );
-            if (hasManagementRole) {
-              router.push('/admin');
-            }
-          }
-        } catch (error) {
-          console.error('Error checking user roles:', error);
-        }
-      }
-    };
-
-    checkAndRedirect();
-  }, [hydrated, isLoggedIn, accessToken, user?.id, router, setUserRoles]);
+    if (!hydrated || !isLoggedIn || !user?.roles?.length) return;
+    const hasManagementRole = user.roles.some((role) =>
+      MANAGEMENT_ROLES.includes(role.roleCode)
+    );
+    if (hasManagementRole) router.push('/admin');
+  }, [hydrated, isLoggedIn, user?.roles, router]);
 
   return (
     <>

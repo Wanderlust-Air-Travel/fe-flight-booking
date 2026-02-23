@@ -15,9 +15,7 @@ import { useRouter } from "next/navigation";
 import { convertToDMY, convertToLocalTime } from "../FormatDate/FormatDate";
 import useStoreFightInfo from "@/app/zustand/storeFightInfo";
 import useUserStore from "@/app/zustand/storeUser";
-
 import { TripListPropsType } from '@/types/trip-list-component-type';
-
 
 const TripList = ({ trips, loading }: TripListPropsType) => {
 
@@ -386,14 +384,17 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                     {/* Responsive grid: 1 column on mobile, 2 on tablet, 3 on desktop */}
                                                     <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.2rem] sm:gap-[1.6rem] w-full">
                                                         {tickets?.map((ticket, index2) => {
-                                                            console.log("trip", trip)
-                                                            console.log("ticket", ticket);
+                                                            const sameTypeCount = tickets?.filter((t) => t.typeTicket === ticket.typeTicket).length ?? 0;
+                                                            const displayLabel = sameTypeCount > 1
+                                                                ? (ticket.description || `${ticket.typeTicket} (${ticket.fareClassCode})`)
+                                                                : ticket.typeTicket;
                                                             return (
-                                                                <li key={index2} className="w-full">
+                                                                <li key={ticket.fareClassCode ?? index2} className="w-full">
                                                                     <Ticket
                                                                         type={type}
                                                                         tickets={ticket}
                                                                         index={index2}
+                                                                        displayLabel={displayLabel}
                                                                         onChoose={() => {
                                                                             handleChoose(index2, ticket, trip, trips, type);
                                                                         }}

@@ -72,8 +72,8 @@ const SignInPage = () => {
                             </div>
                         </div>
                         {/* Right side login form - 30% width and centered */}
-                        <div className="flex-1 w-full px-[1.2rem] flex items-center">
-                            <div className="w-full max-w-[40rem] mx-auto flex flex-col justify-center gap-y-[1.2rem] py-[var(--rowY)]">
+                        <div className="auth-form-panel flex-1 w-full px-[1.2rem] flex items-center">
+                            <div className="w-full mx-auto flex flex-col justify-center gap-y-[1.2rem] py-[var(--rowY)]">
                                 <h2 className="text-center text-lg font-bold text-[var(--cl-pri)] uppercase">Login</h2>
 
                                 <Formik
@@ -90,15 +90,14 @@ const SignInPage = () => {
                                                         <InputFormat name="password" placeholder="Enter password" label="Password" password={true} />
 
 
-                                                        <label htmlFor="remember" className="flex gap-x-[0.6rem] select-none">
+                                                        <label htmlFor="remember" className="flex items-center gap-x-[0.6rem] select-none">
                                                             <Checkbox
                                                                 id="remember"
                                                                 checked={values.remember}
                                                                 onCheckedChange={(checked) => setFieldValue("remember", checked === true)}
-                                                                className="w-[2rem] h-[2rem] flex-shrink-0 mt-[0.35rem]"
+                                                                className="w-[2rem] h-[2rem] flex-shrink-0"
                                                             />
-
-                                                            <p className="text-[var(--cl-pri)] text-base">Remember me</p>
+                                                            <p className="text-[var(--cl-pri)] text-md">Remember me</p>
                                                         </label>
                                                     </div>
 

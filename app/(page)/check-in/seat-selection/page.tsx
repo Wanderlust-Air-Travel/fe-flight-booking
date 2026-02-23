@@ -14,9 +14,11 @@ import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils"
 import { SeatGroup, SeatItem } from "@/types/seat-type";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import useUserStore from "@/app/zustand/storeUser";
+import CabinServicesSelector from "@/app/components/CabinServices/CabinServicesSelector";
 
 const CheckInSeatSelectionPage = () => {
-    const { accessToken } = useUserStore();
+    const { accessToken, hydrated } = useUserStore();
+    const isLoggedIn = Boolean(accessToken);
     const searchParams = useSearchParams();
     const router = useRouter();
     const bookingCode = searchParams.get("bookingCode");
@@ -34,6 +36,7 @@ const CheckInSeatSelectionPage = () => {
     
     const hasFetchedBookingRef = useRef<boolean>(false);
     const hasFetchedSeatsRef = useRef<Map<string, boolean>>(new Map());
+    const hasPrimedCabinRef = useRef<Set<string>>(new Set());
 
     // Helper function to find seat by seatId
     const findSeatBySeatId = useCallback((seatId: string, seatGroups: SeatGroup[]): SeatItem | null => {
@@ -152,6 +155,52 @@ const CheckInSeatSelectionPage = () => {
         }
         return map;
     }, [segmentsByFlight]);
+
+    // Check-in: Backend cần cabin đã được chọn trong booking-state trước khi lưu dịch vụ cabin.
+    // Ghi cabin từ đặt chỗ vào booking-state (một lần mỗi flight). Guest: lưu sessionId từ response để save cabin-services dùng chung.
+    const [cabinPrimed, setCabinPrimed] = useState(false);
+    useEffect(() => {
+        if (!hydrated || segmentsByFlight.size === 0) return;
+
+        const axiosClient = isLoggedIn ? axiosInstance : axiosPublic;
+        const headers: Record<string, string> = {};
+        if (!isLoggedIn) {
+            let sessionId = sessionStorage.getItem("guest_session_id");
+            if (!sessionId && typeof crypto !== "undefined" && crypto.randomUUID) {
+                sessionId = crypto.randomUUID();
+                sessionStorage.setItem("guest_session_id", sessionId);
+            }
+            if (sessionId) headers["X-Session-Id"] = sessionId;
+        }
+
+        const primeCabinForFlights = async () => {
+            for (const [flightId, segments] of segmentsByFlight.entries()) {
+                if (hasPrimedCabinRef.current.has(flightId)) continue;
+                const seg = segments[0];
+                const fareClassCode = seg?.fareClass?.fareClassCode || seg?.fareClassCode;
+                const cabinType = (seg?.cabinType || "economy").toLowerCase();
+                if (!fareClassCode) continue;
+
+                hasPrimedCabinRef.current.add(flightId);
+                try {
+                    const res = await axiosClient.post(
+                        "/api/booking-state/cabin",
+                        { flightInstanceId: flightId, cabinType, fareClassCode },
+                        { headers }
+                    );
+                    if (!isLoggedIn && res?.data?.sessionId) {
+                        sessionStorage.setItem("guest_session_id", res.data.sessionId);
+                    }
+                } catch (e) {
+                    hasPrimedCabinRef.current.delete(flightId);
+                    console.warn("[Check-in] Prime cabin for flight failed:", e);
+                }
+            }
+            setCabinPrimed(true);
+        };
+
+        primeCabinForFlights();
+    }, [hydrated, isLoggedIn, segmentsByFlight]);
 
     // Handle seat toggle for a specific flight instance
     const handleSeatToggle = useCallback((flightInstanceId: string, cabinType: "business" | "economy") => {
@@ -669,6 +718,29 @@ const CheckInSeatSelectionPage = () => {
                                         <AlertDescription>{submitError}</AlertDescription>
                                     </Alert>
                                 )}
+
+                                {/* Chọn dịch vụ cabin (sau khi chọn ghế) */}
+                                {Array.from(segmentsByFlight.entries()).map(([flightId, segments]) => {
+                                    const seg = segments[0];
+                                    const fareClassCode = seg?.fareClass?.fareClassCode || seg?.fareClassCode || "";
+                                    const cabinClassCode = (seg?.cabinType || cabinType) === "business" ? "J" : "Y";
+                                    if (!fareClassCode) return null;
+                                    return (
+                                        <div key={flightId} className="border-t border-[var(--cl-third)] pt-4">
+                                            {segmentsByFlight.size > 1 && (
+                                                <p className="text-sm font-medium text-gray-700 mb-2">
+                                                    {seg?.flightNumber || `Chuyến ${String(flightId).slice(0, 8)}`}
+                                                </p>
+                                            )}
+                                            <CabinServicesSelector
+                                                flightInstanceId={String(flightId)}
+                                                fareClassCode={fareClassCode}
+                                                cabinClassCode={cabinClassCode}
+                                                saveDisabled={!cabinPrimed}
+                                            />
+                                        </div>
+                                    );
+                                })}
 
                                 <Button
                                     onClick={handleCheckIn}

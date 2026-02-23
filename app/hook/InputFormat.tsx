@@ -62,7 +62,8 @@ export const InputFormat = ({
         <label className="flex flex-col gap-y-[0.8rem]">
             <p
                 className={cn(
-                    "text-mn font-medium",
+                    "font-medium",
+                    "text-sm",
                     hasError ? "text-destructive" : "text-[var(--cl-pri)]"
                 )}
             >

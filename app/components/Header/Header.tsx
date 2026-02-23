@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { MenuListsInterface } from "@/types/header-type"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axios-instance";
 const menuLists: MenuListsInterface[] = [
@@ -61,30 +61,35 @@ const Header = () => {
     const hydrated = useUserStore((state) => state.hydrated);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [userRoles, setUserRolesState] = useState<Array<{ roleCode: string; name: string; description: string | null }>>([]);
+    const meFetchedRef = useRef(false);
 
-    // Check if user has management roles
-    const hasManagementRole = userRoles.some(role => MANAGEMENT_ROLES.includes(role.roleCode));
-    const isRegularUser = !hasManagementRole && userRoles.length > 0;
+    // Dùng roles từ store nếu có, không thì dùng state local (sau khi fetch)
+    const roles = user?.roles?.length ? user.roles : userRoles;
+    const hasManagementRole = roles.some(role => MANAGEMENT_ROLES.includes(role.roleCode));
+    const isRegularUser = !hasManagementRole && roles.length > 0;
 
-    // Fetch user roles when logged in
+    // Chỉ một nơi gọi /auth/me; ref tránh gọi trùng (Strict Mode / re-mount)
     useEffect(() => {
+        if (!hydrated || !isLoggedIn || !accessToken || !user?.id) {
+            if (!isLoggedIn) meFetchedRef.current = false;
+            return;
+        }
+        if (meFetchedRef.current) return;
+        meFetchedRef.current = true;
+
         const fetchUserRoles = async () => {
-            if (isLoggedIn && accessToken && user?.id) {
-                try {
-                    const response = await axiosInstance.get('/api/auth/me');
-                    if (response.data && response.data.roles) {
-                        setUserRolesState(response.data.roles);
-                        setUserRoles(response.data.roles);
-                    }
-                } catch (error) {
-                    console.error('Error fetching user roles:', error);
+            try {
+                const response = await axiosInstance.get('/api/auth/me');
+                if (response.data?.roles) {
+                    setUserRolesState(response.data.roles);
+                    setUserRoles(response.data.roles);
                 }
+            } catch (error) {
+                console.error('Error fetching user roles:', error);
+                meFetchedRef.current = false;
             }
         };
-
-        if (hydrated && isLoggedIn) {
-            fetchUserRoles();
-        }
+        fetchUserRoles();
     }, [hydrated, isLoggedIn, accessToken, user?.id, setUserRoles]);
 
     const handleLogout = () => {

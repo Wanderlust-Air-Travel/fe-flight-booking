@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -15,6 +14,7 @@ export default function CabinServicesSelector({
 	fareClassCode,
 	cabinClassCode,
 	onServicesChange,
+	saveDisabled = false,
 }: CabinServicesSelectorProps) {
 	const { isLoggedIn } = useUserStore();
 	
@@ -46,92 +46,98 @@ export default function CabinServicesSelector({
 		saveServices(flightInstanceId);
 	};
 
+	const cardClass = "border border-gray-200 rounded-[1rem] bg-white";
+	const headerBorder = "border-b border-gray-200 pb-3";
+
 	if (loading) {
 		return (
-			<Card>
-				<CardHeader>
-					<CardTitle>Dịch vụ cabin</CardTitle>
-					<CardDescription>Đang tải danh sách dịch vụ...</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<div className="flex items-center justify-center py-8">
-						<Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-					</div>
-				</CardContent>
-			</Card>
+			<div className={cardClass}>
+				<div className="p-4 sm:p-5 border-b border-gray-100">
+					<h3 className="text-base font-semibold text-gray-900">Dịch vụ cabin</h3>
+					<p className="text-sm text-gray-500 mt-1">Đang tải...</p>
+				</div>
+				<div className="p-4 sm:p-5 flex items-center justify-center py-8">
+					<Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+				</div>
+			</div>
 		);
 	}
 
 	if (error && services.length === 0) {
 		return (
-			<Card>
-				<CardHeader>
-					<CardTitle>Dịch vụ cabin</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<p className="text-sm text-red-500">{error}</p>
-				</CardContent>
-			</Card>
+			<div className={cardClass}>
+				<div className="p-4 sm:p-5">
+					<h3 className="text-base font-semibold text-gray-900">Dịch vụ cabin</h3>
+					<p className="text-sm text-gray-600 mt-2">{error}</p>
+				</div>
+			</div>
 		);
 	}
 
 	if (services.length === 0) {
 		return (
-			<Card>
-				<CardHeader>
-					<CardTitle>Dịch vụ cabin</CardTitle>
-					<CardDescription>Không có dịch vụ nào khả dụng</CardDescription>
-				</CardHeader>
-			</Card>
+			<div className={cardClass}>
+				<div className="p-4 sm:p-5">
+					<h3 className="text-base font-semibold text-gray-900">Dịch vụ cabin</h3>
+					<p className="text-sm text-gray-500 mt-1">Không có dịch vụ khả dụng</p>
+				</div>
+			</div>
 		);
 	}
 
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>Dịch vụ cabin</CardTitle>
-				<CardDescription>Chọn các dịch vụ bổ sung cho chuyến bay của bạn</CardDescription>
-			</CardHeader>
-			<CardContent className="space-y-4">
-				{error && <p className="text-sm text-red-500">{error}</p>}
+		<div className={cardClass}>
+			<div className={`p-4 sm:p-5 ${headerBorder}`}>
+				<h3 className="text-base font-semibold text-gray-900">Dịch vụ cabin</h3>
+				<p className="text-sm text-gray-500 mt-1">
+					Chọn dịch vụ bổ sung. &quot;Đã bao gồm&quot; là cố định; các dịch vụ khác bấm để thêm/bỏ.
+				</p>
+			</div>
+			<div className="p-4 sm:p-5 space-y-2">
+				{error && <p className="text-sm text-gray-600">{error}</p>}
 
-				<div className="space-y-3">
+				<div className="space-y-1.5">
 					{services.map((service) => {
 						const isSelected = selectedServices.has(service.cabinServiceId);
-						const isDisabled = service.isIncluded; // Included services are always selected
+						const isIncluded = service.isIncluded;
+						const canToggle = !isIncluded;
 
 						return (
 							<div
 								key={service.cabinServiceId}
-								className={`flex items-start gap-3 p-3 rounded-lg border ${
-									isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200"
-								}`}
+								role={canToggle ? "button" : undefined}
+								tabIndex={canToggle ? 0 : undefined}
+								onClick={canToggle ? () => toggleService(service.cabinServiceId, service.isIncluded) : undefined}
+								onKeyDown={canToggle ? (e) => e.key === "Enter" && toggleService(service.cabinServiceId, service.isIncluded) : undefined}
+								className={`flex items-start gap-3 p-2.5 rounded-md border transition-all ${
+									isSelected ? "border-gray-400 bg-gray-50" : "border-gray-200 bg-white"
+								} ${canToggle ? "cursor-pointer hover:border-gray-300 hover:bg-gray-50" : "cursor-default"}`}
 							>
 								<Checkbox
 									id={service.cabinServiceId}
 									checked={isSelected}
-									disabled={isDisabled}
+									disabled={isIncluded}
 									onCheckedChange={() => toggleService(service.cabinServiceId, service.isIncluded)}
-									className="mt-1"
+									className="mt-0.5 pointer-events-none border-2 border-gray-400 data-[state=checked]:bg-gray-700 data-[state=checked]:border-gray-700"
 								/>
 								<label
 									htmlFor={service.cabinServiceId}
-									className={`flex-1 cursor-pointer ${isDisabled ? "cursor-not-allowed opacity-60" : ""}`}
+									className={`flex-1 min-w-0 ${canToggle ? "cursor-pointer" : "cursor-default"}`}
 								>
-									<div className="flex items-center justify-between">
+									<div className="flex items-center justify-between gap-2 flex-wrap">
 										<div>
-											<p className="font-medium text-sm">{service.serviceName}</p>
+											<p className="font-medium text-sm text-gray-900">{service.serviceName}</p>
 											{service.description && (
-												<p className="text-xs text-gray-500 mt-1">{service.description}</p>
+												<p className="text-xs text-gray-500 mt-0.5">{service.description}</p>
 											)}
 										</div>
-										<div className="text-right ml-4">
-											{service.isIncluded ? (
-												<span className="text-xs text-green-600 font-medium">Đã bao gồm</span>
-											) : service.price !== null ? (
-												<span className="text-sm font-medium">{FormatPrice(service.price)}</span>
+										<div className="text-right shrink-0">
+											{isIncluded ? (
+												<span className="text-xs text-gray-500">Đã bao gồm</span>
+											) : service.price !== null && service.price > 0 ? (
+												<span className="text-sm font-medium text-gray-900">{FormatPrice(service.price)}</span>
 											) : (
-												<span className="text-xs text-gray-400">Miễn phí</span>
+												<span className="text-xs text-gray-500">Có thể thêm</span>
 											)}
 										</div>
 									</div>
@@ -142,19 +148,19 @@ export default function CabinServicesSelector({
 				</div>
 
 				{totalPrice > 0 && (
-					<div className="pt-4 border-t">
+					<div className="pt-3 border-t border-gray-200">
 						<div className="flex items-center justify-between">
-							<span className="font-medium">Tổng tiền dịch vụ:</span>
-							<span className="font-bold text-lg">{FormatPrice(totalPrice)}</span>
+							<span className="text-sm font-medium text-gray-700">Tổng tiền dịch vụ:</span>
+							<span className="text-sm font-semibold text-gray-900">{FormatPrice(totalPrice)}</span>
 						</div>
 					</div>
 				)}
 
 				<Button
 					onClick={handleSaveServices}
-					disabled={saving}
-					className="w-full mt-4"
-					variant="default"
+					disabled={saving || saveDisabled}
+					variant="outline"
+					className="w-full mt-3 h-10 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium text-sm rounded-md"
 				>
 					{saving ? (
 						<>
@@ -165,8 +171,8 @@ export default function CabinServicesSelector({
 						"Lưu lựa chọn"
 					)}
 				</Button>
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 	);
 }
 

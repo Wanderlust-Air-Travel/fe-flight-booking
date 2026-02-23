@@ -4,11 +4,12 @@ import FormatPrice from "../FormatPrice/FormatPrice"
 import { useState } from "react"
 
 
-const Ticket = ({ tickets,type,active,onChoose,index }:TicketProps ) => {
+const Ticket = ({ tickets, type, active, onChoose, index, displayLabel }: TicketProps) => {
+    const title = displayLabel ?? tickets.typeTicket;
     return (
         <div className={`ticketCabin ${type === "economy" ? "border-[var(--cl-five)]" : "border-[var(--cl-pri)]"} ${active ? "translate-y-[-2%] sm:translate-y-[-2%]" : ""} w-full h-full flex flex-col border-[0.1rem] rounded-[0.8rem] sm:rounded-[1rem] overflow-hidden transition ease-liner duration-200 cursor-pointer`} onClick={onChoose}>
             <div className={`${type === "economy" ? "bg-[var(--cl-five)]" : "bg-[var(--cl-pri)]"} flex flex-col justify-center items-center px-[1.2rem] sm:px-[1.6rem] py-[1.2rem] sm:py-[1.6rem]`}>
-                <p className="text-sm sm:text-md text-white font-bold uppercase">{tickets.typeTicket}</p>
+                <p className="text-sm sm:text-md text-white font-bold uppercase">{title}</p>
                 <p className="text-sm sm:text-base text-white mt-[0.4rem]">{FormatPrice(Number(tickets.price))}</p>
             </div>
             <div className="p-[1.2rem] sm:p-[1.6rem]">
