@@ -7,7 +7,7 @@ import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import { Button } from "@/components/ui/button";
 import useUserStore from "@/app/zustand/storeUser";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
-import { CheckCircle2, Calendar, MapPin, Clock, User, CreditCard } from "lucide-react";
+import { CheckCircle2, Calendar, MapPin, Clock, User, CreditCard, Package } from "lucide-react";
 import type { BookingDetails, PaymentDetails } from "@/types/confirmation-page-type";
 
 const ConfirmationPageContent = () => {
@@ -306,6 +306,24 @@ const ConfirmationPageContent = () => {
                           <strong>Recommended Check-in Time:</strong> {getRecommendedCheckInTime(segment.flightInstance.departureDatetimeLocal)}
                         </p>
                       </div>
+                      {segment.services && segment.services.length > 0 && (
+                        <div className="mt-4 p-3 bg-[var(--cl-six)]/60 border border-[var(--cl-third)]/30 rounded-md">
+                          <p className="text-sm font-semibold text-[var(--cl-pri)] mb-2 flex items-center gap-2">
+                            <Package className="w-4 h-4" />
+                            Dịch vụ đã đăng ký
+                          </p>
+                          <ul className="space-y-1 text-sm text-gray-700">
+                            {segment.services.map((svc, i) => (
+                              <li key={i} className="flex justify-between items-center">
+                                <span>{svc.serviceName ?? svc.serviceType ?? "Dịch vụ"}</span>
+                                <span className="font-medium">
+                                  {svc.isIncluded ? "Đã bao gồm" : (svc.price != null ? `${FormatPrice(svc.price)} ${booking.currencyCode}` : "—")}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
