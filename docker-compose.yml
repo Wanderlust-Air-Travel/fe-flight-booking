@@ -1,0 +1,49 @@
+# =============================================================================
+# Flight Booking Frontend — Production Docker Compose
+# fe-flight-booking/docker-compose.yml
+# Usage:
+#   docker compose up -d
+#   docker compose logs -f
+# =============================================================================
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fb-frontend
+    image: flight-booking/frontend:${VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "${FE_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      NEXT_PUBLIC_NODE_ENV: ${NODE_ENV:-production}
+      NEXT_PUBLIC_PAYMENT_MODE: ${NEXT_PUBLIC_PAYMENT_MODE:-stripe}
+      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Flight Booking}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
+      NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+networks:
+  default:
+    name: flight-booking-net
+    driver: bridge
