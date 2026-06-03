@@ -11,6 +11,8 @@ import type {
     CreateBookingResponse,
 } from "@/types/booking-service-type";
 
+export type { CreateReservationResponse } from "@/types/booking-service-type";
+
 /**
  * Create a new reservation
  */

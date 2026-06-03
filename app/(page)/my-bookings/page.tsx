@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import MainNavigationTabs from "@/app/components/MainNavigationTabs/MainNavigationTabs";
@@ -17,7 +17,7 @@ import { convertToDMY, convertToLocalTime } from "@/app/components/FormatDate/Fo
 import Link from "next/link";
 import { Booking, BookingSegment } from "@/types/my-bookings-type";
 
-const MyBookingsPage = () => {
+const MyBookingsPageContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [bookingCode, setBookingCode] = useState(searchParams.get("bookingCode") || "");
@@ -35,7 +35,6 @@ const MyBookingsPage = () => {
     } else if (tab === "check-in") {
       router.push("/check-in");
     }
-    // If tab is "my-bookings", stay on current page
   };
 
   useEffect(() => {
@@ -62,7 +61,6 @@ const MyBookingsPage = () => {
         dismissToast(loadingToastId);
         showSuccess("Đã tìm thấy đặt chỗ");
         setBooking(response.data);
-        // Update URL without reload
         router.push(`/my-bookings?bookingCode=${encodeURIComponent(bookingCode.trim())}`, { scroll: false });
       }
     } catch (err: any) {
@@ -348,5 +346,26 @@ const MyBookingsPage = () => {
   );
 };
 
-export default MyBookingsPage;
+const MyBookingsPage = () => {
+  return (
+    <Suspense fallback={
+      <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)] min-h-screen bg-gray-50">
+        <Breadcrumb />
+        <div className="container flex justify-center items-center py-24">
+          <div className="w-full max-w-md">
+            <div className="bg-white rounded-2xl border border-[var(--cl-six)] shadow-sm p-8">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-12 h-12 rounded-full border-4 border-[var(--cl-pri)] border-t-transparent animate-spin" />
+                <p className="text-lg text-[var(--cl-pri)] font-semibold">Loading...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    }>
+      <MyBookingsPageContent />
+    </Suspense>
+  );
+};
 
+export default MyBookingsPage;

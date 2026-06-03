@@ -1,5 +1,5 @@
 # =============================================================================
-# Flight Booking Frontend — Production Docker Compose
+# Wanderlust Air Travel Frontend — Production Docker Compose
 # fe-flight-booking/docker-compose.yml
 # Usage:
 #   docker compose up -d
@@ -11,24 +11,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: fb-frontend
-    image: flight-booking/frontend:${VERSION:-latest}
+    container_name: wat-frontend
+    image: wanderlust-air/frontend:${VERSION:-latest}
     restart: unless-stopped
     ports:
-      - "${FE_PORT:-3000}:3000"
+      - "${FE_PORT:-3001}:3000"
     environment:
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: "1"
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://wat-api-gateway:3000}
+      API_URL: ${API_URL:-http://wat-api-gateway:3000}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       NEXT_PUBLIC_NODE_ENV: ${NODE_ENV:-production}
       NEXT_PUBLIC_PAYMENT_MODE: ${NEXT_PUBLIC_PAYMENT_MODE:-stripe}
-      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Flight Booking}
+      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Wanderlust Air Travel}
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
       NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/healthz"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -45,5 +46,5 @@ services:
 
 networks:
   default:
-    name: flight-booking-net
-    driver: bridge
+    name: be-flight-booking_default
+    external: true
