@@ -539,24 +539,24 @@ const CheckInSeatSelectionContent = () => {
             
             {/* Booking Info Summary */}
             <div className="container">
-                <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-                    <h2 className="text-lg font-bold mb-2">Thông tin đặt chỗ</h2>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <span className="text-gray-600">Mã đặt chỗ:</span>
-                            <span className="ml-2 font-mono font-bold">{bookingData.pnrCode}</span>
+                <div className="bg-white rounded-lg shadow-md p-5 sm:p-6 mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold mb-4 text-[var(--cl-pri)]">Thông tin đặt chỗ</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 text-base sm:text-lg">
+                        <div className="flex justify-between sm:block">
+                            <span className="text-gray-500 font-medium">Mã đặt chỗ:</span>
+                            <span className="ml-2 sm:ml-0 font-mono font-bold text-[var(--cl-pri)]">{bookingData.pnrCode}</span>
                         </div>
-                        <div>
-                            <span className="text-gray-600">Trạng thái:</span>
-                            <span className="ml-2 capitalize">{bookingData.status}</span>
+                        <div className="flex justify-between sm:block">
+                            <span className="text-gray-500 font-medium">Trạng thái:</span>
+                            <span className="ml-2 sm:ml-0 capitalize font-semibold text-[var(--cl-five)]">{bookingData.status}</span>
                         </div>
-                        <div>
-                            <span className="text-gray-600">Số hành khách:</span>
-                            <span className="ml-2">{bookingData.passengers?.length || 0}</span>
+                        <div className="flex justify-between sm:block">
+                            <span className="text-gray-500 font-medium">Số hành khách:</span>
+                            <span className="ml-2 sm:ml-0 font-semibold">{bookingData.passengers?.length || 0}</span>
                         </div>
-                        <div>
-                            <span className="text-gray-600">Tổng tiền:</span>
-                            <span className="ml-2">
+                        <div className="flex justify-between sm:block">
+                            <span className="text-gray-500 font-medium">Tổng tiền:</span>
+                            <span className="ml-2 sm:ml-0 font-bold text-[var(--cl-pri)] text-lg sm:text-xl">
                                 {FormatPrice(Number(bookingData.totalAmount) || 0)}
                             </span>
                         </div>
@@ -569,7 +569,7 @@ const CheckInSeatSelectionContent = () => {
                 <div className="container">
                     {/* Flight Selection Tabs */}
                     {segmentsByFlight.size > 1 && (
-                        <div className="mb-6 flex gap-2 flex-wrap">
+                        <div className="mb-6 flex gap-3 flex-wrap">
                             {Array.from(segmentsByFlight.entries()).map(([flightId, segments]) => {
                                 const flightStr = String(flightId);
                                 const segment = segments[0];
@@ -578,9 +578,9 @@ const CheckInSeatSelectionContent = () => {
                                         key={flightStr}
                                         onClick={() => setCurrentDisplayFlightId(flightStr)}
                                         variant={currentDisplayFlightId === flightStr ? "default" : "outline"}
-                                        className={currentDisplayFlightId === flightStr ? "bg-[var(--cl-pri)]" : ""}
+                                        className={`px-5 py-3 text-base font-semibold ${currentDisplayFlightId === flightStr ? "bg-[var(--cl-pri)]" : ""}`}
                                     >
-                                        {segment?.flightNumber || `Flight ${flightStr.substring(0, 8)}`}
+                                        {segment?.flightNumber || `Chuyến bay ${flightStr.substring(0, 8)}`}
                                     </Button>
                                 );
                             })}
@@ -641,7 +641,7 @@ const CheckInSeatSelectionContent = () => {
                         
                         <div className="px-[1.2rem] w-[100%] flex-1">
                             <div className="sticky top-[calc(var(--hd)+1rem)] flex flex-col border-[var(--cl-third)] border-[0.1rem] rounded-[1rem] p-[1.6rem] gap-y-[2rem]">
-                                <h2 className="text-center text-md text-[var(--cl-pri)] font-bold">
+                                <h2 className="text-center text-lg text-[var(--cl-pri)] font-bold">
                                     Chọn ghế ngồi
                                 </h2>
 
@@ -663,23 +663,23 @@ const CheckInSeatSelectionContent = () => {
 
                                 {/* Selected Seats Info - Show all flights if multi-segment */}
                                 <div className="space-y-3">
-                                    <p className="text-sm font-medium">Ghế đã chọn:</p>
-                                    
+                                    <p className="text-base font-semibold text-[var(--cl-pri)]">Ghế đã chọn:</p>
+
                                     {Array.from(segmentsByFlight.entries()).length === 1 ? (
                                         // Single flight
                                         <>
                                             {selectedSeatsForCurrentFlight.length === 0 ? (
-                                                <p className="text-sm text-gray-500">Chưa chọn ghế nào</p>
+                                                <p className="text-sm text-gray-500 font-medium">Chưa chọn ghế nào</p>
                                             ) : (
                                                 <div className="flex flex-wrap gap-2">
                                                     {selectedSeatsForCurrentFlight.map((seat, idx) => (
-                                                        <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
+                                                        <span key={idx} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-lg text-sm font-semibold">
                                                             {seat.seatNumber}
                                                         </span>
                                                     ))}
                                                 </div>
                                             )}
-                                            <p className="text-xs text-gray-500">
+                                            <p className="text-sm text-gray-500 font-medium">
                                                 Cần chọn {Array.from(passengersNeedingSeatsByFlight.values()).reduce((a, b) => a + b, 0)} ghế cho {bookingData.passengers?.filter((p: any) => p.passengerType !== 'INF').length || 0} hành khách
                                             </p>
                                         </>
@@ -690,20 +690,20 @@ const CheckInSeatSelectionContent = () => {
                                             const selectedSeats = selectedSeatsByFlight.get(flightStr) || [];
                                             const passengersNeeded = passengersNeedingSeatsByFlight.get(flightStr) || 0;
                                             return (
-                                                <div key={flightStr} className="border-t pt-2">
-                                                    <p className="text-xs font-medium text-gray-700">{segments[0]?.flightNumber || `Flight ${flightStr.substring(0, 8)}`}</p>
+                                                <div key={flightStr} className="border-t pt-3">
+                                                    <p className="text-sm font-semibold text-gray-700">{segments[0]?.flightNumber || `Chuyến ${flightStr.substring(0, 8)}`}</p>
                                                     {selectedSeats.length === 0 ? (
-                                                        <p className="text-xs text-gray-500">Chưa chọn ghế</p>
+                                                        <p className="text-sm text-gray-500 font-medium">Chưa chọn ghế</p>
                                                     ) : (
                                                         <div className="flex flex-wrap gap-1 mt-1">
                                                             {selectedSeats.map((seat, idx) => (
-                                                                <span key={idx} className="px-1 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                                                                <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-semibold">
                                                                     {seat.seatNumber}
                                                                 </span>
                                                             ))}
                                                         </div>
                                                     )}
-                                                    <p className="text-xs text-gray-500 mt-1">
+                                                    <p className="text-sm text-gray-500 font-medium mt-1">
                                                         {selectedSeats.length}/{passengersNeeded}
                                                     </p>
                                                 </div>

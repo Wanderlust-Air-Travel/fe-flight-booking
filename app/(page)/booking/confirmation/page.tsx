@@ -178,19 +178,19 @@ const ConfirmationPageContent = () => {
                 <CheckCircle2 className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-wide">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-wide">
                   Booking Confirmed
                 </h1>
-                <p className="text-xs sm:text-sm md:text-base text-white/80 mt-1">
+                <p className="text-sm sm:text-base md:text-lg text-white/80 mt-2">
                   Your Wanderlust Airways trip is ready. A confirmation email has been sent to your inbox.
                 </p>
               </div>
             </div>
             <div className="flex flex-col items-start md:items-end gap-1 text-sm text-white/90">
-              <span className="uppercase tracking-wide text-[0.7rem] sm:text-xs opacity-80">
+              <span className="uppercase tracking-wide text-xs sm:text-sm opacity-80">
                 Booking Code
               </span>
-              <span className="text-lg sm:text-xl md:text-2xl font-extrabold break-all">
+              <span className="text-xl sm:text-2xl md:text-3xl font-extrabold break-all">
                 {booking.pnrCode}
               </span>
             </div>
@@ -206,24 +206,24 @@ const ConfirmationPageContent = () => {
                 <Calendar className="w-5 h-5" />
                 Booking Information
               </h2>
-              <div className="space-y-3">
-                <div className="flex justify-between text-xs sm:text-sm md:text-base gap-4">
-                  <span className="text-gray-600">PNR Code:</span>
-                  <span className="font-bold">{booking.pnrCode}</span>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center text-sm sm:text-base md:text-lg gap-4">
+                  <span className="text-gray-600 shrink-0">PNR Code:</span>
+                  <span className="font-bold text-[var(--cl-pri)]">{booking.pnrCode}</span>
                 </div>
-                <div className="flex justify-between text-xs sm:text-sm md:text-base gap-4">
-                  <span className="text-gray-600">Booking ID:</span>
-                  <span className="font-mono text-sm">{booking.bookingId}</span>
+                <div className="flex justify-between items-center text-sm sm:text-base md:text-lg gap-4">
+                  <span className="text-gray-600 shrink-0">Booking ID:</span>
+                  <span className="font-mono text-[0.75rem] sm:text-sm text-gray-800 break-all">{booking.bookingId}</span>
                 </div>
-                <div className="flex justify-between text-xs sm:text-sm md:text-base gap-4">
-                  <span className="text-gray-600">Status:</span>
+                <div className="flex justify-between items-center text-sm sm:text-base md:text-lg gap-4">
+                  <span className="text-gray-600 shrink-0">Status:</span>
                   <span className="font-semibold capitalize text-[var(--cl-five)]">
                     {booking.status}
                   </span>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-dashed border-[var(--cl-third)]/40 mt-3 text-sm sm:text-base">
-                  <span className="text-gray-600">Total Amount:</span>
-                  <span className="font-bold text-lg text-[var(--cl-pri)]">
+                <div className="flex justify-between items-center pt-3 border-t border-dashed border-[var(--cl-third)]/40 mt-4 text-base sm:text-lg md:text-xl">
+                  <span className="text-gray-600 shrink-0">Total Amount:</span>
+                  <span className="font-bold text-[var(--cl-pri)]">
                     {FormatPrice(booking.totalAmount)} {booking.currencyCode}
                   </span>
                 </div>
@@ -266,43 +266,43 @@ const ConfirmationPageContent = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4 text-sm md:text-base">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-base md:text-lg">
                         <div>
-                          <p className="text-xs uppercase tracking-wide text-gray-500">
+                          <p className="text-sm uppercase tracking-wide text-gray-500 font-medium">
                             Departure
                           </p>
-                          <p className="font-semibold text-[var(--cl-pri)]">
+                          <p className="font-semibold text-[var(--cl-pri)] text-base md:text-lg">
                             {formatDate(segment.flightInstance.departureDatetimeLocal)} at {formatTime(segment.flightInstance.departureDatetimeLocal)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs uppercase tracking-wide text-gray-500">
+                          <p className="text-sm uppercase tracking-wide text-gray-500 font-medium">
                             Arrival
                           </p>
-                          <p className="font-semibold text-[var(--cl-pri)]">
+                          <p className="font-semibold text-[var(--cl-pri)] text-base md:text-lg">
                             {formatDate(segment.flightInstance.arrivalDatetimeLocal)} at {formatTime(segment.flightInstance.arrivalDatetimeLocal)}
                           </p>
                         </div>
                       </div>
-                      <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
+                      <div className="mt-5 flex flex-wrap items-center gap-5 text-base">
                         <div>
-                          <p className="text-sm text-gray-600">Flight Number</p>
-                          <p className="font-semibold">{segment.flightInstance.flight.flightNumber}</p>
+                          <p className="text-sm text-gray-500 font-medium">Flight Number</p>
+                          <p className="font-semibold text-[var(--cl-pri)]">{segment.flightInstance.flight.flightNumber}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Cabin Class</p>
-                          <p className="font-semibold">{segment.fareClass.fareClassName}</p>
+                          <p className="text-sm text-gray-500 font-medium">Cabin Class</p>
+                          <p className="font-semibold text-[var(--cl-pri)]">{segment.fareClass.fareClassName}</p>
                         </div>
                         {segment.flightSeat && (
                           <div>
-                            <p className="text-sm text-gray-600">Seat</p>
-                            <p className="font-semibold">{segment.flightSeat.seatNumber}</p>
+                            <p className="text-sm text-gray-500 font-medium">Seat</p>
+                            <p className="font-semibold text-[var(--cl-pri)]">{segment.flightSeat.seatNumber}</p>
                           </div>
                         )}
                       </div>
-                      <div className="mt-4 p-3 bg-[var(--cl-pri)]/5 border border-[var(--cl-pri)]/10 rounded-md">
-                        <p className="text-sm text-[var(--cl-pri)]">
-                          <Clock className="w-4 h-4 inline mr-1" />
+                      <div className="mt-5 p-4 bg-[var(--cl-pri)]/5 border border-[var(--cl-pri)]/10 rounded-lg">
+                        <p className="text-base text-[var(--cl-pri)]">
+                          <Clock className="w-5 h-5 inline mr-1" />
                           <strong>Recommended Check-in Time:</strong> {getRecommendedCheckInTime(segment.flightInstance.departureDatetimeLocal)}
                         </p>
                       </div>
@@ -343,21 +343,21 @@ const ConfirmationPageContent = () => {
                       key={passenger.passengerId}
                       className="border-b border-dashed border-[var(--cl-third)]/40 pb-4 last:border-b-0 last:pb-0"
                     >
-                      <p className="font-semibold text-lg mb-2 text-[var(--cl-pri)]">
+                      <p className="font-semibold text-xl mb-3 text-[var(--cl-pri)]">
                         {passenger.fullname}
                       </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-base md:text-lg">
                         <div>
-                          <span className="text-gray-600">Date of Birth:</span>
-                          <span className="ml-2">{formatDate(passenger.dob)}</span>
+                          <span className="text-gray-500 font-medium">Date of Birth:</span>
+                          <span className="ml-2 font-semibold">{formatDate(passenger.dob)}</span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Gender:</span>
-                          <span className="ml-2 capitalize">{passenger.gender}</span>
+                          <span className="text-gray-500 font-medium">Gender:</span>
+                          <span className="ml-2 font-semibold capitalize">{passenger.gender}</span>
                         </div>
                         <div className="col-span-2">
-                          <span className="text-gray-600">Document Number:</span>
-                          <span className="ml-2 font-mono">{passenger.documentNumber}</span>
+                          <span className="text-gray-500 font-medium">Document Number:</span>
+                          <span className="ml-2 font-mono font-semibold">{passenger.documentNumber}</span>
                         </div>
                       </div>
                     </div>
@@ -376,41 +376,41 @@ const ConfirmationPageContent = () => {
                   <CreditCard className="w-5 h-5" />
                   Payment Information
                 </h2>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Payment ID:</span>
-                    <span className="font-mono text-sm">{payment.paymentId}</span>
+                <div className="space-y-4 text-base md:text-lg">
+                  <div className="flex justify-between items-start">
+                    <span className="text-gray-500 font-medium shrink-0">Payment ID:</span>
+                    <span className="font-mono text-[0.7rem] sm:text-sm text-gray-800 break-all text-right">{payment.paymentId}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Status:</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-medium shrink-0">Status:</span>
                     <span className={`font-semibold capitalize ${
-                      payment.status === "success" ? "text-green-600" : 
-                      payment.status === "failed" ? "text-red-600" : 
+                      payment.status === "success" ? "text-green-600" :
+                      payment.status === "failed" ? "text-red-600" :
                       "text-yellow-600"
                     }`}>
                       {payment.status}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Amount:</span>
-                    <span className="font-bold">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-medium shrink-0">Amount:</span>
+                    <span className="font-bold text-[var(--cl-pri)] text-lg">
                       {FormatPrice(payment.amount)} {payment.currencyCode}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Payment Method:</span>
-                    <span className="font-semibold">{payment.paymentMethodName}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 font-medium shrink-0">Payment Method:</span>
+                    <span className="font-semibold text-right">{payment.paymentMethodName}</span>
                   </div>
                   {payment.transactionRef && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Transaction Ref:</span>
-                      <span className="font-mono text-sm">{payment.transactionRef}</span>
+                    <div className="flex justify-between items-start">
+                      <span className="text-gray-500 font-medium shrink-0">Transaction Ref:</span>
+                      <span className="font-mono text-[0.7rem] sm:text-sm text-gray-800 break-all text-right">{payment.transactionRef}</span>
                     </div>
                   )}
                   {payment.paidAt && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Paid At:</span>
-                      <span className="text-sm">{formatDateTime(payment.paidAt)}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 font-medium shrink-0">Paid At:</span>
+                      <span className="font-semibold text-right">{formatDateTime(payment.paidAt)}</span>
                     </div>
                   )}
                 </div>
@@ -423,24 +423,24 @@ const ConfirmationPageContent = () => {
                 <h2 className="text-xl font-bold text-[var(--cl-pri)] mb-4">
                   Contact Information
                 </h2>
-                <div className="space-y-2 text-sm">
+                <div className="space-y-3 text-base md:text-lg">
                   {booking.contactFullname && (
-                    <p>
-                      <span className="text-gray-600">Name:</span>{" "}
-                      <span className="font-semibold">{booking.contactFullname}</span>
-                    </p>
+                    <div className="flex justify-between items-start gap-2">
+                      <span className="text-gray-500 font-medium shrink-0">Name:</span>
+                      <span className="font-semibold text-right">{booking.contactFullname}</span>
+                    </div>
                   )}
                   {booking.contactEmail && (
-                    <p>
-                      <span className="text-gray-600">Email:</span>{" "}
-                      <span className="font-semibold">{booking.contactEmail}</span>
-                    </p>
+                    <div className="flex justify-between items-start gap-2">
+                      <span className="text-gray-500 font-medium shrink-0">Email:</span>
+                      <span className="font-semibold text-right break-all">{booking.contactEmail}</span>
+                    </div>
                   )}
                   {booking.contactPhone && (
-                    <p>
-                      <span className="text-gray-600">Phone:</span>{" "}
-                      <span className="font-semibold">{booking.contactPhone}</span>
-                    </p>
+                    <div className="flex justify-between items-center gap-2">
+                      <span className="text-gray-500 font-medium shrink-0">Phone:</span>
+                      <span className="font-semibold text-right">{booking.contactPhone}</span>
+                    </div>
                   )}
                 </div>
               </div>

@@ -4,7 +4,7 @@ import EnhancedFlightSearchBar from "@/app/components/FlightSearchBar/EnhancedFl
 import ServiceSlide from "@/app/components/Services/ServiceSlide";
 import TripList from "@/app/components/TripList/TripList";
 import { TripListProps } from "@/types/trip-list-type";
-import axios from "axios";
+import { axiosPublic } from "@/lib/axios-instance";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
@@ -53,8 +53,7 @@ const ServiceDetailsResultSearchContent = () => {
     if (!origin || !destination || !departDate) return;
 
     setLoading(true);
-    axios
-      .get(
+    axiosPublic.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/flights?origin=${origin}&destination=${destination}&departDate=${departDate}&returnDate=${returnDate}&tripType=${tripType}&adults=${adults}&minors=${minors}`
       )
       .then((res) => {

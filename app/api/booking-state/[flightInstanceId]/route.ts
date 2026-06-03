@@ -49,7 +49,17 @@ export async function GET(
       }
     );
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      console.error('[booking-state/get] Non-JSON response from backend:', responseText.substring(0, 500));
+      return NextResponse.json(
+        { message: 'Invalid response from backend' },
+        { status: 502 }
+      );
+    }
 
     if (!response.ok) {
       return NextResponse.json(data, { status: response.status });
@@ -57,7 +67,7 @@ export async function GET(
 
     return NextResponse.json(data, { status: 200 });
   } catch (error: any) {
-    console.error('Error fetching booking state:', error);
+    console.error('[booking-state/get] Error:', error?.message || error);
     return NextResponse.json(
       { message: error.message || 'Internal server error' },
       { status: 500 }

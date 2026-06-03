@@ -361,7 +361,7 @@ const PaymentPageContent = () => {
                     type="button"
                     variant="outline"
                     onClick={() =>
-                      router.push(`/booking/info?flightInstanceId=`)
+                      router.back()
                     }
                     className="w-full sm:w-auto px-[2.4rem] py-[1.2rem] sm:py-[1.4rem] text-base sm:text-lg font-semibold border-2 border-gray-300 hover:border-[var(--cl-pri)] hover:text-[var(--cl-pri)] rounded-lg transition-all duration-200"
                   >

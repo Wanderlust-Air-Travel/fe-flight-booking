@@ -49,15 +49,25 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      console.error('[booking-state/cabin] Non-JSON response from backend:', responseText.substring(0, 500));
+      return NextResponse.json(
+        { message: 'Invalid response from backend' },
+        { status: 502 }
+      );
+    }
 
     if (!response.ok) {
       return NextResponse.json(data, { status: response.status });
     }
 
     return NextResponse.json(data, { status: 200 });
-  } catch (error) {
-    console.error('Error saving cabin selection:', error);
+  } catch (error: any) {
+    console.error('[booking-state/cabin] Error:', error?.message || error);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }
