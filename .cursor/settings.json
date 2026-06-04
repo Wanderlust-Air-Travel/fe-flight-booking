@@ -1,0 +1,11 @@
+{
+	"rules": [
+		"typescript-coding-style.md",
+		"typescript-testing.md",
+		"typescript-security.md",
+		"frontend-patterns.md"
+	],
+	"skills": [
+		"frontend-patterns"
+	]
+}
