@@ -30,21 +30,19 @@ The frontend is a **Next.js 16.0.1** application with React 19, built with:
 
 ```
 fe-flight-booking/
-├── src/
-│   ├── app/              # Next.js App Router pages
-│   ├── components/       # Reusable UI components
-│   ├── features/         # Feature-based modules
-│   ├── hooks/            # Custom React hooks
-│   ├── lib/              # Utilities and helpers
-│   ├── store/            # Zustand stores
-│   └── types/            # TypeScript types
-├── public/               # Static assets
-├── docs/                 # Documentation
-├── Dockerfile            # Multi-stage production build
-├── docker-compose.yml    # Docker production setup
-├── .env                  # Environment variables (single file, all environments)
-├── .env.example          # Template with all variables
-└── .env.local            # Local development override (gitignored)
+├── app/                    # Next.js App Router pages
+│   ├── (page)/            # Public pages
+│   ├── api/               # API routes (BFF pattern)
+│   └── layout.tsx         # Root layout
+├── components/            # Shared UI components (shadcn/ui + custom)
+├── lib/                   # Utilities, API client, toast helpers
+├── store/                 # Zustand stores
+├── public/                # Static assets
+├── docs/                  # Documentation
+├── Dockerfile              # Multi-stage production build
+├── docker-compose.yml     # Docker production setup
+├── .env.example           # Template with all variables
+└── .env.local            # Local development overrides (gitignored)
 ```
 
 ---

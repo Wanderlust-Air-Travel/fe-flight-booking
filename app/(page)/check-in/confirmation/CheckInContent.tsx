@@ -334,7 +334,7 @@ const CheckInConfirmationPage = () => {
                                         className="w-full bg-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/90 text-white px-6 py-3 text-base font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                                     >
                                         <span className="flex items-center justify-center gap-2">
-                                            <LogIn className="w-5 h-5" />
+                                            <LogIn className="w-5 h-5 cursor-pointer" />
                                             Đăng nhập để xem vé
                                         </span>
                                     </Button>

@@ -179,13 +179,16 @@ const CheckInSeatSelectionContent = () => {
                 const seg = segments[0];
                 const fareClassCode = seg?.fareClass?.fareClassCode || seg?.fareClassCode;
                 const cabinType = (seg?.cabinType || "economy").toLowerCase();
-                if (!fareClassCode) continue;
+                if (!fareClassCode || !flightId) {
+                    // Skip silently: the booking may not have a fare class code yet
+                    continue;
+                }
 
                 hasPrimedCabinRef.current.add(flightId);
                 try {
                     const res = await axiosClient.post(
                         "/api/booking-state/cabin",
-                        { flightInstanceId: flightId, cabinType, fareClassCode },
+                        { flightInstanceId: String(flightId), cabinType, fareClassCode },
                         { headers }
                     );
                     if (!isLoggedIn && res?.data?.sessionId) {

@@ -2,11 +2,11 @@
 
 ## Tổng quan
 
-Dự án sử dụng **React-Toastify** để hiển thị các thông báo (success, error, warning, info) một cách nhất quán trên toàn bộ ứng dụng.
+Dự án sử dụng **SweetAlert2** ở chế độ toast để hiển thị các thông báo (success, error, warning, info) một cách nhất quán trên toàn bộ ứng dụng.
 
 ## Cài đặt
 
-React-Toastify đã được cài đặt và cấu hình sẵn trong dự án.
+SweetAlert2 đã được cài đặt và cấu hình sẵn trong dự án.
 
 ## Import
 

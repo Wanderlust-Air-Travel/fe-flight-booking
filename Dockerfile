@@ -21,13 +21,13 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# NEXT_PUBLIC_ vars must be passed as --build-arg so Next.js can bake them into the bundle at build time
-ARG NEXT_PUBLIC_API_URL=http://wat-api-gateway:3000
-ARG NEXT_PUBLIC_SITE_URL=http://localhost:3000
-ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
-ARG NEXT_PUBLIC_NODE_ENV=production
-ARG NEXT_PUBLIC_PAYMENT_MODE=stripe
-ARG NEXT_PUBLIC_APP_NAME=Wanderlust\ Air\ Travel
+# NEXT_PUBLIC_ vars are passed as --build-arg from docker-compose
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_NODE_ENV
+ARG NEXT_PUBLIC_PAYMENT_MODE
+ARG NEXT_PUBLIC_APP_NAME
 
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
@@ -46,9 +46,12 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 
-RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 nextjs \
-    && apt-get update && apt-get install -y --no-install-recommends curl \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN groupadd --system --gid 1001 nodejs \
+    && useradd --system --uid 1001 nextjs \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

@@ -26,6 +26,9 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [openPanelIndex, setOpenPanelIndex] = useState<number | null>(null); // Track which panel is open
+    // Store the selected ticket locally so handleAccept can read it synchronously
+    // (Zustand store updates are async and cause race conditions)
+    const [selectedTicket, setSelectedTicket] = useState<FareOption | null>(null);
     const { setData, data } = useInfoTicket();
     const router = useRouter();
     const { accessToken, isLoggedIn } = useUserStore()
@@ -64,6 +67,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
     // Khi click cabin - generic handler
     const handleCabinClick = useCallback((code: string, cabinType: string, index: number) => {
         setActiveIndex(null);
+        setSelectedTicket(null); // Reset selected ticket when switching cabin type
         setType(cabinType);
 
         axiosPublic.get(`/api/search/fare-options?flightInstanceId=${code}&cabinType=${cabinType}`)
@@ -97,6 +101,9 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
     ) => {
         setActiveIndex(index2);
 
+        // Sync: store selected ticket locally for handleAccept
+        setSelectedTicket(ticket as FareOption);
+
         setData({
             id: trip.flightInstanceId,
             // Quan trọng: lưu cả flightInstanceId để InfoTicketBox nhận diện đã có chuyến được chọn
@@ -124,7 +131,13 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
     // Bước 3: Save Cabin Selection và Navigate - với error handling và loading state
     const handleAccept = async (flightInstanceId: string) => {
-        if (!data.fareClassCode) {
+        // Guard: use selectedTicket (local sync state) instead of Zustand store (async/race-prone)
+        if (!selectedTicket?.fareClassCode || !type || !flightInstanceId) {
+            console.error('[handleAccept] Missing required fields', {
+                fareClassCode: selectedTicket?.fareClassCode,
+                cabinType: type,
+                flightInstanceId,
+            });
             alert('Please select a fare class first.');
             return;
         }
@@ -134,7 +147,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
         try {
             // Always save to backend Redis (both authenticated and guest users)
                 const headers: Record<string, string> = {};
-            
+
             // For guest users, get or generate session ID
             let sessionId: string | null = null;
             if (!accessToken) {
@@ -150,13 +163,17 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
 
             const isGuest = !isLoggedIn;
             const axiosClient = isGuest ? axiosPublic : axiosInstance;
+
+            const payload = {
+                flightInstanceId,
+                cabinType: type,
+                fareClassCode: selectedTicket.fareClassCode,
+            };
+            console.log('[handleAccept] Saving cabin selection', { ...payload, isGuest });
+
             const response = await axiosClient.post(
                 '/api/booking-state/cabin',
-                {
-                    flightInstanceId: flightInstanceId,
-                    cabinType: type,
-                    fareClassCode: data.fareClassCode
-                },
+                payload,
                 {
                     headers
                 }
@@ -182,8 +199,8 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
             router.push(`/booking/info?flightInstanceId=${flightInstanceId}`);
         } catch (err: any) {
             console.error('Error saving cabin selection:', err);
-            const errorMessage = err.response?.data?.message || 
-                                err.message || 
+            const errorMessage = err.response?.data?.message ||
+                                err.message ||
                                 'Failed to save cabin selection. Please try again.';
             alert(errorMessage);
         } finally {
@@ -406,7 +423,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                     </ul>
 
 
-                                                    {activeIndex !== null && (
+                                                    {activeIndex !== null && selectedTicket && (
                                                         <Button
                                                             onClick={() => { handleAccept(trip.flightInstanceId) }}
                                                             disabled={isSaving}
