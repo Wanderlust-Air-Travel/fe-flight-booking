@@ -20,6 +20,11 @@ services:
         NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Wanderlust Air Travel}
     container_name: wat-frontend
     image: wanderlust-air/frontend:${VERSION:-latest}
+    volumes:
+      # Bind-mount .next/ for hot-reload during development.
+      # Changes from `npm run build` are picked up immediately without
+      # rebuilding the image or restarting the container (:ro = read-only).
+      - ./.next:/app/.next:ro
     restart: unless-stopped
     env_file:
       - path: .env
@@ -55,5 +60,5 @@ services:
 
 networks:
   default:
-    name: ${COMPOSE_PROJECT_NAME:-be-flight-booking}_default
+    name: be-flight-booking_default
     external: true
