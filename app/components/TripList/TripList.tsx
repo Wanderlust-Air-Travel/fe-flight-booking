@@ -285,7 +285,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                 <div className="w-full md:w-[20%] flex-shrink-0">
                                                     <div className="flex flex-col gap-y-[0.2rem]">
                                                         <p className="text-[var(--cl-five)] font-bold text-sm md:text-base">{convertToLocalTime(trip.departureLocal)}AM - {convertToLocalTime(trip.arrivalLocal)}PM</p>
-                                                        <p className="text-[var(--cl-third)] text-xs md:text-base">Wanderlust</p>
+                                                        <p className="text-[var(--cl-third)] text-sm md:text-base">Wanderlust</p>
                                                     </div>
                                                 </div>
 
@@ -295,8 +295,8 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                         <p className="text-[var(--cl-five)] font-bold text-sm md:text-base">
                                                             {trip.origin?.iata || 'N/A'} - {trip.destination?.iata || 'N/A'}
                                                         </p>
-                                                        {trip.departureLocal && <p className="text-[var(--cl-third)] text-xs md:text-sm">Start: {convertToDMY(trip.departureLocal)}</p>}
-                                                        {trip.arrivalLocal && <p className="text-[var(--cl-third)] text-xs md:text-sm">End: {convertToDMY(trip.arrivalLocal)}</p>}
+                                                        {trip.departureLocal && <p className="text-[var(--cl-third)] text-sm md:text-base">Start: {convertToDMY(trip.departureLocal)}</p>}
+                                                        {trip.arrivalLocal && <p className="text-[var(--cl-third)] text-sm md:text-base">End: {convertToDMY(trip.arrivalLocal)}</p>}
                                                     </div>
                                                 </div>
 
@@ -338,7 +338,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                                         <p className="text-sm sm:text-base text-white font-bold text-center">
                                                                             {displayInfo.name}
                                                                         </p>
-                                                                        <span className="text-xs sm:text-sm text-white text-center">
+                                                                        <span className="text-sm sm:text-base text-white text-center">
                                                                             Total seats: {cabinInfo.availableSeats}
                                                                         </span>
                                                                         <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
@@ -354,10 +354,10 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                                         handleCabinClick(trip.flightInstanceId, 'economy', index);
                                                                     }}
                                                                 >
-                                                                    <p className="text-sm sm:text-base text-white font-bold text-center">
-                                                                        Economy
-                                                                    </p>
-                                                                    <span className="text-xs sm:text-sm text-white text-center">Total seats: {trip.availableSeats}</span>
+                                                                        <p className="text-sm sm:text-base text-white font-bold text-center">
+                                                                            Economy
+                                                                        </p>
+                                                                        <span className="text-sm sm:text-base text-white text-center">Total seats: {trip.availableSeats}</span>
                                                                     <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
                                                                 </div>
                                                                 <div
@@ -369,7 +369,7 @@ const TripList = ({ trips, loading }: TripListPropsType) => {
                                                                     <p className="text-sm sm:text-base text-white font-bold text-center">
                                                                         Business
                                                                     </p>
-                                                                    <span className="text-xs sm:text-sm text-white text-center">Total seats: {trip.availableSeats}</span>
+                                                                    <span className="text-sm sm:text-base text-white text-center">Total seats: {trip.availableSeats}</span>
                                                                     <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
                                                                 </div>
                                                             </>

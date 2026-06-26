@@ -30,8 +30,10 @@
   /* -----------------------------------------------------------
    *  Font sizes  —  no !important, maps Tailwind text-* utilities
    * ----------------------------------------------------------- */
-  --text-xs:   1.1rem;   /* 11px  — micro (badge, timestamp) */
-  --text-sm:   1.2rem;   /* 12px  — caption / helper text */
+  /* 12px — micro (badge, timestamp, helper) */
+  --text-xs:   1.2rem;
+  /* 13px — caption / small helper (base minimum desktop) */
+  --text-sm:   1.3rem;
   --text-base: 1.4rem;   /* 14px  — body small */
   --text-md:   1.6rem;   /* 16px  — body default */
   --text-lg:   1.8rem;   /* 18px  — body large */
@@ -164,8 +166,9 @@
  * ================================================================ */
 @theme inline {
   /* Font sizes — text-* utilities */
-  --text-xs:    var(--text-xs);
-  --text-sm:    var(--text-sm);
+  /* Font sizes — text-* utilities */
+  --text-xs:    var(--text-xs);   /* 12px — increased from 11px */
+  --text-sm:    var(--text-sm);   /* 13px — increased from 12px */
   --text-base:  var(--text-base);
   --text-md:    var(--text-md);
   --text-lg:    var(--text-lg);
@@ -372,6 +375,25 @@ main {
   :root {
     --header-height: 9rem;
   }
+}
+
+/* --hd alias for header height (used in Header.tsx) */
+:root {
+  --hd: var(--header-height);
+}
+
+/* Ensure header has minimum height on mobile */
+header {
+  min-height: 5.6rem;
+}
+
+/* Mobile nav drawer - positioned inside fixed header */
+.mobile-nav-drawer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 40;
 }
 
 /* ================================================================

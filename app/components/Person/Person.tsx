@@ -122,7 +122,7 @@ const Person = ({classNameParent,classNameChild}:any) => {
             <div className="flex gap-x-[0.8rem] justify-between items-center">
                 <div className="flex flex-col">
                     <p className={`text-[1.4rem] text-[var(--cl-pri)] ${classNameChild}`}>Children (2-11):</p>
-                    <p className="text-xs text-gray-500">Has own seat</p>
+                    <p className="text-sm text-gray-500">Has own seat</p>
                 </div>
                 <div className="flex items-center gap-x-[0.6rem]">
                     <button onClick={handleMinusChild} className="group w-[2.8rem] h-[2.8rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)] rounded">
@@ -137,7 +137,7 @@ const Person = ({classNameParent,classNameChild}:any) => {
             <div className="flex gap-x-[0.8rem] justify-between items-center">
                 <div className="flex flex-col">
                     <p className={`text-[1.4rem] text-[var(--cl-pri)] ${classNameChild}`}>Infants (&lt;2):</p>
-                    <p className="text-xs text-gray-500">No seat (max 1 per adult)</p>
+                    <p className="text-sm text-gray-500">No seat (max 1 per adult)</p>
                 </div>
                 <div className="flex items-center gap-x-[0.6rem]">
                     <button onClick={handleMinusInfant} className="group w-[2.8rem] h-[2.8rem] flex justify-center items-center text-[var(--cl-pri)] font-bold flex-shrink-0 cursor-pointer transition hover:bg-[var(--cl-pri)] rounded">
@@ -149,7 +149,7 @@ const Person = ({classNameParent,classNameChild}:any) => {
                     </button>
                 </div>
                 {infant > adult && (
-                    <p className="text-xs text-red-500 ml-2">
+                    <p className="text-sm text-red-500 ml-2">
                         Max {adult} infant(s) allowed
                     </p>
                 )}

@@ -195,7 +195,7 @@ const FlightSearchBar = () => {
             disabled={loadingAirports || !!airportsError}
           />
           {airportsError && (
-            <p className="text-xs text-red-500  px-4 absolute top-[105%] line-clamp-1 left-0 w-full">Failed to load airports. Please refresh the page.</p>
+            <p className="text-sm text-red-500  px-4 absolute top-[105%] line-clamp-1 left-0 w-full">Failed to load airports. Please refresh the page.</p>
           )}
         </div>
         <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6] relative">
@@ -208,7 +208,7 @@ const FlightSearchBar = () => {
             disabled={loadingAirports || !!airportsError}
           />
           {airportsError && (
-            <p className="text-xs text-red-500  px-4 absolute top-[105%] left-0 w-full line-clamp-1">Failed to load airports. Please refresh the page.</p>
+            <p className="text-sm text-red-500  px-4 absolute top-[105%] left-0 w-full line-clamp-1">Failed to load airports. Please refresh the page.</p>
           )}
         </div>
         <div className="w-full md:w-[20%] border-b md:border-b-0 md:border-r-[0.1rem] border-[#cbd4e6]">

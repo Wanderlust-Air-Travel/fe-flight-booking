@@ -738,21 +738,11 @@ export default function CabinServicesPage() {
                                             </TableCell>
                                             <TableCell className="text-base">
                                                 <span className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium ${
-                                                    service.isActive 
-                                                        ? 'bg-[#7ED957]/10 text-[#64AF53]' 
+                                                    service.isActive
+                                                        ? 'bg-[#7ED957]/10 text-[#64AF53]'
                                                         : 'bg-gray-100 text-gray-600'
-                                                }`}>
-                                                    {service.isActive ? (
-                                                        <>
-                                                            <CheckCircle2 className="h-4 w-4" />
-                                                            Hoạt động
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <XCircle className="h-4 w-4" />
-                                                            Không hoạt động
-                                                        </>
-                                                    )}
+                                                }}`}>
+                                                    {service.isActive ? 'Hoạt động' : 'Không hoạt động'}
                                                 </span>
                                             </TableCell>
                                             <TableCell className="text-right text-base">

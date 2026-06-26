@@ -178,7 +178,7 @@ const CheckInConfirmationPage = () => {
                             </div>
                         </div>
                         <div className="flex flex-col items-start md:items-end gap-1 text-sm text-white/90">
-                            <span className="uppercase tracking-wide text-xs sm:text-sm opacity-80">
+                            <span className="uppercase tracking-wide text-sm sm:text-base opacity-80">
                                 Mã đặt chỗ
                             </span>
                             <span className="text-xl sm:text-2xl md:text-3xl font-extrabold break-all">
@@ -210,7 +210,7 @@ const CheckInConfirmationPage = () => {
                                                         {pax.passengerType === "ADT" ? "Người lớn" : pax.passengerType === "CHD" ? "Trẻ em" : "Em bé"}
                                                     </p>
                                                 </div>
-                                                <span className="px-3 py-1 bg-[var(--cl-pri)]/10 text-[var(--cl-pri)] text-xs sm:text-sm font-semibold rounded-full">
+                                                <span className="px-3 py-1 bg-[var(--cl-pri)]/10 text-[var(--cl-pri)] text-sm sm:text-base font-semibold rounded-full">
                                                     {pax.passengerId.slice(0, 8)}...
                                                 </span>
                                             </div>
@@ -241,14 +241,14 @@ const CheckInConfirmationPage = () => {
                                                     </p>
                                                 )}
                                                 {seg.originCity && seg.destinationCity && (
-                                                    <p className="text-xs sm:text-sm text-[var(--cl-gray)]/70 mt-1">
+                                                    <p className="text-sm sm:text-base text-[var(--cl-gray)]/70 mt-1">
                                                         {seg.originCity} — {seg.destinationCity}
                                                     </p>
                                                 )}
                                             </div>
 
                                             {/* Schedule */}
-                                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 text-xs sm:text-sm text-[var(--cl-gray)] mb-3">
+                                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 text-sm sm:text-base text-[var(--cl-gray)] mb-3">
                                                 <div>
                                                     <span className="font-medium">Khởi hành:</span>{" "}
                                                     {seg.departureDateTime ? formatDateTime(seg.departureDateTime) : "—"}

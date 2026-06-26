@@ -674,7 +674,7 @@ const SeatMapPageContent = () => {
                                             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                                                 <p className="text-sm text-red-600 font-medium">{saveError}</p>
                                                 {!accessToken && !sessionStorage.getItem('guest_session_id') && (
-                                                    <p className="text-xs text-red-500 mt-1">
+                                                    <p className="text-sm text-red-500 mt-1">
                                                         Vui lòng chọn hạng vé (cabin) trước khi chọn ghế ngồi.
                                                     </p>
                                                 )}

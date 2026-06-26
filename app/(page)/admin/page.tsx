@@ -65,28 +65,46 @@ export default function AdminDashboardPage() {
 
     if (loading) {
         return (
-            <div>
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-                    <p className="text-gray-600 mt-2">Chào mừng đến với trang quản trị</p>
+            <div className="space-y-6">
+                {/* Loading Header */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#00558f] to-[#3775A4] p-8 text-white shadow-lg">
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-2">
+                            <LayoutDashboard className="h-8 w-8" />
+                            <h1 className="text-3xl font-bold">Dashboard</h1>
+                        </div>
+                        <p className="text-blue-50 text-lg">Quản trị hệ thống</p>
+                    </div>
+                    <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
                 </div>
+
                 <div className="flex items-center justify-center py-12">
-                    <p className="text-gray-500">Đang tải...</p>
+                    <p className="text-base text-gray-500">Đang tải...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-gray-600 mt-2">Chào mừng đến với trang quản trị</p>
+        <div className="space-y-6">
+            {/* Header Section with Primary Color */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#00558f] to-[#3775A4] p-8 text-white shadow-lg">
+                <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-2">
+                        <LayoutDashboard className="h-8 w-8" />
+                        <h1 className="text-3xl font-bold">Dashboard</h1>
+                    </div>
+                    <p className="text-blue-50 text-lg">Quản trị hệ thống</p>
+                </div>
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
             </div>
 
             {dashboardItems.length === 0 ? (
                 <div className="flex items-center justify-center py-12">
-                    <p className="text-gray-500">Bạn không có quyền truy cập vào bất kỳ mục nào.</p>
+                    <p className="text-base text-gray-500">Bạn không có quyền truy cập vào bất kỳ mục nào.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -94,13 +112,15 @@ export default function AdminDashboardPage() {
                         const Icon = iconMap[item.icon] || DollarSign;
                         return (
                             <Link key={item.id} href={item.href}>
-                                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                                <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
                                     <CardHeader>
                                         <div className={`w-12 h-12 ${item.bgColor} rounded-lg flex items-center justify-center mb-4`}>
                                             <Icon className={`h-6 w-6 ${item.color}`} />
                                         </div>
-                                        <CardTitle>{item.title}</CardTitle>
-                                        <CardDescription>{item.description}</CardDescription>
+                                        <CardTitle className="text-xl font-bold text-gray-900">{item.title}</CardTitle>
+                                        <CardDescription className="text-base text-gray-600 mt-2">
+                                            {item.description}
+                                        </CardDescription>
                                     </CardHeader>
                                 </Card>
                             </Link>
@@ -111,4 +131,3 @@ export default function AdminDashboardPage() {
         </div>
     );
 }
-

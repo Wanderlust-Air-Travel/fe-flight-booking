@@ -104,12 +104,12 @@ export function TestAccountsPanel({ onDirectLogin }: TestAccountsPanelProps) {
                     <span className="text-sm font-bold text-[var(--cl-pri)] uppercase tracking-wide">
                       {account.roleName}
                     </span>
-                    <span className="text-xs text-gray-500 font-mono">{account.role}</span>
+                    <span className="text-sm text-gray-500 font-mono">{account.role}</span>
                   </div>
 
                   <div className="p-4 space-y-3">
                     <div>
-                      <label className="text-xs font-medium text-gray-600 mb-1 block">
+                      <label className="text-sm font-medium text-gray-600 mb-1 block">
                         Email
                       </label>
                       <div className="flex gap-2">

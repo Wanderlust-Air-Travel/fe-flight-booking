@@ -32,7 +32,7 @@ export function SelectComponent({ placeholder, icon, data, value, onChange, disa
                                 <SelectItem key={index} className="group" value={item.code}>
                                     <div className="flex justify-between items-center gap-x-2 sm:gap-x-[1rem] w-full group-hover:!bg-[var(--cl-pri)] p-2 sm:p-3 group-data-[state=checked]:bg-[var(--cl-pri)]">
                                         <div className="flex flex-col gap-y-[0.2rem] min-w-0 flex-1">
-                                            <p className="text-xs sm:text-sm md:text-[1.4rem] text-[var(--cl-pri)] group-hover:!text-white group-data-[state=checked]:text-[var(--cl-white)] font-medium">
+                                            <p className="text-sm sm:text-base md:text-[1.4rem] text-[var(--cl-pri)] group-hover:!text-white group-data-[state=checked]:text-[var(--cl-white)] font-medium">
                                                 {item.name}
                                             </p>
                                             <span className="text-[0.9rem] sm:text-[1rem] text-[var(--cl-pri)] group-hover:!text-white line-clamp-1 group-data-[state=checked]:text-[var(--cl-white)]">
@@ -40,7 +40,7 @@ export function SelectComponent({ placeholder, icon, data, value, onChange, disa
                                             </span>
                                         </div>
 
-                                        <div className="p-1.5 sm:p-2 text-xs sm:text-[1rem] text-white uppercase bg-[var(--cl-pri)] rounded-sm h-full group-hover:!bg-[var(--cl-four)] transition flex-shrink-0 group-data-[state=checked]:bg-[var(--cl-four)] font-semibold">
+                                        <div className="p-1.5 sm:p-2 text-sm sm:text-[1.4rem] text-white uppercase bg-[var(--cl-pri)] rounded-sm h-full group-hover:!bg-[var(--cl-four)] transition flex-shrink-0 group-data-[state=checked]:bg-[var(--cl-four)] font-semibold">
                                             {item.code}
                                         </div>
                                     </div>

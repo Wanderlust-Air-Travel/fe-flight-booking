@@ -327,7 +327,7 @@ const PaymentPageContent = () => {
                       {pollingMessage}
                     </p>
                     {paymentId && (
-                      <p className="text-xs text-yellow-600 mt-[0.8rem]">
+                      <p className="text-sm text-yellow-600 mt-[0.8rem]">
                         Payment ID: {paymentId}
                       </p>
                     )}
@@ -341,7 +341,7 @@ const PaymentPageContent = () => {
                       Waiting for payment confirmation from gateway...
                     </p>
                     {paymentId && (
-                      <p className="text-xs text-blue-600 mt-[0.8rem]">
+                      <p className="text-sm text-blue-600 mt-[0.8rem]">
                         Payment ID: {paymentId}
                       </p>
                     )}

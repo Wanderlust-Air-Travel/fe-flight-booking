@@ -24,10 +24,17 @@
  * ================================================================ */
 export const tokens = {
   fontSize: {
-    /** 11px — micro (badge, timestamp) */
-    xs: "1.1rem",      // 11px
-    /** 12px — caption / helper text */
-    sm: "1.2rem",      // 12px
+    /**
+     * 12px — micro (badge, timestamp, helper text)
+     * Tăng từ 11px → 12px vì 11px quá nhỏ không đọc được trên desktop.
+     * Trên mobile nếu cần nhỏ hơn, dùng responsive: text-xs sm:text-sm
+     */
+    xs: "1.2rem",      // 12px
+    /**
+     * 13px — caption / small helper
+     * Tăng từ 12px → 13px làm base minimum cho desktop.
+     */
+    sm: "1.3rem",      // 13px
     /** 14px — body small (form helper, table) */
     base: "1.4rem",    // 14px
     /** 16px — body default (paragraph, list) */

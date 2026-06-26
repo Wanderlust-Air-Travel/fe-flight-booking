@@ -122,13 +122,13 @@ export default function AdminLayout({
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Sidebar */}
-            <aside className="fixed left-0 top-[var(--hd)] h-[calc(100vh-var(--hd))] w-64 bg-white border-r border-gray-200 shadow-sm overflow-y-auto z-40">
+            <aside className="fixed left-0 top-[var(--header-height)] h-[calc(100vh-var(--header-height))] w-72 bg-white border-r border-gray-200 shadow-sm overflow-y-auto z-40">
                 <div className="p-6 border-b border-gray-200">
                     <h1 className="text-2xl font-bold text-[#00558f]">Admin Panel</h1>
-                    <p className="text-sm text-gray-500 mt-1">Quản trị hệ thống</p>
+                    <p className="text-base text-gray-500 mt-1">Quản trị hệ thống</p>
                 </div>
                 
-                <nav className="mt-6">
+                <nav className="mt-6 pb-20">
                     {menuItems.map((item) => {
                         const Icon = iconMap[item.icon] || LayoutDashboard;
                         const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
@@ -142,7 +142,7 @@ export default function AdminLayout({
                                         : "text-gray-700 hover:bg-gray-50"
                                 }`}
                             >
-                                <Icon className="h-5 w-5" />
+                                <Icon className="h-5 w-5 flex-shrink-0" />
                                 {item.title}
                             </Link>
                         );
@@ -154,22 +154,22 @@ export default function AdminLayout({
                         href="/"
                         className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
                     >
-                        <Home className="h-5 w-5" />
+                        <Home className="h-5 w-5 flex-shrink-0" />
                         Về trang chủ
                     </Link>
                     <button
                         onClick={handleLogout}
                         className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors w-full"
                     >
-                        <LogOut className="h-5 w-5" />
+                        <LogOut className="h-5 w-5 flex-shrink-0" />
                         Đăng xuất
                     </button>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="ml-64 pt-[var(--hd)] min-h-screen">
-                <div className="p-8">
+            <main className="ml-72 pt-[var(--header-height)] min-h-screen">
+                <div className="p-6 lg:p-8">
                     {children}
                 </div>
             </main>

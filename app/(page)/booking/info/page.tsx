@@ -130,7 +130,7 @@ const BookingInfoContent = () => {
                                                 Reservation Code:{" "}
                                                 <span className="text-base md:text-lg">{reservationData.reservationCode}</span>
                                             </p>
-                                            <p className="text-gray-700 text-xs md:text-sm">
+                                            <p className="text-gray-700 text-sm md:text-base">
                                                 Expires at:{" "}
                                                 <strong>{new Date(
                                                     reservationData.expiresAt
@@ -149,7 +149,7 @@ const BookingInfoContent = () => {
                                                     <p className={`font-bold text-base md:text-lg lg:text-xl ${isExpired ? 'text-red-600' : remainingSeconds < 300 ? 'text-yellow-700' : 'text-[var(--cl-pri)]'}`}>
                                                         {isExpired ? 'Reservation Expired' : 'Reservation Time Remaining'}
                                                     </p>
-                                                    <p className="text-xs md:text-sm text-gray-700 mt-1 md:mt-2">
+                                                    <p className="text-sm md:text-base text-gray-700 mt-1 md:mt-2">
                                                         Complete your booking before the reservation expires
                                                     </p>
                                                 </div>
@@ -158,7 +158,7 @@ const BookingInfoContent = () => {
                                                         {formattedCountdown}
                                                     </p>
                                                     {isExpired && (
-                                                        <p className="text-xs md:text-sm text-red-600 mt-1 md:mt-2 font-medium">
+                                                        <p className="text-sm md:text-base text-red-600 mt-1 md:mt-2 font-medium">
                                                             Please create a new reservation
                                                         </p>
                                                     )}
@@ -283,8 +283,8 @@ const BookingInfoContent = () => {
                                                                         variant={values.userPassengerIndex === idx ? "default" : "outline"}
                                                                         size="sm"
                                                                         className={values.userPassengerIndex === idx 
-                                                                            ? "bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white border border-[var(--cl-pri)] text-xs md:text-sm lg:text-base font-bold px-3 md:px-4 lg:px-6 py-2 md:py-2.5 lg:py-3"
-                                                                            : "border border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white text-xs md:text-sm lg:text-base font-semibold px-3 md:px-4 lg:px-6 py-2 md:py-2.5 lg:py-3"
+                                                                            ? "bg-[var(--cl-pri)] hover:bg-[var(--cl-four)] text-white border border-[var(--cl-pri)] text-sm md:text-base lg:text-lg font-bold px-3 md:px-4 lg:px-6 py-2 md:py-2.5 lg:py-3"
+                                                                            : "border border-[var(--cl-pri)] text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white text-sm md:text-base lg:text-lg font-semibold px-3 md:px-4 lg:px-6 py-2 md:py-2.5 lg:py-3"
                                                                         }
                                                                         onClick={() => {
                                                                             // Clear previous user selection
@@ -329,7 +329,7 @@ const BookingInfoContent = () => {
                                                                 <h4 className="text-base md:text-lg lg:text-xl xl:text-2xl font-bold text-[var(--cl-pri)]">
                                                                     Passenger {index + 1}
                                                                     {passenger.isCurrentUser && user && (
-                                                                        <span className="ml-2 md:ml-3 text-xs md:text-sm text-[var(--cl-four)] font-semibold bg-[var(--cl-four)]/20 px-2 md:px-3 py-0.5 md:py-1 rounded-full">
+                                                                        <span className="ml-2 md:ml-3 text-sm md:text-base text-[var(--cl-four)] font-semibold bg-[var(--cl-four)]/20 px-2 md:px-3 py-0.5 md:py-1 rounded-full">
                                                                             (Bạn)
                                                                         </span>
                                                                     )}
@@ -372,15 +372,15 @@ const BookingInfoContent = () => {
                                                             
                                                             {isInfant && (
                                                                 <Alert className="mb-4 md:mb-6 border border-[var(--cl-third)] bg-blue-50">
-                                                                    <AlertDescription className="text-xs md:text-sm lg:text-base">
+                                                                    <AlertDescription className="text-sm md:text-base lg:text-lg">
                                                                         <p className="font-bold text-[var(--cl-pri)] mb-2 md:mb-3 text-sm md:text-base lg:text-lg">Infant Requirements:</p>
-                                                                        <ul className="list-disc list-inside space-y-1 md:space-y-2 text-gray-700 text-xs md:text-sm">
+                                                                        <ul className="list-disc list-inside space-y-1 md:space-y-2 text-gray-700 text-sm md:text-base">
                                                                             <li>Must be accompanied by an adult (18+)</li>
                                                                             <li>No separate seat (sits on adult's lap)</li>
                                                                             <li>Maximum 1 infant per adult</li>
                                                                         </ul>
                                                                         {infantCount > adultCount && (
-                                                                            <p className="mt-2 md:mt-3 font-bold text-destructive text-xs md:text-sm lg:text-base">
+                                                                            <p className="mt-2 md:mt-3 font-bold text-destructive text-sm md:text-base lg:text-lg">
                                                                                 Warning: You have {infantCount} infant(s) but only {adultCount} adult(s). 
                                                                                 Each adult can only accompany 1 infant. Additional infant(s) must be booked as Child (CHD).
                                                                             </p>
@@ -407,7 +407,7 @@ const BookingInfoContent = () => {
                                                                                 )}
                                                                             />
                                                                             {passenger.isCurrentUser && user && (
-                                                                                <p className="text-xs md:text-sm text-[var(--cl-four)] font-medium mt-1">
+                                                                                <p className="text-sm md:text-base text-[var(--cl-four)] font-medium mt-1">
                                                                                     Thông tin này được tự động điền từ tài khoản của bạn
                                                                                 </p>
                                                                             )}
@@ -560,7 +560,7 @@ const BookingInfoContent = () => {
                                                                                 <ErrorMessage
                                                                                     name={`passengers.${index}.dob`}
                                                                                     component="p"
-                                                                                    className="text-destructive text-xs italic mt-1"
+                                                                                    className="text-destructive text-sm italic mt-1"
                                                                                 />
                                                                             </div>
                                                                         );
@@ -574,7 +574,7 @@ const BookingInfoContent = () => {
                                                                         const typeMatches = determinedType === passenger.passengerType;
                                                                         return (
                                                                             <div className="md:col-span-2">
-                                                                                <p className={`text-xs md:text-sm mt-2 font-medium ${typeMatches ? 'text-[var(--cl-four)]' : 'text-orange-600'}`}>
+                                                                                <p className={`text-sm md:text-base mt-2 font-medium ${typeMatches ? 'text-[var(--cl-four)]' : 'text-orange-600'}`}>
                                                                                     {typeMatches ? (
                                                                                         <span>✓ Tuổi tại ngày bay: {age} tuổi - Loại hành khách phù hợp: {determinedType}</span>
                                                                                     ) : (

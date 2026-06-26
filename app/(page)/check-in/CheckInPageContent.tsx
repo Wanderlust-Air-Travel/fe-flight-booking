@@ -256,7 +256,7 @@ const CheckInPageContent = () => {
                         )}
 
                         <div className="mt-6 pt-6 border-t">
-                            <p className="text-xs text-gray-500 text-center mb-2">
+                            <p className="text-sm text-gray-500 text-center mb-2">
                                 Làm thủ tục trực tuyến chỉ áp dụng cho các chuyến bay nội địa và quốc tế từ các sân bay lớn.
                             </p>
                         </div>

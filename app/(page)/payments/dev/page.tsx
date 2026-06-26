@@ -99,7 +99,7 @@ const DevPaymentPageContent = () => {
               </p>
 
               <div className="mb-6">
-                <label className="block text-xs font-semibold text-[var(--cl-gray)] uppercase tracking-wider mb-2">
+                <label className="block text-sm font-semibold text-[var(--cl-gray)] uppercase tracking-wider mb-2">
                   Payment ID
                 </label>
                 <div className="rounded-xl bg-gray-50/80 border border-gray-200/80 px-4 py-3 font-mono text-[1.3rem] text-gray-800 break-all leading-snug">

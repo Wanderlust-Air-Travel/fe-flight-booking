@@ -322,7 +322,7 @@ export default function BaggageAllowancesPage() {
                                 <p className="text-2xl font-bold text-gray-900 mt-1">
                                     {baggageAllowances.filter(a => a.isDomestic).length}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">(chỉ trên trang hiện tại)</p>
+                                <p className="text-sm text-gray-500 mt-1">(chỉ trên trang hiện tại)</p>
                             </div>
                             <div className="h-12 w-12 rounded-full bg-[#7ED957]/10 flex items-center justify-center">
                                 <CheckCircle2 className="h-6 w-6 text-[#7ED957]" />
@@ -339,7 +339,7 @@ export default function BaggageAllowancesPage() {
                                 <p className="text-2xl font-bold text-gray-900 mt-1">
                                     {baggageAllowances.filter(a => a.isInternational).length}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">(chỉ trên trang hiện tại)</p>
+                                <p className="text-sm text-gray-500 mt-1">(chỉ trên trang hiện tại)</p>
                             </div>
                             <div className="h-12 w-12 rounded-full bg-[#3775A4]/10 flex items-center justify-center">
                                 <Luggage className="h-6 w-6 text-[#3775A4]" />
@@ -613,14 +613,7 @@ export default function BaggageAllowancesPage() {
                                             className="hover:bg-[#00558f]/5 transition-colors"
                                         >
                                             <TableCell className="font-medium text-base">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-10 w-10 rounded-full bg-[#00558f]/10 flex items-center justify-center flex-shrink-0">
-                                                        <Package className="h-5 w-5 text-[#00558f]" />
-                                                    </div>
-                                                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-[#3775A4]/10 text-[#3775A4]">
-                                                        {allowance.fareClassCode}
-                                                    </span>
-                                                </div>
+                                                {allowance.fareClassCode}
                                             </TableCell>
                                             <TableCell className="text-base text-gray-700">
                                                 {allowance.checkedBaggageKg && allowance.checkedBaggagePieces
@@ -635,13 +628,11 @@ export default function BaggageAllowancesPage() {
                                                 <div className="flex flex-col gap-1.5">
                                                     {allowance.isDomestic && (
                                                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                                            <CheckCircle2 className="h-4 w-4" />
                                                             Nội địa
                                                         </span>
                                                     )}
                                                     {allowance.isInternational && (
                                                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                                            <CheckCircle2 className="h-4 w-4" />
                                                             Quốc tế
                                                         </span>
                                                     )}

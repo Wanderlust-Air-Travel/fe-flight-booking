@@ -269,7 +269,7 @@ export default function FareClassesPage() {
                             <div>
                                 <p className="text-sm font-medium text-gray-600">Kết quả tìm kiếm</p>
                                 <p className="text-2xl font-bold text-gray-900 mt-1">{filteredFareClasses.length}</p>
-                                <p className="text-xs text-gray-500 mt-1">(sau khi lọc)</p>
+                                <p className="text-sm text-gray-500 mt-1">(sau khi lọc)</p>
                             </div>
                             <div className="h-12 w-12 rounded-full bg-[#3775A4]/10 flex items-center justify-center">
                                 <Package className="h-6 w-6 text-[#3775A4]" />
@@ -474,14 +474,7 @@ export default function FareClassesPage() {
                                             className="hover:bg-[#00558f]/5 transition-colors"
                                         >
                                             <TableCell className="font-medium text-base">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-10 w-10 rounded-full bg-[#00558f]/10 flex items-center justify-center flex-shrink-0">
-                                                        <DollarSign className="h-5 w-5 text-[#00558f]" />
-                                                    </div>
-                                                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-[#3775A4]/10 text-[#3775A4]">
-                                                        {fareClass.fareClassCode}
-                                                    </span>
-                                                </div>
+                                                {fareClass.fareClassCode}
                                             </TableCell>
                                             <TableCell className="text-base text-gray-700">
                                                 {fareClass.cabinClass?.name || fareClass.cabinClassCode || "-"}

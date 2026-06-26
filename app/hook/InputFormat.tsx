@@ -103,7 +103,7 @@ export const InputFormat = ({
                 )}
 
                 {hasError && (
-                    <div className="flex items-start gap-2 text-xs md:text-sm text-destructive font-medium animate-in fade-in-0 slide-in-from-top-1">
+                    <div className="flex items-start gap-2 text-sm md:text-base text-destructive font-medium animate-in fade-in-0 slide-in-from-top-1">
                         <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
                         <span>{error}</span>
                     </div>

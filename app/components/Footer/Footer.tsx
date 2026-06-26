@@ -32,14 +32,14 @@ const Footer = () => {
                                 className="w-full h-full object-contain transition ease-linear group-hover:scale-95 filter-white"
                             />
                         </Link>
-                        <p className="hidden sm:block text-xs md:text-sm text-white/80">
+                        <p className="hidden sm:block text-sm md:text-base text-white/80">
                             © 2025 Wanderlust Airways. All rights reserved.
                         </p>
                     </div>
 
                     {/* Quick links + social icons (gộp cùng bên phải) */}
                     <div className="flex flex-col items-center gap-2 md:flex-row md:gap-4">
-                        <nav className="flex flex-wrap items-center justify-center gap-3 text-xs md:text-sm text-white/80">
+                        <nav className="flex flex-wrap items-center justify-center gap-3 text-sm md:text-base text-white/80">
                             <Link
                                 href="/about"
                                 className={`hover:text-[var(--cl-four)] transition-colors ${

@@ -121,10 +121,10 @@ const MyJourneyPage = () => {
                       <Plane className="w-5 h-5 text-[var(--cl-pri)]" />
                       <span className="font-bold text-lg">{journey.flightNumber}</span>
                     </div>
-                    <div className="px-3 py-1 rounded-full bg-[var(--cl-pri)] text-white text-xs sm:text-sm font-medium">
+                    <div className="px-3 py-1 rounded-full bg-[var(--cl-pri)] text-white text-sm sm:text-base font-medium">
                       {journey.pnrCode}
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
+                    <div className={`px-3 py-1 rounded-full text-sm sm:text-base font-medium ${
                       journey.status === 'confirmed' 
                         ? 'bg-green-100 text-green-800' 
                         : journey.status === 'pending'
@@ -135,7 +135,7 @@ const MyJourneyPage = () => {
                        journey.status === 'pending' ? 'Đang chờ' : journey.status}
                     </div>
                     {journey.isDomestic && (
-                      <div className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs sm:text-sm font-medium">
+                      <div className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm sm:text-base font-medium">
                         Nội địa
                       </div>
                     )}
@@ -169,7 +169,7 @@ const MyJourneyPage = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-sm sm:text-base">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <Calendar className="w-4 h-4 text-gray-600" />

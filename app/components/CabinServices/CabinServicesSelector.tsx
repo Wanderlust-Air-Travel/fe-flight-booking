@@ -128,16 +128,16 @@ export default function CabinServicesSelector({
 										<div>
 											<p className="font-medium text-sm text-gray-900">{service.serviceName}</p>
 											{service.description && (
-												<p className="text-xs text-gray-500 mt-0.5">{service.description}</p>
+												<p className="text-sm text-gray-500 mt-0.5">{service.description}</p>
 											)}
 										</div>
 										<div className="text-right shrink-0">
 											{isIncluded ? (
-												<span className="text-xs text-gray-500">Đã bao gồm</span>
+												<span className="text-sm text-gray-500">Đã bao gồm</span>
 											) : service.price !== null && service.price > 0 ? (
 												<span className="text-sm font-medium text-gray-900">{FormatPrice(service.price)}</span>
 											) : (
-												<span className="text-xs text-gray-500">Có thể thêm</span>
+												<span className="text-sm text-gray-500">Có thể thêm</span>
 											)}
 										</div>
 									</div>

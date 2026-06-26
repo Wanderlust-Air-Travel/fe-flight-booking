@@ -187,7 +187,7 @@ const ConfirmationPageContent = () => {
               </div>
             </div>
             <div className="flex flex-col items-start md:items-end gap-1 text-sm text-white/90">
-              <span className="uppercase tracking-wide text-xs sm:text-sm opacity-80">
+              <span className="uppercase tracking-wide text-sm sm:text-base opacity-80">
                 Booking Code
               </span>
               <span className="text-xl sm:text-2xl md:text-3xl font-extrabold break-all">

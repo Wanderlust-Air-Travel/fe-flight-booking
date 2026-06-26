@@ -102,13 +102,10 @@ const Header = () => {
 
     return (
         <header
-            className={`h-[var(--hd)] shadow fixed top-0 left-0 w-full z-[999]`}
+            className={`h-[var(--hd)] shadow fixed top-0 left-0 w-full z-[999] bg-[var(--cl-pri)]`}
         >
-            <div
-                className={`bg-[var(--cl-pri)] h-full transition ease-linear`}
-            >
-                <div className="container h-full">
-                    <div className="flex h-full items-center justify-between gap-x-[1.6rem]">
+            <div className="container h-full flex">
+                <div className="flex h-full items-center justify-between gap-x-[1.6rem] w-full">
                         <Link
                             className="group max-w-[16rem] w-full !h-auto overflow-hidden block"
                             href={hasManagementRole ? "/admin" : "/"}
@@ -311,11 +308,10 @@ const Header = () => {
                             )}
                         </div>
                     </div>
-                </div>
             </div>
             {/* Mobile navigation drawer */}
             <div
-                className={`lg:hidden bg-[var(--cl-pri)] text-[var(--cl-white)] transition-max-height duration-300 overflow-hidden ${isMobileMenuOpen ? "max-h-[40rem]" : "max-h-0"
+                className={`lg:hidden bg-[var(--cl-pri)] text-[var(--cl-white)] transition-max-height duration-300 overflow-hidden mobile-nav-drawer ${isMobileMenuOpen ? "max-h-[40rem]" : "max-h-0"
                     }`}
             >
                 <div className="container pb-4">
@@ -335,7 +331,7 @@ const Header = () => {
                         {hydrated && (
                             isLoggedIn ? (
                                 <div className="mt-2 border-t border-white/10 pt-2 flex flex-col gap-y-2">
-                                    <p className="text-xs uppercase text-white/80 flex items-center gap-x-2">
+                                    <p className="text-sm uppercase text-white/80 flex items-center gap-x-2">
                                         <Image src="/icAva.png" alt="icAva" width={20} height={20} className="flex-shrink-0" priority unoptimized />
                                         {user?.fullname}
                                     </p>

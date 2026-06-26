@@ -424,7 +424,7 @@ const MyTicketsPage = () => {
               <p className="ml-2">Economy Saver Max, Economy Saver (Wanderlust Eco) - các hạng vé siêu tiết kiệm thông thường không được phép hoàn/hủy vé.</p>
             </div>
             <div className="mt-4 sm:mt-5 p-3 sm:p-4 bg-blue-50 rounded border-l-4 border-blue-400">
-              <p className="text-blue-800 text-xs sm:text-sm italic">
+              <p className="text-blue-800 text-sm sm:text-base italic">
                 <strong>Lưu ý:</strong> Bạn luôn nên kiểm tra lại Điều kiện giá vé (Fare Rules) cụ thể của vé máy bay bạn đã mua để biết chính xác quy định áp dụng.
               </p>
             </div>
@@ -442,10 +442,10 @@ const MyTicketsPage = () => {
                       <Plane className="w-5 h-5 text-[var(--cl-pri)]" />
                       <span className="font-bold text-base sm:text-lg">{ticket.flightNumber}</span>
                     </div>
-                    <div className="px-3 py-1 rounded-full bg-[var(--cl-pri)] text-white text-xs sm:text-sm font-medium">
+                    <div className="px-3 py-1 rounded-full bg-[var(--cl-pri)] text-white text-sm sm:text-base font-medium">
                       {ticket.pnrCode}
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
+                    <div className={`px-3 py-1 rounded-full text-sm sm:text-base font-medium ${
                       ticket.bookingStatus === 'confirmed' 
                         ? 'bg-green-100 text-green-800' 
                         : ticket.bookingStatus === 'pending'
@@ -492,7 +492,7 @@ const MyTicketsPage = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-sm sm:text-base">
                     <div>
                       <p className="text-gray-600 mb-1">Ngày khởi hành</p>
                       <p className="font-semibold">{convertToDMY(ticket.departureDateTime)}</p>
@@ -519,20 +519,20 @@ const MyTicketsPage = () => {
                   <div className="space-y-4">
                     {/* Ticket Code */}
                     <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Mã vé</p>
+                      <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">Mã vé</p>
                       <p className="font-mono font-bold text-base text-gray-900">{ticket.ticketNumber}</p>
                     </div>
                     
                     {/* Fare Class */}
                     <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Hạng vé</p>
+                      <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">Hạng vé</p>
                       <p className="font-semibold text-base text-gray-900">{ticket.fareClassName}</p>
-                      <p className="text-xs text-gray-500 mt-1">{ticket.cabinClass === 'economy' ? 'Phổ thông' : 'Thương gia'}</p>
+                      <p className="text-sm text-gray-500 mt-1">{ticket.cabinClass === 'economy' ? 'Phổ thông' : 'Thương gia'}</p>
                     </div>
                     
                     {/* Total Amount */}
                     <div className="bg-[var(--cl-pri)]/5 p-3 sm:p-4 rounded-lg border-2 border-[var(--cl-pri)]/20">
-                      <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Tổng tiền</p>
+                      <p className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">Tổng tiền</p>
                       <p className="text-xl font-bold text-[var(--cl-pri)]">{FormatPrice(ticket.totalAmount)}</p>
                     </div>
                     

@@ -310,7 +310,7 @@ export default function FlightSchedulesPage() {
                                 <p className="text-2xl font-bold text-gray-900 mt-1">
                                     {schedules.filter(s => s.status === 'active').length}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">(chỉ trên trang hiện tại)</p>
+                                <p className="text-sm text-gray-500 mt-1">(chỉ trên trang hiện tại)</p>
                             </div>
                             <div className="h-12 w-12 rounded-full bg-[#7ED957]/10 flex items-center justify-center">
                                 <CheckCircle2 className="h-6 w-6 text-[#7ED957]" />
@@ -325,7 +325,7 @@ export default function FlightSchedulesPage() {
                             <div>
                                 <p className="text-sm font-medium text-gray-600">Kết quả tìm kiếm</p>
                                 <p className="text-2xl font-bold text-gray-900 mt-1">{filteredSchedules.length}</p>
-                                <p className="text-xs text-gray-500 mt-1">(sau khi lọc)</p>
+                                <p className="text-sm text-gray-500 mt-1">(sau khi lọc)</p>
                             </div>
                             <div className="h-12 w-12 rounded-full bg-[#3775A4]/10 flex items-center justify-center">
                                 <Clock className="h-6 w-6 text-[#3775A4]" />
@@ -650,14 +650,7 @@ export default function FlightSchedulesPage() {
                                             className="hover:bg-[#00558f]/5 transition-colors"
                                         >
                                             <TableCell className="font-medium text-base">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-10 w-10 rounded-full bg-[#00558f]/10 flex items-center justify-center flex-shrink-0">
-                                                        <Plane className="h-5 w-5 text-[#00558f]" />
-                                                    </div>
-                                                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-[#3775A4]/10 text-[#3775A4]">
-                                                        {schedule.flightNumber}
-                                                    </span>
-                                                </div>
+                                                {schedule.flightNumber}
                                             </TableCell>
                                             <TableCell className="text-base text-gray-700">
                                                 {formatRoute(schedule)}
@@ -666,31 +659,20 @@ export default function FlightSchedulesPage() {
                                                 {schedule.aircraftType?.code || "N/A"}
                                             </TableCell>
                                             <TableCell className="text-base text-gray-700">
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="h-4 w-4 text-gray-400" />
-                                                    {schedule.departureTime}
-                                                </div>
+                                                {schedule.departureTime}
                                             </TableCell>
                                             <TableCell className="text-base text-gray-700">
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="h-4 w-4 text-gray-400" />
-                                                    {schedule.arrivalTime}
-                                                </div>
+                                                {schedule.arrivalTime}
                                             </TableCell>
                                             <TableCell className="text-base text-gray-700">
                                                 {formatOperatingDays(schedule.operatingDays || "0000000")}
                                             </TableCell>
                                             <TableCell className="text-base text-gray-700">
-                                                <div className="flex items-center gap-2">
-                                                    <CalendarIcon className="h-4 w-4 text-gray-400" />
-                                                    <span>
-                                                        {schedule.effectiveFrom 
-                                                            ? new Date(schedule.effectiveFrom).toLocaleDateString("vi-VN")
-                                                            : 'N/A'} - {schedule.effectiveTo 
-                                                                ? new Date(schedule.effectiveTo).toLocaleDateString("vi-VN")
-                                                                : 'Vô thời hạn'}
-                                                    </span>
-                                                </div>
+                                                {schedule.effectiveFrom 
+                                                    ? new Date(schedule.effectiveFrom).toLocaleDateString("vi-VN")
+                                                    : 'N/A'} - {schedule.effectiveTo 
+                                                        ? new Date(schedule.effectiveTo).toLocaleDateString("vi-VN")
+                                                        : 'Vô thời hạn'}
                                             </TableCell>
                                             <TableCell className="text-base">
                                                 <span className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium ${

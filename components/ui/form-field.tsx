@@ -106,7 +106,7 @@ export function FormField({
             role="alert"
             aria-live="polite"
             className={cn(
-              "flex items-start gap-2 text-xs md:text-sm text-destructive font-medium",
+              "flex items-start gap-2 text-sm md:text-base text-destructive font-medium",
               "animate-in fade-in-0 slide-in-from-top-1 duration-200",
               errorClassName
             )}

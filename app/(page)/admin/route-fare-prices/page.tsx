@@ -433,7 +433,7 @@ export default function RouteFarePricesPage() {
                                 <p className="text-2xl font-bold text-gray-900 mt-1">
                                     {routeFarePrices.filter(p => p.isActive).length}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">(chỉ trên trang hiện tại)</p>
+                                <p className="text-sm text-gray-500 mt-1">(chỉ trên trang hiện tại)</p>
                             </div>
                             <div className="h-12 w-12 rounded-full bg-[#7ED957]/10 flex items-center justify-center">
                                 <CheckCircle2 className="h-6 w-6 text-[#7ED957]" />
@@ -853,12 +853,7 @@ export default function RouteFarePricesPage() {
                                             className="hover:bg-[#00558f]/5 transition-colors"
                                         >
                                             <TableCell className="font-medium text-base">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-10 w-10 rounded-full bg-[#00558f]/10 flex items-center justify-center flex-shrink-0">
-                                                        <Plane className="h-5 w-5 text-[#00558f]" />
-                                                    </div>
-                                                    <span className="text-base">{formatRoute(price.route)}</span>
-                                                </div>
+                                                {formatRoute(price.route)}
                                             </TableCell>
                                             <TableCell className="text-base">
                                                 <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-[#3775A4]/10 text-[#3775A4]">
@@ -875,34 +870,19 @@ export default function RouteFarePricesPage() {
                                                 {((price.feeRate || 0) * 100).toFixed(1)}%
                                             </TableCell>
                                             <TableCell className="text-base text-gray-700">
-                                                <div className="flex items-center gap-2">
-                                                    <CalendarIcon className="h-5 w-5 text-gray-400" />
-                                                    <span>
-                                                        {price.effectiveFrom 
-                                                            ? new Date(price.effectiveFrom).toLocaleDateString('vi-VN')
-                                                            : 'N/A'} - {price.effectiveTo 
-                                                                ? new Date(price.effectiveTo).toLocaleDateString('vi-VN')
-                                                                : 'Vô thời hạn'}
-                                                    </span>
-                                                </div>
+                                                {price.effectiveFrom 
+                                                    ? new Date(price.effectiveFrom).toLocaleDateString('vi-VN')
+                                                    : 'N/A'} - {price.effectiveTo 
+                                                        ? new Date(price.effectiveTo).toLocaleDateString('vi-VN')
+                                                        : 'Vô thời hạn'}
                                             </TableCell>
                                             <TableCell className="text-base">
-                                                <span className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium ${
+                                                <span className={`inline-flex items-center px-3 py-2 rounded-full text-sm font-medium ${
                                                     price.isActive 
                                                         ? 'bg-[#7ED957]/10 text-[#64AF53]' 
                                                         : 'bg-gray-100 text-gray-600'
                                                 }`}>
-                                                    {price.isActive ? (
-                                                        <>
-                                                            <CheckCircle2 className="h-4 w-4" />
-                                                            Hoạt động
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <XCircle className="h-4 w-4" />
-                                                            Không hoạt động
-                                                        </>
-                                                    )}
+                                                    {price.isActive ? 'Hoạt động' : 'Không hoạt động'}
                                                 </span>
                                             </TableCell>
                                             <TableCell className="text-right text-base">
