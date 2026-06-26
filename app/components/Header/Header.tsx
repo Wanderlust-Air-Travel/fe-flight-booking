@@ -255,18 +255,18 @@ const Header = () => {
                                         <>
                                             <li className="group">
                                                 <Link
-                                                    className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex uppercase justify-center items-center gap-x-2 ${router === "/signin" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`}
-                                                    href="/signin"
+                                                    className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex uppercase justify-center items-center gap-x-2 ${router === "/sign-in" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`}
+                                                    href="/sign-in"
                                                 >
                                                     Sign in
                                                 </Link>
                                             </li>
 
 
-                                            <li className={`group h-auto flex flex-col justify-center px-[2rem] py-[0.6rem] rounded-lg hover:bg-[var(--cl-white)]  relative  ${router === "/signup" ? "bg-[var(--cl-white)]" : "bg-[var(--cl-four)]"} transition `}>
+                                            <li className={`group h-auto flex flex-col justify-center px-[2rem] py-[0.6rem] rounded-lg hover:bg-[var(--cl-white)]  relative  ${router === "/sign-up" ? "bg-[var(--cl-white)]" : "bg-[var(--cl-four)]"} transition `}>
                                                 <Link
-                                                    className={`p-[1rem] text-md transition ease-linear h-full flex justify-center items-center gap-x-2 uppercase group-hover:text-[var(--cl-pri)] ${router === "/signup" ? "text-[var(--cl-pri)]" : "text-[var(--cl-white)]"}`}
-                                                    href="/signup"
+                                                    className={`p-[1rem] text-md transition ease-linear h-full flex justify-center items-center gap-x-2 uppercase group-hover:text-[var(--cl-pri)] ${router === "/sign-up" ? "text-[var(--cl-pri)]" : "text-[var(--cl-white)]"}`}
+                                                    href="/sign-up"
                                                 >
                                                     Sign up
                                                 </Link>
@@ -294,7 +294,7 @@ const Header = () => {
                             ) : (
                                 <>
                                     {hydrated && !isLoggedIn && (
-                                        <Link href="/signin" className="text-[var(--cl-white)] text-sm uppercase">
+                                        <Link href="/sign-in" className="text-[var(--cl-white)] text-sm uppercase">
                                             Sign in
                                         </Link>
                                     )}
@@ -378,9 +378,9 @@ const Header = () => {
                             ) : (
                                 <div className="mt-2 border-t border-white/10 pt-2 flex flex-col gap-y-2">
                                     <Link
-                                        href="/signin"
+                                        href="/sign-in"
                                         onClick={() => setIsMobileMenuOpen(false)}
-                                        className={`text-sm uppercase ${router === "/signin" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`}
+                                        className={`text-sm uppercase ${router === "/sign-in" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`}
                                     >
                                         Sign in
                                     </Link>
@@ -389,7 +389,7 @@ const Header = () => {
                                         size="sm"
                                         className="bg-[var(--cl-four)] text-[var(--cl-white)] hover:bg-[var(--cl-white)] hover:text-[var(--cl-pri)]"
                                     >
-                                        <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)} className="uppercase text-sm">
+                                        <Link href="/sign-up" onClick={() => setIsMobileMenuOpen(false)} className="uppercase text-sm">
                                             Sign up
                                         </Link>
                                     </Button>

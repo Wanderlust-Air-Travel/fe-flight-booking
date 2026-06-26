@@ -51,7 +51,7 @@ const MyTicketsPage = () => {
   useEffect(() => {
     if (hydrated && !accessToken && !user?.id) {
       // User is not logged in, redirect to login
-      router.push(`/signin?redirect=${encodeURIComponent('/my-tickets')}`)
+      router.push(`/sign-in?redirect=${encodeURIComponent('/my-tickets')}`)
       return
     }
   }, [hydrated, accessToken, user?.id, router])
@@ -77,7 +77,7 @@ const MyTicketsPage = () => {
       if (status === 401) {
         setError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.")
         setTimeout(() => {
-          router.push(`/signin?redirect=${encodeURIComponent('/my-tickets')}`)
+          router.push(`/sign-in?redirect=${encodeURIComponent('/my-tickets')}`)
         }, 2000)
       } else {
         setError(err.response?.data?.message || "Không thể tải danh sách vé. Vui lòng thử lại sau.")

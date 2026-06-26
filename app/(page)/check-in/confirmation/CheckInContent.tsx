@@ -330,7 +330,7 @@ const CheckInConfirmationPage = () => {
                                     </Button>
                                 ) : (
                                     <Button
-                                        onClick={() => window.location.href = "/signin?redirect=/my-tickets"}
+                                        onClick={() => window.location.href = "/sign-in?redirect=/my-tickets"}
                                         className="w-full bg-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/90 text-white px-6 py-3 text-base font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                                     >
                                         <span className="flex items-center justify-center gap-2">

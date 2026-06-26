@@ -8,7 +8,7 @@ const Footer = () => {
     const router = usePathname();
 
     // Không dùng footer trên trang đăng nhập / đăng ký và trang admin để layout full screen
-    if (router === "/signin" || router === "/signup" || router?.startsWith("/admin")) {
+    if (router === "/sign-in" || router === "/sign-up" || router?.startsWith("/admin")) {
         return null;
     }
 
