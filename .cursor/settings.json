@@ -1,11 +1,27 @@
 {
 	"rules": [
+		"common-coding-style.md",
+		"common-agents.md",
+		"common-development-workflow.md",
+		"common-git-workflow.md",
+		"common-hooks.md",
+		"common-patterns.md",
+		"common-performance.md",
+		"common-security.md",
+		"common-testing.md",
 		"typescript-coding-style.md",
 		"typescript-testing.md",
 		"typescript-security.md",
 		"frontend-patterns.md"
 	],
 	"skills": [
-		"frontend-patterns"
+		"frontend-patterns",
+		"react-patterns",
+		"react-testing",
+		"react-performance",
+		"nextjs-turbopack",
+		"tdd-workflow",
+		"security-review",
+		"coding-standards"
 	]
 }
