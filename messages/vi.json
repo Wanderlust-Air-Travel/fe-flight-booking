@@ -1,12 +1,237 @@
 {
 	"common": {
 		"loading": "Đang tải...",
-		"backToHome": "Về trang chủ"
+		"backToHome": "Về trang chủ",
+		"save": "Lưu",
+		"cancel": "Hủy",
+		"next": "Tiếp tục",
+		"previous": "Quay lại",
+		"search": "Tìm kiếm",
+		"searching": "Đang tìm kiếm...",
+		"confirm": "Xác nhận",
+		"close": "Đóng",
+		"back": "Quay lại",
+		"edit": "Chỉnh sửa",
+		"delete": "Xóa",
+		"add": "Thêm",
+		"yes": "Có",
+		"no": "Không",
+		"continue": "Tiếp tục",
+		"submit": "Gửi",
+		"reset": "Đặt lại",
+		"detail": "Chi tiết",
+		"from": "Từ",
+		"to": "Đến",
+		"required": "Bắt buộc",
+		"fullName": "Họ và tên",
+		"fullNamePlaceholder": "Nhập họ và tên",
+		"email": "Email",
+		"emailPlaceholder": "Nhập email",
+		"phone": "Số điện thoại",
+		"phonePlaceholder": "Nhập số điện thoại",
+		"password": "Mật khẩu",
+		"passwordPlaceholder": "Nhập mật khẩu",
+		"dateOfBirth": "Ngày sinh",
+		"address": "Địa chỉ",
+		"addressPlaceholder": "Nhập địa chỉ",
+		"code": "Mã",
+		"codePlaceholder": "Nhập mã"
+	},
+	"errors": {
+		"generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
+		"network": "Lỗi mạng. Vui lòng kiểm tra kết nối.",
+		"unauthorized": "Bạn cần đăng nhập để tiếp tục.",
+		"forbidden": "Bạn không có quyền truy cập.",
+		"notFound": "Không tìm thấy dữ liệu.",
+		"validation": "Vui lòng kiểm tra lại thông tin nhập."
 	},
 	"locale": {
 		"vi": "Tiếng Việt",
 		"en": "English",
 		"label": "Ngôn ngữ"
+	},
+	"home": {
+		"servicesTitle": "Dịch vụ",
+		"seeMore": "Xem thêm"
+	},
+	"header": {
+		"home": "Trang chủ",
+		"about": "Giới thiệu",
+		"service": "Dịch vụ",
+		"signIn": "Đăng nhập",
+		"signUp": "Đăng ký",
+		"myTickets": "Vé của tôi",
+		"myJourney": "Hành trình của tôi",
+		"manage": "Quản lý",
+		"logout": "Đăng xuất",
+		"logoutMobile": "Đăng xuất",
+		"toggleNav": "Bật/tắt menu điều hướng"
+	},
+	"footer": {
+		"about": "Giới thiệu",
+		"support": "Hỗ trợ",
+		"contact": "Liên hệ",
+		"privacy": "Bảo mật",
+		"copyright": "© 2025 Wanderlust Airways. Bảo lưu mọi quyền."
+	},
+	"auth": {
+		"signIn": {
+			"title": "Đăng nhập",
+			"emailLabel": "Email",
+			"emailPlaceholder": "Nhập email",
+			"passwordLabel": "Mật khẩu",
+			"passwordPlaceholder": "Nhập mật khẩu",
+			"rememberMe": "Ghi nhớ đăng nhập",
+			"forgotPassword": "Quên mật khẩu?",
+			"submitButton": "Đăng nhập",
+			"submitting": "Đang đăng nhập...",
+			"noAccount": "Chưa có tài khoản?",
+			"signUpHere": "Đăng ký tại đây",
+			"orContinueWith": "Hoặc tiếp tục với"
+		},
+		"signUp": {
+			"title": "Đăng ký",
+			"fullnameLabel": "Họ và tên",
+			"fullnamePlaceholder": "Nhập họ và tên",
+			"emailLabel": "Email",
+			"emailPlaceholder": "Nhập email",
+			"phoneLabel": "Số điện thoại",
+			"phonePlaceholder": "Nhập số điện thoại",
+			"passwordLabel": "Mật khẩu",
+			"passwordPlaceholder": "Nhập mật khẩu",
+			"repasswordLabel": "Nhập lại mật khẩu",
+			"repasswordPlaceholder": "Nhập lại mật khẩu",
+			"submitButton": "Đăng ký",
+			"submitting": "Đang đăng ký...",
+			"haveAccount": "Đã có tài khoản?",
+			"signInHere": "Đăng nhập tại đây"
+		}
+	},
+	"search": {
+		"roundTrip": "Khứ hồi",
+		"oneWay": "Một chiều",
+		"multiCity": "Nhiều chặng",
+		"from": "Từ",
+		"to": "Đến",
+		"departure": "Khởi hành",
+		"return": "Quay về",
+		"passengers": "Hành khách",
+		"adult": "Người lớn",
+		"child": "Trẻ em",
+		"infant": "Em bé",
+		"seatClass": "Hạng ghế",
+		"economy": "Phổ thông",
+		"business": "Thương gia",
+		"first": "Hạng nhất",
+		"promoCode": "Mã khuyến mãi",
+		"searchButton": "Tìm chuyến bay",
+		"swap": "Đổi chiều",
+		"origin": "Chọn điểm đi",
+		"destination": "Chọn điểm đến"
+	},
+	"services": {
+		"viewDetail": "Xem chi tiết",
+		"bookNow": "Đặt ngay",
+		"learnMore": "Tìm hiểu thêm",
+		"seeAll": "Xem tất cả",
+		"serviceItem": "Dịch vụ",
+		"emptyState": "Hiện chưa có dịch vụ nào.",
+		"departureLabel": "Ngày đi:",
+		"returnLabel": "Ngày về:",
+		"fromLabel": "chỉ từ"
+	},
+	"booking": {
+		"pageTitle": "Đặt chỗ",
+		"flightInfo": "Thông tin chuyến bay",
+		"passengerInfo": "Thông tin hành khách",
+		"contactInfo": "Thông tin liên hệ",
+		"contactFullname": "Họ và tên",
+		"contactEmail": "Email",
+		"contactPhone": "Số điện thoại",
+		"reservationExpired": "Đã hết hạn giữ chỗ",
+		"reservationRemaining": "Thời gian giữ chỗ còn lại",
+		"selectType": "Chọn loại",
+		"fullName": "Họ và tên",
+		"dateOfBirth": "Ngày sinh",
+		"month": "Tháng",
+		"gender": "Giới tính",
+		"male": "Nam",
+		"female": "Nữ",
+		"documentNumber": "Số CCCD/Hộ chiếu",
+		"loyaltyNumber": "Số thẻ khách hàng thân thiết (tùy chọn)",
+		"continuePayment": "Tiếp tục thanh toán",
+		"creatingBooking": "Đang tạo đặt chỗ...",
+		"seatMap": "Sơ đồ ghế",
+		"selectSeat": "Chọn ghế",
+		"confirmation": "Xác nhận đặt chỗ",
+		"payment": "Thanh toán",
+		"paymentSuccess": "Thanh toán thành công",
+		"paymentFailed": "Thanh toán thất bại"
+	},
+	"checkIn": {
+		"successTitle": "Làm thủ tục thành công!",
+		"alreadyCheckedInTitle": "Đặt chỗ đã được làm thủ tục",
+		"successDesc": "Vé máy bay của bạn đã được tạo thành công.",
+		"alreadyCheckedInDesc": "Đặt chỗ này đã được làm thủ tục trước đó. Vé máy bay đã được phát hành.",
+		"pnrCodeLabel": "Mã đặt chỗ",
+		"loading": "Đang tải thông tin...",
+		"invalidCode": "Mã đặt chỗ không hợp lệ",
+		"fetchError": "Không thể tải thông tin đặt chỗ",
+		"passengersTitle": "Thông tin hành khách",
+		"flightTitle": "Thông tin chuyến bay & ghế ngồi",
+		"flightNoFlight": "Không có thông tin chuyến bay",
+		"flightLabel": "Chuyến bay {n}: {flight}",
+		"departure": "Khởi hành:",
+		"arrival": "Đến nơi:",
+		"seatLabel": "Ghế:",
+		"cabinBusiness": "Hạng thương gia",
+		"cabinEconomy": "Phổ thông",
+		"seatUnassigned": "Chỗ ngồi chưa được ghi nhận",
+		"ticketCountLabel": "Số vé đã tạo:",
+		"emailTitle": "Email xác nhận",
+		"emailNotice": "Chúng tôi đã gửi email xác nhận đến {email}",
+		"recipient": "Người nhận: {name}",
+		"actionMyTickets": "Xem vé của tôi",
+		"actionLoginToView": "Đăng nhập để xem vé",
+		"backToHome": "Về trang chủ",
+		"passengerTypeADT": "Người lớn",
+		"passengerTypeCHD": "Trẻ em",
+		"passengerTypeINF": "Em bé",
+		"pageTitle": "Làm thủ tục",
+		"seatSelection": "Chọn ghế",
+		"enterPnr": "Nhập mã đặt chỗ 6 ký tự để làm thủ tục",
+		"checkInButton": "Làm Thủ Tục",
+		"checkInSubmitting": "Đang kiểm tra...",
+		"tabByCode": "Mã Đặt Chỗ",
+		"tabByTicket": "Số Vé",
+		"tabByMembership": "Số Hội Viên",
+		"ticketNumberLabel": "Số Vé",
+		"lastNameLabel": "Họ",
+		"lastNamePlaceholder": "NGUYEN",
+		"featureComingSoon": "Tính năng đang được phát triển",
+		"ticketSearchComingSoon": "Tính năng tìm kiếm theo số vé đang được phát triển",
+		"membershipSearchComingSoon": "Tính năng tìm kiếm theo số hội viên đang được phát triển",
+		"membershipPlaceholder": "Nhập số hội viên",
+		"ticketPlaceholder": "123XXXXXXXXXXX",
+		"pnrConfirmHelp": "Vui lòng nhập đúng mã đặt chỗ như trên email xác nhận",
+		"pnrPlaceholder": "Ví dụ: ABC123",
+		"tabBookTicket": "Đặt vé",
+		"tabCheckIn": "Làm thủ tục",
+		"tabMyBookings": "Đặt chỗ của tôi"
+	},
+	"myTickets": {
+		"pageTitle": "Vé của tôi",
+		"empty": "Bạn chưa có vé nào",
+		"loading": "Đang tải vé..."
+	},
+	"myJourney": {
+		"pageTitle": "Hành trình của tôi",
+		"empty": "Bạn chưa có hành trình nào",
+		"loading": "Đang tải hành trình..."
+	},
+	"infoTicket": {
+		"pageTitle": "Thông tin vé",
+		"loading": "Đang tải..."
 	},
 	"myBookings": {
 		"pageTitle": "Đặt Chỗ Của Tôi",
@@ -38,8 +263,6 @@
 		"bookingDate": "Ngày đặt",
 		"flightSection": "Thông Tin Chuyến Bay",
 		"cabinClass": "Hạng vé",
-		"from": "Điểm đi",
-		"to": "Điểm đến",
 		"totalLabel": "Tổng tiền:",
 		"actionPay": "Thanh Toán",
 		"actionCheckIn": "Làm Thủ Tục",
@@ -56,34 +279,67 @@
 		"helper": "Chọn dịch vụ bổ sung. \"Đã bao gồm\" là cố định; các dịch vụ khác bấm để thêm/bỏ.",
 		"totalLabel": "Tổng tiền dịch vụ:"
 	},
-	"checkIn": {
-		"successTitle": "Làm thủ tục thành công!",
-		"alreadyCheckedInTitle": "Đặt chỗ đã được làm thủ tục",
-		"successDesc": "Vé máy bay của bạn đã được tạo thành công.",
-		"alreadyCheckedInDesc": "Đặt chỗ này đã được làm thủ tục trước đó. Vé máy bay đã được phát hành.",
-		"pnrCodeLabel": "Mã đặt chỗ",
-		"loading": "Đang tải thông tin...",
-		"invalidCode": "Mã đặt chỗ không hợp lệ",
-		"fetchError": "Không thể tải thông tin đặt chỗ",
-		"passengersTitle": "Thông tin hành khách",
-		"flightTitle": "Thông tin chuyến bay & ghế ngồi",
-		"flightNoFlight": "Không có thông tin chuyến bay",
-		"flightLabel": "Chuyến bay {n}: {flight}",
-		"departure": "Khởi hành:",
-		"arrival": "Đến nơi:",
-		"seatLabel": "Ghế:",
-		"cabinBusiness": "Hạng thương gia",
-		"cabinEconomy": "Phổ thông",
-		"seatUnassigned": "Chỗ ngồi chưa được ghi nhận",
-		"ticketCountLabel": "Số vé đã tạo:",
-		"emailTitle": "Email xác nhận",
-		"emailNotice": "Chúng tôi đã gửi email xác nhận đến {email}",
-		"recipient": "Người nhận: {name}",
-		"actionMyTickets": "Xem vé của tôi",
-		"actionLoginToView": "Đăng nhập để xem vé",
-		"backToHome": "Về trang chủ",
-		"passengerTypeADT": "Người lớn",
-		"passengerTypeCHD": "Trẻ em",
-		"passengerTypeINF": "Em bé"
+	"chooseCabin": {
+		"pageTitle": "Chọn hạng ghế",
+		"economy": "Phổ thông",
+		"business": "Thương gia",
+		"first": "Hạng nhất",
+		"select": "Chọn",
+		"priceFrom": "Giá từ",
+		"loading": "Đang tải..."
+	},
+	"service": {
+		"pageTitle": "Dịch vụ",
+		"loading": "Đang tải...",
+		"empty": "Chưa có dịch vụ nào",
+		"detailTitle": "Chi tiết dịch vụ",
+		"bookNow": "Đặt ngay"
+	},
+	"about": {
+		"pageTitle": "Về chúng tôi",
+		"loading": "Đang tải..."
+	},
+	"admin": {
+		"pageTitle": "Bảng điều khiển",
+		"loading": "Đang tải...",
+		"empty": "Bạn không có quyền truy cập vào mục nào.",
+		"sidebar": {
+			"title": "Bảng quản trị",
+			"subtitle": "Quản trị hệ thống",
+			"dashboard": "Bảng điều khiển",
+			"home": "Về trang chủ",
+			"logout": "Đăng xuất"
+		},
+		"users": {
+			"title": "Người dùng",
+			"addUser": "Thêm người dùng",
+			"searchPlaceholder": "Tìm theo tên hoặc email"
+		},
+		"flightSchedules": {
+			"title": "Lịch chuyến bay",
+			"addSchedule": "Thêm lịch bay"
+		},
+		"fareClasses": {
+			"title": "Hạng vé",
+			"addFare": "Thêm hạng"
+		},
+		"routeFarePrices": {
+			"title": "Giá vé theo tuyến",
+			"addPrice": "Thêm giá"
+		},
+		"baggageAllowances": {
+			"title": "Hành lý cho phép",
+			"addAllowance": "Thêm hạn mức"
+		},
+		"cabinServices": {
+			"title": "Dịch vụ cabin",
+			"addService": "Thêm dịch vụ"
+		}
+	},
+	"payments": {
+		"dev": {
+			"title": "Thanh toán (dev)",
+			"loading": "Đang tải..."
+		}
 	}
 }

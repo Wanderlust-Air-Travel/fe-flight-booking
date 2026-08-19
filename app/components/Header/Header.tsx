@@ -3,39 +3,23 @@ import LocaleSwitcher from "@/app/components/LocaleSwitcher/LocaleSwitcher";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axios-instance";
-import type { MenuListsInterface } from "@/types/header-type";
+import { localizedHref, type Locale, stripLocale } from "@/i18n/config";
 import { ChevronDown, LogOut, Menu, Settings, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-const menuLists: MenuListsInterface[] = [
-  {
-    title: "Home",
-    path: "/",
-  },
-  // {
-  //     title: "Booking",
-  //     path: "/booking",
-  //     child: [
-  //         {
-  //             title: "Demo 1",
-  //             path: "/",
-  //         },
-  //         {
-  //             title: "Demo 2",
-  //             path: "/",
-  //         }
-  //     ]
-  // },
-  {
-    title: "About",
-    path: "/about",
-  },
-  {
-    title: "Service",
-    path: "/service",
-  },
+import { useLocale, useTranslations } from "next-intl";
+
+interface MenuItemConfig {
+  key: "home" | "about" | "service";
+  path: string;
+}
+
+const menuLists: MenuItemConfig[] = [
+  { key: "home", path: "/" },
+  { key: "about", path: "/about" },
+  { key: "service", path: "/service" },
 ];
 
 // Management roles - không cần "Vé của tôi" và "Hành trình của tôi"
@@ -55,8 +39,12 @@ const MANAGEMENT_ROLES = [
 
 const Header = () => {
   const { isLoggedIn, user, logout, setUserRoles, accessToken } = useUserStore();
-  const router = usePathname();
+  const fullPathname = usePathname();
   const navigation = useRouter();
+  const locale = useLocale() as Locale;
+  const t = useTranslations("header");
+  // pathname đã bỏ locale prefix, dùng để so sánh highlight menu
+  const strippedPath = stripLocale(fullPathname);
   const hydrated = useUserStore((state) => state.hydrated);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userRoles, setUserRolesState] = useState<
@@ -97,8 +85,8 @@ const Header = () => {
     logout();
     setUserRolesState([]);
     setIsMobileMenuOpen(false);
-    // Điều hướng về trang chủ sau khi đăng xuất
-    navigation.push("/");
+    // Điều hướng về trang chủ (locale prefix) sau khi đăng xuất
+    navigation.push(localizedHref("/", locale));
   };
 
   return (
@@ -107,7 +95,7 @@ const Header = () => {
         <div className="flex h-full items-center justify-between gap-x-[1.6rem] w-full">
           <Link
             className="group max-w-[16rem] w-full !h-auto overflow-hidden block"
-            href={hasManagementRole ? "/admin" : "/"}
+            href={hasManagementRole ? localizedHref("/admin", locale) : localizedHref("/", locale)}
           >
             <Image
               src="/logoHD.png"
@@ -120,7 +108,7 @@ const Header = () => {
             />
           </Link>
           {/* Logout button for admin pages */}
-          {router?.startsWith("/admin") && hydrated && isLoggedIn && (
+          {strippedPath.startsWith("/admin") && hydrated && isLoggedIn && (
             <div className="flex items-center gap-4">
               <div className="hidden lg:flex items-center gap-2 text-[var(--cl-white)]">
                 <Image
@@ -137,80 +125,60 @@ const Header = () => {
               <button
                 onClick={() => {
                   handleLogout();
-                  navigation.push("/");
+                  navigation.push(localizedHref("/", locale));
                 }}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[var(--cl-white)] hover:bg-[var(--cl-four)] rounded-lg transition-colors uppercase"
-                title="Đăng xuất"
+                title={t("logout")}
               >
                 <LogOut className="w-4 h-4" />
-                <span className="hidden lg:inline">Đăng xuất</span>
+                <span className="hidden lg:inline">{t("logout")}</span>
               </button>
             </div>
           )}
           {/* Desktop navigation - đẩy ra giữa, ẩn menu cho management roles */}
-          {!hasManagementRole && !router?.startsWith("/admin") && (
+          {!hasManagementRole && !strippedPath.startsWith("/admin") && (
             <ul className="hidden lg:flex gap-x-[1.2rem] items-center mx-auto">
-              {menuLists.map((menuList, index) => {
+              {menuLists.map((menuList) => {
+                const target = localizedHref(menuList.path, locale);
+                const isActive = strippedPath === menuList.path;
                 return (
                   <li
-                    key={index}
+                    key={menuList.key}
                     className="group last:[&>a]:h-auto last:flex last:flex-col last:justify-center last:[&>a]:bg-[var(--cl-pri)] h-full last:[&>a]:text-[var(--cl-sec)] last:[&>a]:px-[2rem] last:[&>a]:py-[1.2rem] last:[&>a]:rounded-lg last:[&>a]:hover:bg-[var(--cl-four)] relative last:[&>a]:hover:!text-[var(--cl-white)]"
                   >
                     <Link
-                      className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex justify-center items-center gap-x-2 ${router === menuList.path ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"} uppercase`}
-                      href={menuList.path}
+                      className={`p-[1rem]  text-md group-hover:text-[var(--cl-four)] transition ease-linear h-full flex justify-center items-center gap-x-2 ${isActive ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"} uppercase`}
+                      href={target}
                     >
-                      {menuList.title}
-                      {menuList.child && menuList.child?.length > 0 && (
-                        <span className="w-[2rem] h-[2rem] flex justify-center items-center ">
-                          <ChevronDown className="text-[var(--cl-white)] w-full h-full mt-[0.35rem] transition group-hover:rotate-[180deg] group-hover:text-[var(--cl-four)]" />
-                        </span>
-                      )}
+                      {t(menuList.key)}
                     </Link>
-
-                    {menuList.child && menuList.child?.length > 0 && (
-                      <ul className="absolute top-[100%] left-0 min-w-[16rem] shadow-bg-dark-900 shadow-lg bg-white opacity-0 pointer-events-none transition translate-y-[5%] group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-[0%]">
-                        {menuList.child.map((child, index) => {
-                          return (
-                            <li key={index} className="">
-                              <Link
-                                className="p-[1rem] text-base flex items-center text-[var(--cl-pri)] text-base xl:hover:text-[var(--cl-sec)] xl:hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
-                                href={child.path}
-                              >
-                                {child.title}
-                              </Link>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
                   </li>
                 );
               })}
             </ul>
           )}
           {/* Right group - auth + locale switcher (desktop) */}
-          {!hasManagementRole && !router?.startsWith("/admin") && (
+          {!hasManagementRole && !strippedPath.startsWith("/admin") && (
             <div className="hidden lg:flex items-center gap-x-[3rem] ml-auto">
               {hydrated && !isLoggedIn && (
                 <>
                   <Link
-                    className={`p-[1rem] text-md transition ease-linear h-full flex uppercase justify-center items-center gap-x-2 ${router === "/sign-in" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"} hover:text-[var(--cl-four)]`}
-                    href="/sign-in"
-                  >
-                    Sign in
+className={`p-[1rem] text-md transition ease-linear h-full flex uppercase justify-center items-center gap-x-2 ${strippedPath === "/sign-in" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"} hover:text-[var(--cl-four)]`}
+                  href={localizedHref("/sign-in", locale)}
+                >
+                  {t("signIn")}
                   </Link>
                   <Link
                     className={`h-auto flex flex-col justify-center px-[2rem] py-[0.6rem] rounded-lg transition ${
-                      router === "/sign-up"
+                      strippedPath === "/sign-up"
                         ? "bg-[var(--cl-white)] text-[var(--cl-pri)]"
                         : "bg-[var(--cl-four)] text-[var(--cl-white)] hover:bg-[var(--cl-white)] hover:text-[var(--cl-pri)]"
                     }`}
-                    href="/sign-up"
+                    href={localizedHref("/sign-up", locale)}
                   >
-                    <span className="p-[1rem] text-md h-full flex justify-center items-center gap-x-2 uppercase">
-                      Sign up
-                    </span>
+<span className="p-[1rem] text-md h-full flex justify-center items-center gap-x-2 uppercase">
+                        {t("signUp")}
+                      </span>
                   </Link>
                 </>
               )}
@@ -239,17 +207,17 @@ const Header = () => {
                     <li>
                       <Link
                         className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
-                        href="/my-tickets"
+                        href={localizedHref("/my-tickets", locale)}
                       >
-                        Vé của tôi
+                        {t("myTickets")}
                       </Link>
                     </li>
                     <li>
                       <Link
                         className="p-[1rem] text-base flex items-center text-[var(--cl-third)] text-base hover:text-[var(--cl-sec)] hover:bg-[var(--cl-four)] transition ease-linear uppercase text-nowrap"
-                        href="/my-journey"
+                        href={localizedHref("/my-journey", locale)}
                       >
-                        Hành trình của tôi
+                        {t("myJourney")}
                       </Link>
                     </li>
                     <li>
@@ -257,7 +225,7 @@ const Header = () => {
                         onClick={handleLogout}
                         className="p-[1rem] text-base flex items-center text-[var(--cl-red)] text-base hover:text-[var(--cl-white)] hover:bg-[var(--cl-red)] w-full transition ease-linear uppercase text-nowrap cursor-pointer"
                       >
-                        Logout
+                        {t("logout")}
                       </button>
                     </li>
                   </ul>
@@ -268,22 +236,22 @@ const Header = () => {
           )}
           {/* Mobile actions (locale switcher ẩn mobile để dành chỗ cho menu button) */}
           <div className="flex items-center gap-x-2 lg:hidden ml-auto">
-            {router?.startsWith("/admin") && hydrated && isLoggedIn ? (
+            {strippedPath.startsWith("/admin") && hydrated && isLoggedIn ? (
               <button
                 onClick={() => {
                   handleLogout();
-                  navigation.push("/");
+                  navigation.push(localizedHref("/", locale));
                 }}
                 className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cl-white)] hover:bg-[var(--cl-four)] rounded-lg transition-colors"
-                title="Đăng xuất"
+                title={t("logout")}
               >
                 <LogOut className="w-5 h-5" />
               </button>
             ) : (
               <>
                 {hydrated && !isLoggedIn && (
-                  <Link href="/sign-in" className="text-[var(--cl-white)] text-sm uppercase">
-                    Sign in
+                  <Link href={localizedHref("/sign-in", locale)} className="text-[var(--cl-white)] text-sm uppercase">
+                    {t("signIn")}
                   </Link>
                 )}
                 <Button
@@ -291,7 +259,7 @@ const Header = () => {
                   size="icon"
                   className="text-[var(--cl-white)] hover:bg-[var(--cl-four)]"
                   onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-                  aria-label="Toggle navigation menu"
+                  aria-label={t("toggleNav")}
                 >
                   {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                 </Button>
@@ -309,16 +277,16 @@ const Header = () => {
         <div className="container pb-4">
           <nav className="flex flex-col gap-y-2 pt-2">
             {!hasManagementRole &&
-              menuLists.map((menuList, index) => (
+              menuLists.map((menuList) => (
                 <Link
-                  key={index}
-                  href={menuList.path}
+                  key={menuList.key}
+                  href={localizedHref(menuList.path, locale)}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`py-2 text-sm font-medium uppercase border-b border-white/10 last:border-b-0 ${
-                    router === menuList.path ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"
+                    strippedPath === menuList.path ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"
                   }`}
                 >
-                  {menuList.title}
+                  {t(menuList.key)}
                 </Link>
               ))}
 
@@ -339,28 +307,28 @@ const Header = () => {
                   </p>
                   {hasManagementRole ? (
                     <Link
-                      href="/admin"
+                      href={localizedHref("/admin", locale)}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-four)] flex items-center gap-2"
                     >
                       <Settings className="w-4 h-4" />
-                      Quản lý
+                      {t("manage")}
                     </Link>
                   ) : (
                     <>
                       <Link
-                        href="/my-tickets"
+                        href={localizedHref("/my-tickets", locale)}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-four)]"
                       >
-                        Vé của tôi
+                        {t("myTickets")}
                       </Link>
                       <Link
-                        href="/my-journey"
+                        href={localizedHref("/my-journey", locale)}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="text-sm text-[var(--cl-white)] hover:text-[var(--cl-four)]"
                       >
-                        Hành trình của tôi
+                        {t("myJourney")}
                       </Link>
                     </>
                   )}
@@ -370,17 +338,17 @@ const Header = () => {
                     className="mt-1 self-start"
                     onClick={handleLogout}
                   >
-                    Logout
+                    {t("logout")}
                   </Button>
                 </div>
               ) : (
                 <div className="mt-2 border-t border-white/10 pt-2 flex flex-col gap-y-2">
                   <Link
-                    href="/sign-in"
+                    href={localizedHref("/sign-in", locale)}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`text-sm uppercase ${router === "/sign-in" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`}
+                    className={`text-sm uppercase ${strippedPath === "/sign-in" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"}`}
                   >
-                    Sign in
+                    {t("signIn")}
                   </Link>
                   <Button
                     asChild
@@ -388,11 +356,11 @@ const Header = () => {
                     className="bg-[var(--cl-four)] text-[var(--cl-white)] hover:bg-[var(--cl-white)] hover:text-[var(--cl-pri)]"
                   >
                     <Link
-                      href="/sign-up"
+                      href={localizedHref("/sign-up", locale)}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="uppercase text-sm"
                     >
-                      Sign up
+                      {t("signUp")}
                     </Link>
                   </Button>
                 </div>

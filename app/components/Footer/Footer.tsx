@@ -2,12 +2,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { localizedHref, type Locale, stripLocale } from "@/i18n/config";
 
 const Footer = () => {
-  const router = usePathname();
+  const fullPathname = usePathname();
+  const locale = useLocale() as Locale;
+  const t = useTranslations("footer");
+  const router = stripLocale(fullPathname);
 
   // Không dùng footer trên trang đăng nhập / đăng ký và trang admin để layout full screen
-  if (router === "/sign-in" || router === "/sign-up" || router?.startsWith("/admin")) {
+  if (router === "/sign-in" || router === "/sign-up" || router.startsWith("/admin")) {
     return null;
   }
 
@@ -19,7 +24,7 @@ const Footer = () => {
           <div className="flex items-center gap-2 md:gap-3">
             <Link
               className="group block max-w-[11rem] md:max-w-[13rem] !h-auto overflow-hidden"
-              href="/"
+              href={localizedHref("/", locale)}
             >
               <Image
                 src="/logoHD.png"
@@ -32,7 +37,7 @@ const Footer = () => {
               />
             </Link>
             <p className="hidden sm:block text-sm md:text-base text-white/80">
-              © 2025 Wanderlust Airways. All rights reserved.
+              {t("copyright")}
             </p>
           </div>
 
@@ -40,55 +45,55 @@ const Footer = () => {
           <div className="flex flex-col items-center gap-2 md:flex-row md:gap-4">
             <nav className="flex flex-wrap items-center justify-center gap-3 text-sm md:text-base text-white/80">
               <Link
-                href="/about"
+                href={localizedHref("/about", locale)}
                 className={`hover:text-[var(--cl-four)] transition-colors ${
                   router === "/about" ? "text-[var(--cl-four)]" : ""
                 }`}
               >
-                About
+                {t("about")}
               </Link>
               <span className="hidden sm:inline-block h-[0.8rem] w-px bg-white/25" />
               <Link
-                href="/help"
+                href={localizedHref("/help", locale)}
                 className={`hover:text-[var(--cl-four)] transition-colors ${
                   router === "/help" ? "text-[var(--cl-four)]" : ""
                 }`}
               >
-                Support
+                {t("support")}
               </Link>
               <span className="hidden sm:inline-block h-[0.8rem] w-px bg-white/25" />
               <Link
-                href="/contact"
+                href={localizedHref("/contact", locale)}
                 className={`hover:text-[var(--cl-four)] transition-colors ${
                   router === "/contact" ? "text-[var(--cl-four)]" : ""
                 }`}
               >
-                Contact
+                {t("contact")}
               </Link>
               <span className="hidden sm:inline-block h-[0.8rem] w-px bg-white/25" />
               <Link
-                href="/privacy-policy"
+                href={localizedHref("/privacy-policy", locale)}
                 className={`hover:text-[var(--cl-four)] transition-colors ${
                   router === "/privacy-policy" ? "text-[var(--cl-four)]" : ""
                 }`}
               >
-                Privacy
+                {t("privacy")}
               </Link>
             </nav>
 
             <div className="flex items-center gap-3 md:gap-4">
               <div className="flex items-center gap-2">
-                <Link className="hover:scale-110 transition ease-linear" href="/">
+                <Link className="hover:scale-110 transition ease-linear" href={localizedHref("/", locale)}>
                   <Image src="/facebook.svg" alt="facebook" width={18} height={18} priority />
                 </Link>
-                <Link className="hover:scale-110 transition ease-linear" href="/">
+                <Link className="hover:scale-110 transition ease-linear" href={localizedHref("/", locale)}>
                   <Image src="/instagram.svg" alt="instagram" width={18} height={18} priority />
                 </Link>
-                <Link className="hover:scale-110 transition ease-linear" href="/">
+                <Link className="hover:scale-110 transition ease-linear" href={localizedHref("/", locale)}>
                   <Image src="/twitter.svg" alt="twitter" width={18} height={18} priority />
                 </Link>
               </div>
-              <p className="sm:hidden text-[0.75rem] text-white/70">© 2025 Wanderlust Airways.</p>
+              <p className="sm:hidden text-[0.75rem] text-white/70">{t("copyright")}</p>
             </div>
           </div>
         </div>

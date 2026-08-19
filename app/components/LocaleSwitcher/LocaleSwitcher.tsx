@@ -1,7 +1,7 @@
 "use client";
 
-import { LOCALE_COOKIE, locales, type Locale } from "@/i18n/config";
-import { useLocale } from "next-intl";
+import { LOCALE_COOKIE, locales, type Locale, stripLocale } from "@/i18n/config";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition, useRef, useEffect, useState } from "react";
 import { ChevronDown, Check } from "lucide-react";
@@ -12,21 +12,30 @@ const LANGUAGES: Record<Locale, { flag: string; label: string }> = {
 };
 
 export default function LocaleSwitcher() {
-	const router = useRouter();
+	const nextRouter = useRouter();
 	const pathname = usePathname();
 	const currentLocale = useLocale() as Locale;
+	const tLocale = useTranslations("locale");
 	const [isPending, startTransition] = useTransition();
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	const switchTo = (next: Locale) => {
-		if (next === currentLocale) return;
+		if (next === currentLocale) {
+			setIsOpen(false);
+			return;
+		}
+		// Persist locale in a cookie consumed by i18n/request.ts (back-compat).
 		document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
-		startTransition(() => {
-			router.refresh();
-			if (pathname) router.replace(pathname);
-		});
 		setIsOpen(false);
+
+		// Strip current prefix so we can re-prefix with the new locale.
+		const stripped = stripLocale(pathname);
+		const target = stripped === "/" ? `/${next}` : `/${next}${stripped}`;
+		startTransition(() => {
+			nextRouter.replace(target, { scroll: false });
+			nextRouter.refresh();
+		});
 	};
 
 	// Close on outside click
@@ -46,7 +55,7 @@ export default function LocaleSwitcher() {
 		<div ref={dropdownRef} className="relative inline-flex">
 			<button
 				type="button"
-				aria-label="Select language"
+				aria-label={tLocale("label")}
 				aria-expanded={isOpen}
 				aria-haspopup="listbox"
 				disabled={isPending}
@@ -69,7 +78,7 @@ export default function LocaleSwitcher() {
 			{isOpen && (
 				<ul
 					role="listbox"
-					aria-label="Language options"
+					aria-label={tLocale("label")}
 					className="absolute right-0 top-full mt-1 z-50 min-w-[12rem] rounded-lg border border-white/20 bg-[var(--cl-pri)] shadow-lg overflow-hidden"
 				>
 					{locales.map((loc) => {

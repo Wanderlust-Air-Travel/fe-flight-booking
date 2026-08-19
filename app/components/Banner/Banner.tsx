@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { axiosPublic } from "@/lib/axios-instance";
 import { dismissToast, showError, showLoading, showSuccess } from "@/lib/toast";
+import { localizedHref, type Locale } from "@/i18n/config";
 import type { BannerApi } from "@/types/banner";
 import axios from "axios";
+import { useLocale, useTranslations } from "next-intl";
 import { AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -39,6 +41,10 @@ const BannerHome = () => {
   const [isMyBookingLoading, setIsMyBookingLoading] = useState(false);
 
   const router = useRouter();
+  const locale = useLocale() as Locale;
+  const tCheckIn = useTranslations("checkIn");
+  const tMyBk = useTranslations("myBookings");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     axios
@@ -56,7 +62,7 @@ const BannerHome = () => {
     e.preventDefault();
 
     if (!bookingCode.trim()) {
-      setCheckInError("Vui lòng nhập mã đặt chỗ (PNR code)");
+      setCheckInError(tCheckIn("pnrRequired"));
       return;
     }
 
@@ -68,17 +74,17 @@ const BannerHome = () => {
 
       if (response.status === 200 && response.data) {
         router.push(
-          `/check-in/seat-selection?bookingCode=${encodeURIComponent(bookingCode.trim())}`
+          `${localizedHref("/check-in/seat-selection", locale)}?bookingCode=${encodeURIComponent(bookingCode.trim())}`
         );
       } else {
-        setCheckInError("Không tìm thấy đặt chỗ với mã này. Vui lòng kiểm tra lại.");
+        setCheckInError(tCheckIn("notFoundToast"));
       }
     } catch (err: any) {
       console.error("Error fetching booking:", err);
       const errorMessage =
         err.response?.data?.message ||
         err.message ||
-        "Không tìm thấy đặt chỗ với mã này. Vui lòng kiểm tra lại.";
+        tCheckIn("notFoundToast");
       setCheckInError(errorMessage);
     } finally {
       setIsCheckInLoading(false);
@@ -87,26 +93,26 @@ const BannerHome = () => {
 
   const handleMyBookingsSearch = async () => {
     if (!myBookingCode.trim()) {
-      setMyBookingError("Vui lòng nhập mã đặt chỗ (PNR code)");
+      setMyBookingError(tMyBk("pnrRequired"));
       return;
     }
 
     setIsMyBookingLoading(true);
     setMyBookingError(null);
-    const loadingToastId = showLoading("Đang tìm kiếm đặt chỗ...");
+    const loadingToastId = showLoading(tMyBk("searchingToast"));
 
     try {
       const response = await axiosPublic.get(`/api/bookings/code/${myBookingCode.trim()}`);
 
       if (response.data) {
         dismissToast(loadingToastId);
-        showSuccess("Đã tìm thấy đặt chỗ. Đang chuyển hướng...");
-        router.push(`/my-bookings?bookingCode=${encodeURIComponent(myBookingCode.trim())}`);
+        showSuccess(tMyBk("foundToast"));
+        router.push(`${localizedHref("/my-bookings", locale)}?bookingCode=${encodeURIComponent(myBookingCode.trim())}`);
       }
     } catch (err: any) {
       dismissToast(loadingToastId);
       const errorMessage =
-        err.response?.data?.message || "Không tìm thấy đặt chỗ với mã này. Vui lòng kiểm tra lại.";
+        err.response?.data?.message || tMyBk("notFoundToast");
       setMyBookingError(errorMessage);
       showError(errorMessage);
     } finally {
@@ -136,7 +142,7 @@ const BannerHome = () => {
                     : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
                 }`}
               >
-                <span className="font-medium">Mã Đặt Chỗ</span>
+                <span className="font-medium">{tCheckIn("tabByCode")}</span>
               </button>
               <button
                 type="button"
@@ -147,7 +153,7 @@ const BannerHome = () => {
                     : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
                 }`}
               >
-                <span className="font-medium">Số Vé</span>
+                <span className="font-medium">{tMyBk("tabByCode").split("/")[1]?.trim() || tMyBk("tabByCode")}</span>
               </button>
               <button
                 type="button"
@@ -158,7 +164,7 @@ const BannerHome = () => {
                     : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
                 }`}
               >
-                <span className="font-medium">Số Hội Viên</span>
+                <span className="font-medium">{tMyBk("tabMembership")}</span>
               </button>
             </div>
 
@@ -168,11 +174,10 @@ const BannerHome = () => {
                   {/* Header Section */}
                   <div className="flex flex-col gap-y-[0.4rem]  w-fit">
                     <p className="text-base text-gray-700 font-medium">
-                      Nhập mã đặt chỗ 6 ký tự để làm thủ tục
+                      {tCheckIn("enterPnr")}
                     </p>
                     <p className="text-sm  text-gray-600 font-medium">
-                      <strong className="text-red-600 ">*</strong> Vui lòng nhập đúng mã đặt chỗ như
-                      trên email xác nhận
+                      <strong className="text-red-600 ">*</strong> {tCheckIn("pnrConfirmHelp")}
                     </p>
                   </div>
 
@@ -237,11 +242,9 @@ const BannerHome = () => {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           />
                         </svg>
-                        Đang kiểm tra...
+                        {tCheckIn("checkInSubmitting")}
                       </span>
-                    ) : (
-                      "Làm Thủ Tục"
-                    )}
+                    ) : tCheckIn("checkInButton")}
                   </Button>
                 </div>
               </form>
@@ -253,10 +256,10 @@ const BannerHome = () => {
                   {/* Header Section */}
                   <div className=" w-fit flex flex-col gap-y-[0.4rem]">
                     <p className="text-base text-gray-700 font-medium ">
-                      Nhập số vé và họ để tra cứu
+                      {tCheckIn("tabByTicket")}
                     </p>
                     <p className="text-sm  text-gray-600 font-medium">
-                      <strong className="text-red-600 ">*</strong> Tính năng đang được phát triển
+                      <strong className="text-red-600 ">*</strong> {tCheckIn("featureComingSoon")}
                     </p>
                   </div>
 
@@ -267,12 +270,12 @@ const BannerHome = () => {
                         htmlFor="ticketNumber"
                         className="text-mn font-semibold text-gray-70 block text-nowrap"
                       >
-                        Số Vé
+                        {tCheckIn("ticketNumberLabel")}
                       </Label>
                       <Input
                         id="ticketNumber"
                         type="text"
-                        placeholder="123XXXXXXXXXXX"
+                        placeholder={tCheckIn("ticketPlaceholder")}
                         value={ticketNumber}
                         onChange={(e) => setTicketNumber(e.target.value)}
                         disabled={true}
@@ -284,12 +287,12 @@ const BannerHome = () => {
                         htmlFor="lastName"
                         className="text-mn font-semibold text-gray-700 mb-2 block"
                       >
-                        Họ
+                        {tCheckIn("lastNameLabel")}
                       </Label>
                       <Input
                         id="lastName"
                         type="text"
-                        placeholder="NGUYEN"
+                        placeholder={tCheckIn("lastNamePlaceholder")}
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value.toUpperCase())}
                         disabled={true}
@@ -300,7 +303,7 @@ const BannerHome = () => {
 
                   {/* Submit Button */}
                   <Button
-                    onClick={() => showError("Tính năng tìm kiếm theo số vé đang được phát triển")}
+                    onClick={() => showError(tCheckIn("ticketSearchComingSoon"))}
                     disabled={isCheckInLoading || !ticketNumber.trim() || !lastName.trim()}
                     className="w-full flex-1 h-[4.8rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-xl rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
                   >
@@ -326,10 +329,10 @@ const BannerHome = () => {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           />
                         </svg>
-                        Đang tìm kiếm...
+                        {tCommon("searching")}
                       </span>
                     ) : (
-                      <span className="flex items-center justify-center gap-2">Tìm Kiếm</span>
+                      <span className="flex items-center justify-center gap-2">{tCommon("search")}</span>
                     )}
                   </Button>
                 </div>
@@ -342,10 +345,10 @@ const BannerHome = () => {
                   {/* Header Section */}
                   <div className="flex flex-col gap-y-[0.4rem] w-fit">
                     <p className="text-base text-gray-700 font-medium">
-                      Nhập số hội viên để tra cứu
+                      {tMyBk("searchCardDesc")}
                     </p>
                     <p className="text-sm  text-gray-600 font-medium">
-                      <strong className="text-red-600 ">*</strong> Tính năng đang được phát triển
+                      <strong className="text-red-600 ">*</strong> {tMyBk("pnrHelper")}
                     </p>
                   </div>
 
@@ -354,7 +357,7 @@ const BannerHome = () => {
                     <Input
                       id="membershipNumber"
                       type="text"
-                      placeholder="Nhập số hội viên"
+                      placeholder={tMyBk("pnrPlaceholder")}
                       value={membershipNumber}
                       onChange={(e) => setMembershipNumber(e.target.value)}
                       disabled={true}
@@ -365,7 +368,7 @@ const BannerHome = () => {
                   {/* Submit Button */}
                   <Button
                     onClick={() =>
-                      showError("Tính năng tìm kiếm theo số hội viên đang được phát triển")
+                      showError(tCheckIn("membershipSearchComingSoon"))
                     }
                     disabled={isCheckInLoading || !membershipNumber.trim()}
                     className="w-full flex-1 bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-xl rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md h-[4.8rem]!"
@@ -392,10 +395,10 @@ const BannerHome = () => {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           />
                         </svg>
-                        Đang tìm kiếm...
+                        {tCommon("searching")}
                       </span>
                     ) : (
-                      <span className="flex items-center justify-center gap-2">Tìm Kiếm</span>
+                      <span className="flex items-center justify-center gap-2">{tCommon("search")}</span>
                     )}
                   </Button>
                 </div>
@@ -417,7 +420,7 @@ const BannerHome = () => {
                     : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
                 }`}
               >
-                <span className="font-medium">Mã Đặt Chỗ/Số Vé</span>
+                <span className="font-medium">{tMyBk("tabByCode")}</span>
               </button>
               <button
                 type="button"
@@ -438,11 +441,10 @@ const BannerHome = () => {
                   {/* Header Section */}
                   <div className=" w-fit flex flex-col gap-y-[0.4rem]">
                     <p className="text-base text-gray-700 font-medium">
-                      Nhập mã đặt chỗ 6 ký tự để tra cứu
+                      {tMyBk("searchCardDesc")}
                     </p>
                     <p className="text-sm  text-gray-600 font-medium">
-                      <strong className="text-red-600 ">*</strong> Vui lòng nhập đúng mã đặt chỗ như
-                      trên email xác nhận
+                      <strong className="text-red-600 ">*</strong> {tMyBk("pnrConfirmHelp") || tMyBk("pnrHelper")}
                     </p>
                   </div>
 
@@ -511,10 +513,10 @@ const BannerHome = () => {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           />
                         </svg>
-                        Đang tìm kiếm...
+                        {tCommon("searching")}
                       </span>
                     ) : (
-                      "Tìm Kiếm"
+                      tMyBk("searchButton")
                     )}
                   </Button>
                 </div>
@@ -527,13 +529,13 @@ const BannerHome = () => {
                   {/* Header Section */}
                   <div className="text-center">
                     <p className="text-base text-gray-700 font-medium">
-                      Đăng nhập vào Wanderlust Club để xem chuyến bay sắp tới của bạn
+                      {tMyBk("membershipDesc")}
                     </p>
                   </div>
 
                   {/* Submit Button */}
-                  <Button className="w-full max-w-[20rem] mx-auto flex-1 h-[4rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
-                    Login
+                  <Button onClick={() => router.push(localizedHref("/sign-in", locale))} className="w-full max-w-[20rem] mx-auto flex-1 h-[4rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                    {tMyBk("membershipLogin")}
                   </Button>
                 </div>
               </div>

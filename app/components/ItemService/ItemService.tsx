@@ -1,7 +1,9 @@
 import { convertToYMD } from "@/app/components/FormatDate/FormatDate";
 import { getApiUrl } from "@/lib/api-config";
+import { localizedHref, type Locale } from "@/i18n/config";
 import type { ItemServiceProp } from "@/types/item-service-type";
 import { ArrowRight } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -14,6 +16,8 @@ const ItemService = ({
   service,
   price,
 }: ItemServiceProp) => {
+  const locale = useLocale() as Locale;
+  const t = useTranslations("services");
   const imageUrl = `${getApiUrl()}${image}`;
 
   // Build search URL so that clicking a service pre-fills the search on /search/flights
@@ -25,14 +29,19 @@ const ItemService = ({
       const destinationCode = matches[1]?.replace(/[()]/g, "") || "";
 
       if (!originCode || !destinationCode) {
-        return link || "/search/flights";
+        return link
+          ? localizedHref(link, locale)
+          : localizedHref("/search/flights", locale);
       }
 
       const departDate = convertToYMD(startDate);
 
-      return `/search/flights?origin=${originCode}&destination=${destinationCode}&departDate=${departDate}&returnDate=&tripType=one_way&adults=1&minors=0`;
+      const searchBase = localizedHref("/search/flights", locale);
+      return `${searchBase}?origin=${originCode}&destination=${destinationCode}&departDate=${departDate}&returnDate=&tripType=one_way&adults=1&minors=0`;
     } catch {
-      return link || "/search/flights";
+      return link
+        ? localizedHref(link, locale)
+        : localizedHref("/search/flights", locale);
     }
   };
 
@@ -57,14 +66,14 @@ const ItemService = ({
           <h2 className="text-[2rem] font-medium hover:text-[var(--cl-four)] transition ease-linear">
             <Link href={searchHref}>{title}</Link>
           </h2>
-          {startDate && <p className="title-sm">Ngày đi: {startDate}</p>}
-          {endDate && <p className="title-sm">Ngày về: {endDate}</p>}
+          {startDate && <p className="title-sm">{t("departureLabel")} {startDate}</p>}
+          {endDate && <p className="title-sm">{t("returnLabel")} {endDate}</p>}
         </div>
 
         <div className="flex gap-x-[0.8rem] justify-between items-end">
           <div className="flex flex-col gap-y-[0.2rem] w-full flex-1">
             <p className="text-[var(--cl-gray)] text-sm">
-              chỉ từ <span className="text-[var(--cl-pri)]">(VND)</span>
+              {t("fromLabel")} <span className="text-[var(--cl-pri)]">(VND)</span>
             </p>
 
             <div className="flex flex-col">
