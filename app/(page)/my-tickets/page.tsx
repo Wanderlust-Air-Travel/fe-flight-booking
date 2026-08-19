@@ -1,22 +1,11 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb"
-import axiosInstance from "@/lib/axios-instance"
-import FormatPrice from "@/app/components/FormatPrice/FormatPrice"
-import { convertToDMY, convertToLocalTime } from "@/app/components/FormatDate/FormatDate"
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
-} from "@/components/ui/pagination"
-import { Plane, Calendar, MapPin, User, Ticket as TicketIcon, XCircle, CheckCircle, X, Info } from "lucide-react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
+import { convertToDMY, convertToLocalTime } from "@/app/components/FormatDate/FormatDate";
+import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
+import useUserStore from "@/app/zustand/storeUser";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -24,324 +13,345 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { showError, showInfo, showSuccess } from "@/lib/toast"
-import type { MyTicketsResponse } from "@/types/my-tickets-type"
-import useUserStore from "@/app/zustand/storeUser"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import axiosInstance from "@/lib/axios-instance";
+import { showError, showInfo, showSuccess } from "@/lib/toast";
+import type { MyTicketsResponse } from "@/types/my-tickets-type";
+import { CheckCircle, Info, MapPin, Plane, Ticket as TicketIcon, X, XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const MyTicketsPage = () => {
-  const { user, accessToken, hydrated } = useUserStore()
-  const router = useRouter()
-  const [data, setData] = useState<MyTicketsResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [cancellingId, setCancellingId] = useState<string | null>(null)
-  const [cancellationDialogOpen, setCancellationDialogOpen] = useState<string | null>(null)
-  const [otpDialogOpen, setOtpDialogOpen] = useState<string | null>(null)
-  const [otpValue, setOtpValue] = useState<string>("")
-  const [sendingOtp, setSendingOtp] = useState(false)
-  const [verifyingOtp, setVerifyingOtp] = useState(false)
-  const [otpSent, setOtpSent] = useState<string | null>(null)
-  const pageSize = 10
+  const { user, accessToken, hydrated } = useUserStore();
+  const router = useRouter();
+  const [data, setData] = useState<MyTicketsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [cancellationDialogOpen, setCancellationDialogOpen] = useState<string | null>(null);
+  const [otpDialogOpen, setOtpDialogOpen] = useState<string | null>(null);
+  const [otpValue, setOtpValue] = useState<string>("");
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [otpSent, setOtpSent] = useState<string | null>(null);
+  const pageSize = 10;
 
   // Check authentication before fetching
   useEffect(() => {
     if (hydrated && !accessToken && !user?.id) {
       // User is not logged in, redirect to login
-      router.push(`/sign-in?redirect=${encodeURIComponent('/my-tickets')}`)
-      return
+      router.push(`/sign-in?redirect=${encodeURIComponent("/my-tickets")}`);
+      return;
     }
-  }, [hydrated, accessToken, user?.id, router])
+  }, [hydrated, accessToken, user?.id, router]);
 
   const fetchTickets = async (page: number) => {
     // Don't fetch if not authenticated
     if (!accessToken && !user?.id) {
-      setError("Vui lòng đăng nhập để xem vé của bạn.")
-      setLoading(false)
-      return
+      setError("Vui lòng đăng nhập để xem vé của bạn.");
+      setLoading(false);
+      return;
     }
 
     try {
-      setLoading(true)
-      setError(null)
-      const response = await axiosInstance.get(`/api/bookings/my-tickets?page=${page}&limit=${pageSize}`)
-      setData(response.data)
+      setLoading(true);
+      setError(null);
+      const response = await axiosInstance.get(
+        `/api/bookings/my-tickets?page=${page}&limit=${pageSize}`
+      );
+      setData(response.data);
     } catch (err: any) {
-      console.error("Error fetching tickets:", err)
-      const status = err?.response?.status
-      
+      console.error("Error fetching tickets:", err);
+      const status = err?.response?.status;
+
       // Handle 401 Unauthorized - redirect to login
       if (status === 401) {
-        setError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.")
+        setError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
         setTimeout(() => {
-          router.push(`/sign-in?redirect=${encodeURIComponent('/my-tickets')}`)
-        }, 2000)
+          router.push(`/sign-in?redirect=${encodeURIComponent("/my-tickets")}`);
+        }, 2000);
       } else {
-        setError(err.response?.data?.message || "Không thể tải danh sách vé. Vui lòng thử lại sau.")
+        setError(
+          err.response?.data?.message || "Không thể tải danh sách vé. Vui lòng thử lại sau."
+        );
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     // Only fetch if user is authenticated
     if (hydrated && (accessToken || user?.id)) {
-      fetchTickets(currentPage)
+      fetchTickets(currentPage);
     } else if (hydrated) {
       // Not authenticated, stop loading
-      setLoading(false)
+      setLoading(false);
     }
-  }, [currentPage, hydrated, accessToken, user?.id])
+  }, [currentPage, hydrated, accessToken, user?.id]);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleCancelBooking = async (bookingId: string, bookingStatus?: string) => {
-    if (!confirm("Bạn có chắc chắn muốn hủy đặt chỗ này không? Hành động này không thể hoàn tác.")) {
-      return
+    if (
+      !confirm("Bạn có chắc chắn muốn hủy đặt chỗ này không? Hành động này không thể hoàn tác.")
+    ) {
+      return;
     }
 
     // If booking is paid, require OTP
-    if (bookingStatus === 'paid') {
-      setOtpDialogOpen(bookingId)
-      setOtpValue("")
-      setOtpSent(null)
-      return
+    if (bookingStatus === "paid") {
+      setOtpDialogOpen(bookingId);
+      setOtpValue("");
+      setOtpSent(null);
+      return;
     }
 
     // For pending/confirmed bookings, proceed directly
-    await performCancellation(bookingId)
-  }
+    await performCancellation(bookingId);
+  };
 
   const handleSendOtp = async (bookingId: string) => {
     try {
-      setSendingOtp(true)
+      setSendingOtp(true);
       // Get user ID from user store or API
-      let userId = user?.id
+      let userId = user?.id;
       if (!userId) {
-        const userResponse = await axiosInstance.get('/api/auth/me')
-        userId = userResponse.data.userId || userResponse.data.id
+        const userResponse = await axiosInstance.get("/api/auth/me");
+        userId = userResponse.data.userId || userResponse.data.id;
       }
 
       if (!userId) {
-        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
-        return
+        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.");
+        return;
       }
 
-      await axiosInstance.post('/api/auth/otp/cancellation/send', {
+      await axiosInstance.post("/api/auth/otp/cancellation/send", {
         userId,
         bookingId,
-      })
+      });
 
-      setOtpSent(bookingId)
-      showSuccess('Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra email.')
+      setOtpSent(bookingId);
+      showSuccess("Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra email.");
     } catch (err: any) {
-      console.error("Error sending OTP:", err)
-      showError(err.response?.data?.message || "Không thể gửi mã OTP. Vui lòng thử lại sau.")
+      console.error("Error sending OTP:", err);
+      showError(err.response?.data?.message || "Không thể gửi mã OTP. Vui lòng thử lại sau.");
     } finally {
-      setSendingOtp(false)
+      setSendingOtp(false);
     }
-  }
+  };
 
   const handleSendOtpForTicket = async (ticketId: string) => {
     try {
-      setSendingOtp(true)
+      setSendingOtp(true);
       // Get user ID from user store or API
-      let userId = user?.id
+      let userId = user?.id;
       if (!userId) {
-        const userResponse = await axiosInstance.get('/api/auth/me')
-        userId = userResponse.data.userId || userResponse.data.id
+        const userResponse = await axiosInstance.get("/api/auth/me");
+        userId = userResponse.data.userId || userResponse.data.id;
       }
 
       if (!userId) {
-        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
-        return
+        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.");
+        return;
       }
 
       // Get ticket info to get bookingId
-      const ticketInfoResponse = await axiosInstance.get(`/api/tickets/${ticketId}/info`)
-      const bookingId = ticketInfoResponse.data.bookingId
+      const ticketInfoResponse = await axiosInstance.get(`/api/tickets/${ticketId}/info`);
+      const bookingId = ticketInfoResponse.data.bookingId;
 
-      await axiosInstance.post('/api/auth/otp/cancellation/send', {
+      await axiosInstance.post("/api/auth/otp/cancellation/send", {
         userId,
         bookingId,
-      })
+      });
 
-      setOtpSent(ticketId)
-      showSuccess('Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra email.')
+      setOtpSent(ticketId);
+      showSuccess("Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra email.");
     } catch (err: any) {
-      console.error("Error sending OTP:", err)
-      showError(err.response?.data?.message || "Không thể gửi mã OTP. Vui lòng thử lại sau.")
+      console.error("Error sending OTP:", err);
+      showError(err.response?.data?.message || "Không thể gửi mã OTP. Vui lòng thử lại sau.");
     } finally {
-      setSendingOtp(false)
+      setSendingOtp(false);
     }
-  }
+  };
 
   const handleVerifyOtpAndCancel = async (bookingId: string) => {
     if (!otpValue || otpValue.length !== 6) {
-      showError("Vui lòng nhập đầy đủ 6 chữ số OTP")
-      return
+      showError("Vui lòng nhập đầy đủ 6 chữ số OTP");
+      return;
     }
 
     try {
-      setVerifyingOtp(true)
+      setVerifyingOtp(true);
       // Get user ID from user store or API
-      let userId = user?.id
+      let userId = user?.id;
       if (!userId) {
-        const userResponse = await axiosInstance.get('/api/auth/me')
-        userId = userResponse.data.userId || userResponse.data.id
+        const userResponse = await axiosInstance.get("/api/auth/me");
+        userId = userResponse.data.userId || userResponse.data.id;
       }
 
       if (!userId) {
-        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
-        return
+        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.");
+        return;
       }
 
       // Verify OTP first
-      await axiosInstance.post('/api/auth/otp/cancellation/verify', {
+      await axiosInstance.post("/api/auth/otp/cancellation/verify", {
         userId,
         bookingId,
         otp: otpValue,
-      })
+      });
 
       // If OTP is valid, proceed with cancellation (without OTP in body)
-      await performCancellation(bookingId)
+      await performCancellation(bookingId);
     } catch (err: any) {
-      console.error("Error verifying OTP:", err)
-      showError(err.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.")
+      console.error("Error verifying OTP:", err);
+      showError(
+        err.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại."
+      );
     } finally {
-      setVerifyingOtp(false)
+      setVerifyingOtp(false);
     }
-  }
+  };
 
   const handleCancelTicket = async (ticketId: string, bookingStatus?: string) => {
     if (!confirm("Bạn có chắc chắn muốn hủy vé này không? Hành động này không thể hoàn tác.")) {
-      return
+      return;
     }
 
     // If booking is paid, require OTP
-    if (bookingStatus === 'paid') {
-      setOtpDialogOpen(ticketId)
-      setOtpValue("")
-      setOtpSent(null)
-      return
+    if (bookingStatus === "paid") {
+      setOtpDialogOpen(ticketId);
+      setOtpValue("");
+      setOtpSent(null);
+      return;
     }
 
     // For pending/confirmed bookings, proceed directly
-    await performTicketCancellation(ticketId)
-  }
+    await performTicketCancellation(ticketId);
+  };
 
   const handleVerifyOtpAndCancelTicket = async (ticketId: string) => {
     if (!otpValue || otpValue.length !== 6) {
-      showError("Vui lòng nhập đầy đủ 6 chữ số OTP")
-      return
+      showError("Vui lòng nhập đầy đủ 6 chữ số OTP");
+      return;
     }
 
     try {
-      setVerifyingOtp(true)
+      setVerifyingOtp(true);
       // Get user ID from user store or API
-      let userId = user?.id
+      let userId = user?.id;
       if (!userId) {
-        const userResponse = await axiosInstance.get('/api/auth/me')
-        userId = userResponse.data.userId || userResponse.data.id
+        const userResponse = await axiosInstance.get("/api/auth/me");
+        userId = userResponse.data.userId || userResponse.data.id;
       }
 
       if (!userId) {
-        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.")
-        return
+        showError("Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.");
+        return;
       }
 
       // Get ticket info to get bookingId
-      const ticketInfoResponse = await axiosInstance.get(`/api/bookings/tickets/${ticketId}/info`)
-      const bookingId = ticketInfoResponse.data.bookingId
+      const ticketInfoResponse = await axiosInstance.get(`/api/bookings/tickets/${ticketId}/info`);
+      const bookingId = ticketInfoResponse.data.bookingId;
 
       // Verify OTP first
-      await axiosInstance.post('/api/auth/otp/cancellation/verify', {
+      await axiosInstance.post("/api/auth/otp/cancellation/verify", {
         userId,
         bookingId,
         otp: otpValue,
-      })
+      });
 
       // If OTP is valid, proceed with ticket cancellation
-      await performTicketCancellation(ticketId)
+      await performTicketCancellation(ticketId);
     } catch (err: any) {
-      console.error("Error verifying OTP:", err)
-      showError(err.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.")
+      console.error("Error verifying OTP:", err);
+      showError(
+        err.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại."
+      );
     } finally {
-      setVerifyingOtp(false)
+      setVerifyingOtp(false);
     }
-  }
+  };
 
   const performTicketCancellation = async (ticketId: string) => {
     try {
-      setCancellingId(ticketId)
-      const response = await axiosInstance.patch(`/api/bookings/tickets/${ticketId}/cancel`, {})
-      
+      setCancellingId(ticketId);
+      const response = await axiosInstance.patch(`/api/bookings/tickets/${ticketId}/cancel`, {});
+
       // Close OTP dialog if open
-      setOtpDialogOpen(null)
-      setOtpValue("")
-      setOtpSent(null)
+      setOtpDialogOpen(null);
+      setOtpValue("");
+      setOtpSent(null);
 
       // Show success toast with refund information
       if (response.data.refundAmount) {
         showSuccess(
-          `Hủy vé thành công! Số tiền hoàn lại: ${response.data.refundAmount.toLocaleString('vi-VN')} VND. Số tiền sẽ được chuyển về tài khoản của bạn trong vòng 5-7 ngày làm việc.`,
+          `Hủy vé thành công! Số tiền hoàn lại: ${response.data.refundAmount.toLocaleString("vi-VN")} VND. Số tiền sẽ được chuyển về tài khoản của bạn trong vòng 5-7 ngày làm việc.`,
           { autoClose: 6000 }
-        )
+        );
       } else {
-        showSuccess(response.data.message || "Hủy vé thành công!")
+        showSuccess(response.data.message || "Hủy vé thành công!");
       }
 
       // If booking was auto-cancelled, show additional message
       if (response.data.bookingCancelled) {
-        showInfo("Tất cả vé trong đặt chỗ đã được hủy. Đặt chỗ đã được tự động hủy.")
+        showInfo("Tất cả vé trong đặt chỗ đã được hủy. Đặt chỗ đã được tự động hủy.");
       }
 
       // Refresh the tickets list
-      await fetchTickets(currentPage)
+      await fetchTickets(currentPage);
     } catch (err: any) {
-      console.error("Error cancelling ticket:", err)
-      showError(err.response?.data?.message || "Không thể hủy vé. Vui lòng thử lại sau.")
+      console.error("Error cancelling ticket:", err);
+      showError(err.response?.data?.message || "Không thể hủy vé. Vui lòng thử lại sau.");
     } finally {
-      setCancellingId(null)
+      setCancellingId(null);
     }
-  }
+  };
 
   const performCancellation = async (bookingId: string) => {
     try {
-      setCancellingId(bookingId)
-      const response = await axiosInstance.patch(`/api/bookings/${bookingId}/cancel`, {})
-      
+      setCancellingId(bookingId);
+      const response = await axiosInstance.patch(`/api/bookings/${bookingId}/cancel`, {});
+
       // Close OTP dialog if open
-      setOtpDialogOpen(null)
-      setOtpValue("")
-      setOtpSent(null)
+      setOtpDialogOpen(null);
+      setOtpValue("");
+      setOtpSent(null);
 
       // Show success toast with refund information
       if (response.data.refundAmount) {
         showSuccess(
-          `Hủy đặt chỗ thành công! Số tiền hoàn lại: ${response.data.refundAmount.toLocaleString('vi-VN')} VND. Số tiền sẽ được chuyển về tài khoản của bạn trong vòng 5-7 ngày làm việc.`,
+          `Hủy đặt chỗ thành công! Số tiền hoàn lại: ${response.data.refundAmount.toLocaleString("vi-VN")} VND. Số tiền sẽ được chuyển về tài khoản của bạn trong vòng 5-7 ngày làm việc.`,
           { autoClose: 6000 }
-        )
+        );
       } else {
-        showSuccess("Hủy đặt chỗ thành công!")
+        showSuccess("Hủy đặt chỗ thành công!");
       }
 
       // Refresh the tickets list
-      await fetchTickets(currentPage)
+      await fetchTickets(currentPage);
     } catch (err: any) {
-      console.error("Error cancelling booking:", err)
-      showError(err.response?.data?.message || "Không thể hủy đặt chỗ. Vui lòng thử lại sau.")
+      console.error("Error cancelling booking:", err);
+      showError(err.response?.data?.message || "Không thể hủy đặt chỗ. Vui lòng thử lại sau.");
     } finally {
-      setCancellingId(null)
+      setCancellingId(null);
     }
-  }
+  };
 
   if (loading && !data) {
     return (
@@ -350,13 +360,13 @@ const MyTicketsPage = () => {
         <div className="container py-[4rem]">
           <div className="flex justify-center items-center min-h-[50vh]">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--cl-pri)] mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--cl-pri)] mx-auto mb-4" />
               <p className="text-lg text-[var(--cl-pri)]">Đang tải...</p>
             </div>
           </div>
         </div>
       </main>
-    )
+    );
   }
 
   if (error) {
@@ -372,7 +382,7 @@ const MyTicketsPage = () => {
           </div>
         </div>
       </main>
-    )
+    );
   }
 
   if (!data || data.tickets.length === 0) {
@@ -388,7 +398,7 @@ const MyTicketsPage = () => {
           </div>
         </div>
       </main>
-    )
+    );
   }
 
   return (
@@ -396,36 +406,51 @@ const MyTicketsPage = () => {
       <Breadcrumb />
       <div className="container py-6 sm:py-8 lg:py-[4rem]">
         <div className="mb-6 sm:mb-8 lg:mb-[3rem]">
-          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-[var(--cl-pri)] mb-2">Vé của tôi</h1>
-          <p className="text-base sm:text-lg lg:text-xl text-gray-600">Tổng số vé: {data.totalItems}</p>
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-[var(--cl-pri)] mb-2">
+            Vé của tôi
+          </h1>
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600">
+            Tổng số vé: {data.totalItems}
+          </p>
         </div>
 
         {/* Cancellation Policy Section */}
         <div className="mb-6 sm:mb-8 p-4 sm:p-5 md:p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-          <h2 className="text-xl sm:text-2xl font-bold text-[var(--cl-pri)] mb-4 sm:mb-5">Quy định hủy vé Wanderlust Airways</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-[var(--cl-pri)] mb-4 sm:mb-5">
+            Quy định hủy vé Wanderlust Airways
+          </h2>
           <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-gray-700">
             <div>
               <p className="font-semibold text-base sm:text-lg mb-2 sm:mb-3">Thời gian hủy vé:</p>
               <ul className="list-disc list-inside space-y-1.5 sm:space-y-2 ml-2">
                 <li>
-                  <strong>Chặng bay nội địa:</strong> Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng.
+                  <strong>Chặng bay nội địa:</strong> Hoàn thiện thủ tục hoàn vé trước giờ khởi hành
+                  tối thiểu 03 tiếng.
                 </li>
                 <li>
-                  <strong>Chặng bay quốc tế:</strong> Thực hiện thủ tục hoàn vé trước giờ khởi hành ít nhất 05 tiếng.
+                  <strong>Chặng bay quốc tế:</strong> Thực hiện thủ tục hoàn vé trước giờ khởi hành
+                  ít nhất 05 tiếng.
                 </li>
               </ul>
             </div>
             <div>
               <p className="font-semibold text-base sm:text-lg mb-2">Hạng vé được phép hoàn:</p>
-              <p className="ml-2">Economy Smart, Economy Flex, Premium Smart, Premium Flex, Business Smart, Business Flex.</p>
+              <p className="ml-2">
+                Economy Smart, Economy Flex, Premium Smart, Premium Flex, Business Smart, Business
+                Flex.
+              </p>
             </div>
             <div>
               <p className="font-semibold text-base sm:text-lg mb-2">Hạng vé không được hoàn:</p>
-              <p className="ml-2">Economy Saver Max, Economy Saver (Wanderlust Eco) - các hạng vé siêu tiết kiệm thông thường không được phép hoàn/hủy vé.</p>
+              <p className="ml-2">
+                Economy Saver Max, Economy Saver (Wanderlust Eco) - các hạng vé siêu tiết kiệm thông
+                thường không được phép hoàn/hủy vé.
+              </p>
             </div>
             <div className="mt-4 sm:mt-5 p-3 sm:p-4 bg-blue-50 rounded border-l-4 border-blue-400">
               <p className="text-blue-800 text-sm sm:text-base italic">
-                <strong>Lưu ý:</strong> Bạn luôn nên kiểm tra lại Điều kiện giá vé (Fare Rules) cụ thể của vé máy bay bạn đã mua để biết chính xác quy định áp dụng.
+                <strong>Lưu ý:</strong> Bạn luôn nên kiểm tra lại Điều kiện giá vé (Fare Rules) cụ
+                thể của vé máy bay bạn đã mua để biết chính xác quy định áp dụng.
               </p>
             </div>
           </div>
@@ -433,7 +458,10 @@ const MyTicketsPage = () => {
 
         <div className="grid gap-4 md:gap-6">
           {data.tickets.map((ticket) => (
-            <Card key={ticket.ticketId} className="p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
+            <Card
+              key={ticket.ticketId}
+              className="p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow"
+            >
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
                 {/* Left: Flight Info */}
                 <div className="flex-1">
@@ -445,22 +473,28 @@ const MyTicketsPage = () => {
                     <div className="px-3 py-1 rounded-full bg-[var(--cl-pri)] text-white text-sm sm:text-base font-medium">
                       {ticket.pnrCode}
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-sm sm:text-base font-medium ${
-                      ticket.bookingStatus === 'confirmed' 
-                        ? 'bg-green-100 text-green-800' 
-                        : ticket.bookingStatus === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : ticket.bookingStatus === 'paid'
-                        ? 'bg-blue-100 text-blue-800'
-                        : ticket.bookingStatus === 'cancelled'
-                        ? 'bg-gray-100 text-gray-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {ticket.bookingStatus === 'confirmed' ? 'Đã xác nhận' : 
-                       ticket.bookingStatus === 'pending' ? 'Đang chờ' : 
-                       ticket.bookingStatus === 'paid' ? 'Đã thanh toán' :
-                       ticket.bookingStatus === 'cancelled' ? 'Đã hủy' : 
-                       ticket.bookingStatus}
+                    <div
+                      className={`px-3 py-1 rounded-full text-sm sm:text-base font-medium ${
+                        ticket.bookingStatus === "confirmed"
+                          ? "bg-green-100 text-green-800"
+                          : ticket.bookingStatus === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : ticket.bookingStatus === "paid"
+                              ? "bg-blue-100 text-blue-800"
+                              : ticket.bookingStatus === "cancelled"
+                                ? "bg-gray-100 text-gray-800"
+                                : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {ticket.bookingStatus === "confirmed"
+                        ? "Đã xác nhận"
+                        : ticket.bookingStatus === "pending"
+                          ? "Đang chờ"
+                          : ticket.bookingStatus === "paid"
+                            ? "Đã thanh toán"
+                            : ticket.bookingStatus === "cancelled"
+                              ? "Đã hủy"
+                              : ticket.bookingStatus}
                     </div>
                   </div>
 
@@ -496,7 +530,9 @@ const MyTicketsPage = () => {
                     <div>
                       <p className="text-gray-600 mb-1">Ngày khởi hành</p>
                       <p className="font-semibold">{convertToDMY(ticket.departureDateTime)}</p>
-                      <p className="text-gray-500">{convertToLocalTime(ticket.departureDateTime)}</p>
+                      <p className="text-gray-500">
+                        {convertToLocalTime(ticket.departureDateTime)}
+                      </p>
                     </div>
                     <div>
                       <p className="text-gray-600 mb-1">Ngày đến</p>
@@ -519,26 +555,40 @@ const MyTicketsPage = () => {
                   <div className="space-y-4">
                     {/* Ticket Code */}
                     <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">Mã vé</p>
-                      <p className="font-mono font-bold text-base text-gray-900">{ticket.ticketNumber}</p>
+                      <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+                        Mã vé
+                      </p>
+                      <p className="font-mono font-bold text-base text-gray-900">
+                        {ticket.ticketNumber}
+                      </p>
                     </div>
-                    
+
                     {/* Fare Class */}
                     <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">Hạng vé</p>
-                      <p className="font-semibold text-base text-gray-900">{ticket.fareClassName}</p>
-                      <p className="text-sm text-gray-500 mt-1">{ticket.cabinClass === 'economy' ? 'Phổ thông' : 'Thương gia'}</p>
+                      <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+                        Hạng vé
+                      </p>
+                      <p className="font-semibold text-base text-gray-900">
+                        {ticket.fareClassName}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {ticket.cabinClass === "economy" ? "Phổ thông" : "Thương gia"}
+                      </p>
                     </div>
-                    
+
                     {/* Total Amount */}
                     <div className="bg-[var(--cl-pri)]/5 p-3 sm:p-4 rounded-lg border-2 border-[var(--cl-pri)]/20">
-                      <p className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">Tổng tiền</p>
-                      <p className="text-xl font-bold text-[var(--cl-pri)]">{FormatPrice(ticket.totalAmount)}</p>
+                      <p className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">
+                        Tổng tiền
+                      </p>
+                      <p className="text-xl font-bold text-[var(--cl-pri)]">
+                        {FormatPrice(ticket.totalAmount)}
+                      </p>
                     </div>
-                    
+
                     {/* Cancellation Information */}
                     <div className="pt-3 border-t border-gray-200">
-                      {ticket.bookingStatus === 'cancelled' ? (
+                      {ticket.bookingStatus === "cancelled" ? (
                         <>
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2 text-gray-600">
@@ -554,13 +604,18 @@ const MyTicketsPage = () => {
                               <CheckCircle className="w-4 h-4 flex-shrink-0" />
                               <p className="text-sm font-semibold">Có thể hủy</p>
                             </div>
-                            <Dialog open={cancellationDialogOpen === ticket.ticketId} onOpenChange={(open) => setCancellationDialogOpen(open ? ticket.ticketId : null)}>
-                            <DialogTrigger asChild>
-                              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1.5">
-                                <Info className="w-4 h-4" />
-                                Chi tiết
-                              </button>
-                            </DialogTrigger>
+                            <Dialog
+                              open={cancellationDialogOpen === ticket.ticketId}
+                              onOpenChange={(open) =>
+                                setCancellationDialogOpen(open ? ticket.ticketId : null)
+                              }
+                            >
+                              <DialogTrigger asChild>
+                                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1.5">
+                                  <Info className="w-4 h-4" />
+                                  Chi tiết
+                                </button>
+                              </DialogTrigger>
                               <DialogContent className="max-w-md">
                                 <DialogHeader>
                                   <DialogTitle>Thông tin hủy vé</DialogTitle>
@@ -572,14 +627,17 @@ const MyTicketsPage = () => {
                                   {ticket.cancellationDeadline && (
                                     <>
                                       <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
-                                        <p className="text-sm font-semibold text-gray-700 mb-2">Hạn hủy:</p>
+                                        <p className="text-sm font-semibold text-gray-700 mb-2">
+                                          Hạn hủy:
+                                        </p>
                                         <p className="text-lg font-bold text-gray-900">
-                                          {convertToDMY(ticket.cancellationDeadline)} {convertToLocalTime(ticket.cancellationDeadline)}
+                                          {convertToDMY(ticket.cancellationDeadline)}
+                                          {convertToLocalTime(ticket.cancellationDeadline)}
                                         </p>
                                       </div>
                                       <div className="bg-gray-50 p-4 rounded-lg">
                                         <p className="text-sm text-gray-700 leading-relaxed">
-                                          {ticket.isDomestic 
+                                          {ticket.isDomestic
                                             ? "Chặng bay nội địa: Hoàn thiện thủ tục hoàn vé trước giờ khởi hành tối thiểu 03 tiếng."
                                             : "Chặng bay quốc tế: Thực hiện thủ tục hoàn vé trước giờ khởi hành ít nhất 05 tiếng."}
                                         </p>
@@ -594,7 +652,9 @@ const MyTicketsPage = () => {
                             <Button
                               variant="destructive"
                               size="sm"
-                              onClick={() => handleCancelTicket(ticket.ticketId, ticket.bookingStatus)}
+                              onClick={() =>
+                                handleCancelTicket(ticket.ticketId, ticket.bookingStatus)
+                              }
                               disabled={cancellingId === ticket.ticketId}
                               className="w-full"
                             >
@@ -610,7 +670,9 @@ const MyTicketsPage = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleCancelBooking(ticket.bookingId, ticket.bookingStatus)}
+                              onClick={() =>
+                                handleCancelBooking(ticket.bookingId, ticket.bookingStatus)
+                              }
                               disabled={cancellingId === ticket.bookingId}
                               className="w-full text-sm"
                             >
@@ -624,39 +686,30 @@ const MyTicketsPage = () => {
                               )}
                             </Button>
                           </div>
-                          
+
                           {/* OTP Dialog for paid bookings (for cancel booking) */}
-                          <Dialog open={otpDialogOpen === ticket.bookingId} onOpenChange={(open) => {
-                            if (!open) {
-                              setOtpDialogOpen(null)
-                              setOtpValue("")
-                              setOtpSent(null)
-                            } else {
-                              setOtpDialogOpen(ticket.bookingId)
-                            }
-                          }}>
+                          <Dialog
+                            open={otpDialogOpen === ticket.bookingId}
+                            onOpenChange={(open) => {
+                              if (open) {
+                                setOtpDialogOpen(ticket.bookingId);
+                              } else {
+                                setOtpDialogOpen(null);
+                                setOtpValue("");
+                                setOtpSent(null);
+                              }
+                            }}
+                          >
                             <DialogContent className="max-w-md">
                               <DialogHeader>
                                 <DialogTitle>Xác thực hủy đặt chỗ</DialogTitle>
                                 <DialogDescription>
-                                  Để hủy đặt chỗ đã thanh toán, vui lòng nhập mã OTP đã được gửi đến email của bạn.
+                                  Để hủy đặt chỗ đã thanh toán, vui lòng nhập mã OTP đã được gửi đến
+                                  email của bạn.
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="space-y-4 mt-4">
-                                {!otpSent ? (
-                                  <>
-                                    <p className="text-sm text-gray-600">
-                                      Chúng tôi sẽ gửi mã OTP đến email đăng ký của bạn để xác thực việc hủy đặt chỗ.
-                                    </p>
-                                    <Button
-                                      onClick={() => handleSendOtp(ticket.bookingId)}
-                                      disabled={sendingOtp}
-                                      className="w-full"
-                                    >
-                                      {sendingOtp ? "Đang gửi..." : "Gửi mã OTP"}
-                                    </Button>
-                                  </>
-                                ) : (
+                                {otpSent ? (
                                   <>
                                     <div className="space-y-2">
                                       <Label htmlFor="otp-booking">Nhập mã OTP (6 chữ số)</Label>
@@ -666,9 +719,9 @@ const MyTicketsPage = () => {
                                         maxLength={6}
                                         value={otpValue}
                                         onChange={(e) => {
-                                          const value = e.target.value.replace(/\D/g, '')
+                                          const value = e.target.value.replace(/\D/g, "");
                                           if (value.length <= 6) {
-                                            setOtpValue(value)
+                                            setOtpValue(value);
                                           }
                                         }}
                                         placeholder="000000"
@@ -679,8 +732,8 @@ const MyTicketsPage = () => {
                                       <Button
                                         variant="outline"
                                         onClick={() => {
-                                          setOtpSent(null)
-                                          setOtpValue("")
+                                          setOtpSent(null);
+                                          setOtpValue("");
                                         }}
                                         className="flex-1"
                                       >
@@ -695,43 +748,48 @@ const MyTicketsPage = () => {
                                       </Button>
                                     </div>
                                   </>
-                                )}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-
-                          {/* OTP Dialog for paid bookings (for cancel ticket) */}
-                          <Dialog open={otpDialogOpen === ticket.ticketId} onOpenChange={(open) => {
-                            if (!open) {
-                              setOtpDialogOpen(null)
-                              setOtpValue("")
-                              setOtpSent(null)
-                            } else {
-                              setOtpDialogOpen(ticket.ticketId)
-                            }
-                          }}>
-                            <DialogContent className="max-w-md">
-                              <DialogHeader>
-                                <DialogTitle>Xác thực hủy vé</DialogTitle>
-                                <DialogDescription>
-                                  Để hủy vé đã thanh toán, vui lòng nhập mã OTP đã được gửi đến email của bạn.
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="space-y-4 mt-4">
-                                {!otpSent ? (
+                                ) : (
                                   <>
                                     <p className="text-sm text-gray-600">
-                                      Chúng tôi sẽ gửi mã OTP đến email đăng ký của bạn để xác thực việc hủy vé.
+                                      Chúng tôi sẽ gửi mã OTP đến email đăng ký của bạn để xác thực
+                                      việc hủy đặt chỗ.
                                     </p>
                                     <Button
-                                      onClick={() => handleSendOtpForTicket(ticket.ticketId)}
+                                      onClick={() => handleSendOtp(ticket.bookingId)}
                                       disabled={sendingOtp}
                                       className="w-full"
                                     >
                                       {sendingOtp ? "Đang gửi..." : "Gửi mã OTP"}
                                     </Button>
                                   </>
-                                ) : (
+                                )}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+
+                          {/* OTP Dialog for paid bookings (for cancel ticket) */}
+                          <Dialog
+                            open={otpDialogOpen === ticket.ticketId}
+                            onOpenChange={(open) => {
+                              if (open) {
+                                setOtpDialogOpen(ticket.ticketId);
+                              } else {
+                                setOtpDialogOpen(null);
+                                setOtpValue("");
+                                setOtpSent(null);
+                              }
+                            }}
+                          >
+                            <DialogContent className="max-w-md">
+                              <DialogHeader>
+                                <DialogTitle>Xác thực hủy vé</DialogTitle>
+                                <DialogDescription>
+                                  Để hủy vé đã thanh toán, vui lòng nhập mã OTP đã được gửi đến
+                                  email của bạn.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4 mt-4">
+                                {otpSent ? (
                                   <>
                                     <div className="space-y-2">
                                       <Label htmlFor="otp-ticket">Nhập mã OTP (6 chữ số)</Label>
@@ -741,9 +799,9 @@ const MyTicketsPage = () => {
                                         maxLength={6}
                                         value={otpValue}
                                         onChange={(e) => {
-                                          const value = e.target.value.replace(/\D/g, '')
+                                          const value = e.target.value.replace(/\D/g, "");
                                           if (value.length <= 6) {
-                                            setOtpValue(value)
+                                            setOtpValue(value);
                                           }
                                         }}
                                         placeholder="000000"
@@ -754,21 +812,37 @@ const MyTicketsPage = () => {
                                       <Button
                                         variant="outline"
                                         onClick={() => {
-                                          setOtpSent(null)
-                                          setOtpValue("")
+                                          setOtpSent(null);
+                                          setOtpValue("");
                                         }}
                                         className="flex-1"
                                       >
                                         Gửi lại OTP
                                       </Button>
                                       <Button
-                                        onClick={() => handleVerifyOtpAndCancelTicket(ticket.ticketId)}
+                                        onClick={() =>
+                                          handleVerifyOtpAndCancelTicket(ticket.ticketId)
+                                        }
                                         disabled={verifyingOtp || otpValue.length !== 6}
                                         className="flex-1"
                                       >
                                         {verifyingOtp ? "Đang xác thực..." : "Xác nhận hủy vé"}
                                       </Button>
                                     </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p className="text-sm text-gray-600">
+                                      Chúng tôi sẽ gửi mã OTP đến email đăng ký của bạn để xác thực
+                                      việc hủy vé.
+                                    </p>
+                                    <Button
+                                      onClick={() => handleSendOtpForTicket(ticket.ticketId)}
+                                      disabled={sendingOtp}
+                                      className="w-full"
+                                    >
+                                      {sendingOtp ? "Đang gửi..." : "Gửi mã OTP"}
+                                    </Button>
                                   </>
                                 )}
                               </div>
@@ -783,13 +857,18 @@ const MyTicketsPage = () => {
                               <p className="text-sm font-semibold">Không thể hủy</p>
                             </div>
                             {ticket.cannotCancelReason && (
-                              <Dialog open={cancellationDialogOpen === ticket.ticketId} onOpenChange={(open) => setCancellationDialogOpen(open ? ticket.ticketId : null)}>
-                            <DialogTrigger asChild>
-                              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1.5">
-                                <Info className="w-4 h-4" />
-                                Chi tiết
-                              </button>
-                            </DialogTrigger>
+                              <Dialog
+                                open={cancellationDialogOpen === ticket.ticketId}
+                                onOpenChange={(open) =>
+                                  setCancellationDialogOpen(open ? ticket.ticketId : null)
+                                }
+                              >
+                                <DialogTrigger asChild>
+                                  <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1.5">
+                                    <Info className="w-4 h-4" />
+                                    Chi tiết
+                                  </button>
+                                </DialogTrigger>
                                 <DialogContent className="max-w-md">
                                   <DialogHeader>
                                     <DialogTitle>Lý do không thể hủy</DialogTitle>
@@ -799,7 +878,9 @@ const MyTicketsPage = () => {
                                   </DialogHeader>
                                   <div className="mt-4">
                                     <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-400">
-                                      <p className="text-sm text-gray-700 leading-relaxed">{ticket.cannotCancelReason}</p>
+                                      <p className="text-sm text-gray-700 leading-relaxed">
+                                        {ticket.cannotCancelReason}
+                                      </p>
                                     </div>
                                   </div>
                                 </DialogContent>
@@ -824,10 +905,12 @@ const MyTicketsPage = () => {
                 <PaginationItem>
                   <PaginationPrevious
                     onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    className={
+                      currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"
+                    }
                   />
                 </PaginationItem>
-                
+
                 {Array.from({ length: data.totalPages }, (_, i) => i + 1).map((page) => (
                   <PaginationItem key={page}>
                     <PaginationLink
@@ -842,8 +925,14 @@ const MyTicketsPage = () => {
 
                 <PaginationItem>
                   <PaginationNext
-                    onClick={() => currentPage < data.totalPages && handlePageChange(currentPage + 1)}
-                    className={currentPage === data.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    onClick={() =>
+                      currentPage < data.totalPages && handlePageChange(currentPage + 1)
+                    }
+                    className={
+                      currentPage === data.totalPages
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer"
+                    }
                   />
                 </PaginationItem>
               </PaginationContent>
@@ -852,8 +941,7 @@ const MyTicketsPage = () => {
         )}
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default MyTicketsPage
-
+export default MyTicketsPage;

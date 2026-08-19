@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-const BACKEND_API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const BACKEND_API_URL =
+  process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 /**
  * POST /api/bookings/[bookingId]/cancel
- * 
+ *
  * Proxy request to Go backend to cancel a booking
  * Falls back to mock response if backend is unavailable
  */
@@ -46,17 +47,22 @@ export async function POST(
     );
 
     if (response.status === 404) {
-      console.log(`[API /api/bookings/cancel] Backend returned 404 for booking ${bookingId}, returning mock response`);
-      return NextResponse.json({
-        success: true,
-        message: "Booking cancelled successfully (mock)",
-        bookingId: bookingId,
-        status: "CANCELLED",
-        refundAmount: 1350000,
-        refundCurrency: "VND",
-        refundStatus: "PENDING",
-        _mock: true,
-      }, { status: 200 });
+      console.log(
+        `[API /api/bookings/cancel] Backend returned 404 for booking ${bookingId}, returning mock response`
+      );
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Booking cancelled successfully (mock)",
+          bookingId: bookingId,
+          status: "CANCELLED",
+          refundAmount: 1350000,
+          refundCurrency: "VND",
+          refundStatus: "PENDING",
+          _mock: true,
+        },
+        { status: 200 }
+      );
     }
 
     const data = await response.json();
@@ -74,15 +80,18 @@ export async function POST(
     const resolvedParams = await Promise.resolve(context.params);
     const bookingId = resolvedParams?.bookingId;
     // Return mock response on connection error
-    return NextResponse.json({
-      success: true,
-      message: "Booking cancelled successfully (mock)",
-      bookingId: bookingId || "unknown",
-      status: "CANCELLED",
-      refundAmount: 1350000,
-      refundCurrency: "VND",
-      refundStatus: "PENDING",
-      _mock: true,
-    }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Booking cancelled successfully (mock)",
+        bookingId: bookingId || "unknown",
+        status: "CANCELLED",
+        refundAmount: 1350000,
+        refundCurrency: "VND",
+        refundStatus: "PENDING",
+        _mock: true,
+      },
+      { status: 200 }
+    );
   }
 }

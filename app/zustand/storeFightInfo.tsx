@@ -1,36 +1,33 @@
-import { FightInfoStore } from "@/types/fight-info";
-import { reach } from "yup";
+import type { FightInfoStore } from "@/types/fight-info";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-
 const useStoreFightInfo = create<FightInfoStore>()(
-    persist(
-        (set)=>({
+  persist(
+    (set) => ({
+      data: {
+        flightInstanceId: "",
+        cabinType: "",
+      },
+      setData: (newData) => {
+        set((state) => {
+          return {
             data: {
-                flightInstanceId:"",
-                cabinType:""
+              ...newData,
+              ...state.data,
             },
-            setData: (newData) => {
-                set((state)=>{
-                    return {
-                        data:{
-                            ...newData,
-                            ...state.data
-                        }
-                    }
-                })
-            }
-        }),
+          };
+        });
+      },
+    }),
 
-        {
-            name:"Fight-Info",
-            storage:createJSONStorage(()=>{
-                return sessionStorage
-            })
-
-        }
-    )
-)
+    {
+      name: "Fight-Info",
+      storage: createJSONStorage(() => {
+        return sessionStorage;
+      }),
+    }
+  )
+);
 
 export default useStoreFightInfo;

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import axiosInstance from "@/lib/axios-instance";
+import { type NextRequest, NextResponse } from "next/server";
 
-const BACKEND_API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const BACKEND_API_URL =
+  process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export async function PATCH(
   req: NextRequest,
@@ -13,19 +13,13 @@ export async function PATCH(
     const ticketId = resolvedParams?.ticketId;
 
     if (!ticketId) {
-      return NextResponse.json(
-        { message: "Ticket ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Ticket ID is required" }, { status: 400 });
     }
 
     // Get authorization header
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
-      return NextResponse.json(
-        { message: "Authorization header is required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Authorization header is required" }, { status: 401 });
     }
 
     // Get request body (may contain OTP for paid bookings)
@@ -62,4 +56,3 @@ export async function PATCH(
     );
   }
 }
-

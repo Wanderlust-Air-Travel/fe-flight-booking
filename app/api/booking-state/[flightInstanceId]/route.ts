@@ -1,7 +1,8 @@
 // app/api/booking-state/[flightInstanceId]/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from "next/server";
 
-const BACKEND_API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const BACKEND_API_URL =
+  process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export async function GET(
   req: NextRequest,
@@ -13,38 +14,35 @@ export async function GET(
     const flightInstanceId = resolvedParams?.flightInstanceId;
 
     if (!flightInstanceId) {
-      return NextResponse.json(
-        { message: 'flightInstanceId is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "flightInstanceId is required" }, { status: 400 });
     }
 
     // Get authorization header (optional - for authenticated users)
-    const authHeader = req.headers.get('authorization');
-    
+    const authHeader = req.headers.get("authorization");
+
     // Get X-Session-Id header (for guest users)
-    const sessionId = req.headers.get('x-session-id');
+    const sessionId = req.headers.get("x-session-id");
 
     // Build headers for backend request
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     };
 
     // Add authorization header if provided
     if (authHeader) {
-      headers['Authorization'] = authHeader;
+      headers.Authorization = authHeader;
     }
 
     // Add session ID header if provided (for guest users)
     if (sessionId) {
-      headers['X-Session-Id'] = sessionId;
+      headers["X-Session-Id"] = sessionId;
     }
 
     // Proxy request to backend
     const response = await fetch(
       `${BACKEND_API_URL}/api/v1/booking-state/${encodeURIComponent(flightInstanceId)}`,
       {
-        method: 'GET',
+        method: "GET",
         headers,
       }
     );
@@ -54,11 +52,11 @@ export async function GET(
     try {
       data = JSON.parse(responseText);
     } catch {
-      console.error('[booking-state/get] Non-JSON response from backend:', responseText.substring(0, 500));
-      return NextResponse.json(
-        { message: 'Invalid response from backend' },
-        { status: 502 }
+      console.error(
+        "[booking-state/get] Non-JSON response from backend:",
+        responseText.substring(0, 500)
       );
+      return NextResponse.json({ message: "Invalid response from backend" }, { status: 502 });
     }
 
     if (!response.ok) {
@@ -67,11 +65,10 @@ export async function GET(
 
     return NextResponse.json(data, { status: 200 });
   } catch (error: any) {
-    console.error('[booking-state/get] Error:', error?.message || error);
+    console.error("[booking-state/get] Error:", error?.message || error);
     return NextResponse.json(
-      { message: error.message || 'Internal server error' },
+      { message: error.message || "Internal server error" },
       { status: 500 }
     );
   }
 }
-

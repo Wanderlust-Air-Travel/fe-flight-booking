@@ -1,58 +1,55 @@
-"use client"
+"use client";
 
-import { Eye, Clipboard, Check, LogIn, Loader2 } from "lucide-react"
-import { useState, useCallback } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { TEST_ACCOUNTS, TEST_PASSWORD, type TestAccount } from "@/lib/test-accounts"
+} from "@/components/ui/dialog";
+import { TEST_ACCOUNTS, TEST_PASSWORD, type TestAccount } from "@/lib/test-accounts";
+import { Check, Clipboard, Eye, Loader2, LogIn } from "lucide-react";
+import { useCallback, useState } from "react";
 
-export type { TestAccount }
-export { TEST_ACCOUNTS, TEST_PASSWORD }
+export type { TestAccount };
+export { TEST_ACCOUNTS, TEST_PASSWORD };
 
 interface TestAccountsPanelProps {
-  onDirectLogin: (
-    email: string,
-    password: string
-  ) => Promise<{ success: boolean; error?: string }>
+  onDirectLogin: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 export function TestAccountsPanel({ onDirectLogin }: TestAccountsPanelProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [loggingInRole, setLoggingInRole] = useState<string | null>(null)
-  const [loginError, setLoginError] = useState<string | null>(null)
-  const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const [loggingInRole, setLoggingInRole] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const handleCopy = useCallback(async (value: string, fieldKey: string) => {
     try {
-      await navigator.clipboard.writeText(value)
-      setCopiedField(fieldKey)
-      setTimeout(() => setCopiedField(null), 1500)
+      await navigator.clipboard.writeText(value);
+      setCopiedField(fieldKey);
+      setTimeout(() => setCopiedField(null), 1500);
     } catch {
       // ignore
     }
-  }, [])
+  }, []);
 
   const handleAccountLogin = useCallback(
     async (account: TestAccount) => {
-      setLoggingInRole(account.role)
-      setLoginError(null)
-      const result = await onDirectLogin(account.email, account.password)
-      if (!result.success) {
-        setLoginError(result.error || "Đăng nhập thất bại")
-        setLoggingInRole(null)
+      setLoggingInRole(account.role);
+      setLoginError(null);
+      const result = await onDirectLogin(account.email, account.password);
+      if (result.success) {
+        setIsOpen(false);
+        setLoggingInRole(null);
       } else {
-        setIsOpen(false)
-        setLoggingInRole(null)
+        setLoginError(result.error || "Đăng nhập thất bại");
+        setLoggingInRole(null);
       }
     },
     [onDirectLogin]
-  )
+  );
 
   return (
     <>
@@ -60,8 +57,8 @@ export function TestAccountsPanel({ onDirectLogin }: TestAccountsPanelProps) {
         type="button"
         variant="outline"
         onClick={() => {
-          setLoginError(null)
-          setIsOpen(true)
+          setLoginError(null);
+          setIsOpen(true);
         }}
         className="w-full h-[4.4rem] px-[2rem] bg-white text-[var(--cl-pri)] text-[1.6rem] uppercase border border-[var(--cl-pri)] hover:bg-[var(--cl-pri)]/5 cursor-pointer gap-2"
       >
@@ -77,7 +74,8 @@ export function TestAccountsPanel({ onDirectLogin }: TestAccountsPanelProps) {
             </DialogTitle>
             <DialogDescription className="text-sm text-gray-600">
               {TEST_ACCOUNTS.length} tài khoản mẫu (mỗi role một account). Click để đăng nhập nhanh.
-              Mật khẩu chung: <span className="font-mono font-semibold text-[var(--cl-pri)]">{TEST_PASSWORD}</span>
+              Mật khẩu chung:
+              <span className="font-mono font-semibold text-[var(--cl-pri)]">{TEST_PASSWORD}</span>
             </DialogDescription>
           </DialogHeader>
 
@@ -89,8 +87,8 @@ export function TestAccountsPanel({ onDirectLogin }: TestAccountsPanelProps) {
 
           <div className="flex-1 min-h-0 overflow-y-auto pr-1 -mr-1 space-y-3">
             {TEST_ACCOUNTS.map((account) => {
-              const isLogging = loggingInRole === account.role
-              const isDisabled = loggingInRole !== null && !isLogging
+              const isLogging = loggingInRole === account.role;
+              const isDisabled = loggingInRole !== null && !isLogging;
               return (
                 <div
                   key={account.role}
@@ -109,9 +107,7 @@ export function TestAccountsPanel({ onDirectLogin }: TestAccountsPanelProps) {
 
                   <div className="p-4 space-y-3">
                     <div>
-                      <label className="text-sm font-medium text-gray-600 mb-1 block">
-                        Email
-                      </label>
+                      <label className="text-sm font-medium text-gray-600 mb-1 block">Email</label>
                       <div className="flex gap-2">
                         <input
                           readOnly
@@ -144,17 +140,15 @@ export function TestAccountsPanel({ onDirectLogin }: TestAccountsPanelProps) {
                       ) : (
                         <LogIn className="w-4 h-4" />
                       )}
-                      {isLogging
-                        ? "Đang đăng nhập..."
-                        : `Đăng nhập với ${account.roleName}`}
+                      {isLogging ? "Đang đăng nhập..." : `Đăng nhập với ${account.roleName}`}
                     </Button>
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

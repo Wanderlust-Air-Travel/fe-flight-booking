@@ -1,10 +1,8 @@
 // app/api/payments/[paymentId]/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 const BACKEND_API_URL =
-  process.env.API_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:3000";
+  process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export async function GET(
   req: NextRequest,
@@ -25,9 +23,9 @@ export async function GET(
 
     if (!paymentId) {
       return NextResponse.json(
-        { 
+        {
           message: "Payment ID is required. Please ensure you have a valid payment ID.",
-          error: "MISSING_PAYMENT_ID"
+          error: "MISSING_PAYMENT_ID",
         },
         { status: 400 }
       );
@@ -40,10 +38,10 @@ export async function GET(
     const backendHeaders: Record<string, string> = {
       "Content-Type": "application/json",
     };
-    
+
     // Add Authorization header only if present (for authenticated users)
     if (authHeader) {
-      backendHeaders["Authorization"] = authHeader;
+      backendHeaders.Authorization = authHeader;
     }
 
     const response = await fetch(
@@ -63,11 +61,6 @@ export async function GET(
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error("Error fetching payment:", error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
-
-

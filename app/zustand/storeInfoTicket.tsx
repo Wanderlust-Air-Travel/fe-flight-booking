@@ -1,9 +1,8 @@
-
 "use client";
 
-import { InfoTicketTypeState } from "@/types/info-ticket-type";
+import type { InfoTicketTypeState } from "@/types/info-ticket-type";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 const useInfoTicket = create<InfoTicketTypeState>()(
   persist(
@@ -30,7 +29,7 @@ const useInfoTicket = create<InfoTicketTypeState>()(
         fareClassCode: "",
         flightInstanceId: "",
         totalPerson: 0,
-        code: 0
+        code: 0,
       },
 
       // 👇 thêm field này

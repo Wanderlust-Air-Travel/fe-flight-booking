@@ -3,11 +3,11 @@ import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import EnhancedFlightSearchBar from "@/app/components/FlightSearchBar/EnhancedFlightSearchBar";
 import ServiceSlide from "@/app/components/Services/ServiceSlide";
 import TripList from "@/app/components/TripList/TripList";
-import { TripListProps } from "@/types/trip-list-type";
-import { axiosPublic } from "@/lib/axios-instance";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
 import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
+import { axiosPublic } from "@/lib/axios-instance";
+import type { TripListProps } from "@/types/trip-list-type";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 const ServiceDetailsResultSearchContent = () => {
   const [trips, setTrips] = useState<TripListProps | null>(null);
@@ -20,8 +20,7 @@ const ServiceDetailsResultSearchContent = () => {
   const destination = searchParams.get("destination") || "";
   const departDate = searchParams.get("departDate") || "";
   const rawReturnDate = searchParams.get("returnDate");
-  const returnDate =
-    rawReturnDate === "undefined-undefined-" ? "" : (rawReturnDate || "");
+  const returnDate = rawReturnDate === "undefined-undefined-" ? "" : rawReturnDate || "";
   const tripType = searchParams.get("tripType") || "one_way";
 
   // Nếu adults / minors không có (case click từ Service), default hợp lý để BE xử lý được
@@ -53,19 +52,20 @@ const ServiceDetailsResultSearchContent = () => {
     if (!origin || !destination || !departDate) return;
 
     setLoading(true);
-    axiosPublic.get(
+    axiosPublic
+      .get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/search/flights?origin=${origin}&destination=${destination}&departDate=${departDate}&returnDate=${returnDate}&tripType=${tripType}&adults=${adults}&minors=${minors}`
       )
       .then((res) => {
         const tripTypeValue = tripType === "round_trip" ? "round_trip" : "one_way";
         // Backend returns { tripType, outbound, inbound?, totalPassengers }
         // Handle both response formats: direct array or object with outbound property
-        const outboundFlights = Array.isArray(res.data)
-          ? res.data
-          : res.data?.outbound || [];
+        const outboundFlights = Array.isArray(res.data) ? res.data : res.data?.outbound || [];
         const inboundFlights =
           tripTypeValue === "round_trip"
-            ? (Array.isArray(res.data) ? undefined : res.data?.inbound || undefined)
+            ? Array.isArray(res.data)
+              ? undefined
+              : res.data?.inbound || undefined
             : undefined;
 
         setTrips({
@@ -86,7 +86,7 @@ const ServiceDetailsResultSearchContent = () => {
   console.log(trips);
 
   return (
-    <main className={`pt-[var(--hd)] flex flex-col gap-y-[var(--rowY)]`}>
+    <main className="pt-[var(--hd)] flex flex-col gap-y-[var(--rowY)]">
       <Breadcrumb />
       <section className="w-full">
         <div className="container">
@@ -111,16 +111,18 @@ const ServiceDetailsResultSearchContent = () => {
 
 const ServiceDetailsResultSearch = () => {
   return (
-    <Suspense fallback={
-      <main className={`pt-[var(--hd)] flex flex-col gap-y-[var(--rowY)]`}>
-        <Breadcrumb />
-        <div className="container">
-          <div className="text-center py-[4rem]">
-            <p className="text-lg">Loading...</p>
+    <Suspense
+      fallback={
+        <main className="pt-[var(--hd)] flex flex-col gap-y-[var(--rowY)]">
+          <Breadcrumb />
+          <div className="container">
+            <div className="text-center py-[4rem]">
+              <p className="text-lg">Loading...</p>
+            </div>
           </div>
-        </div>
-      </main>
-    }>
+        </main>
+      }
+    >
       <ServiceDetailsResultSearchContent />
     </Suspense>
   );

@@ -1,9 +1,8 @@
 "use client";
 
+import type { SeatRowProps } from "@/types/seat-map-component-type";
+import type { SeatItem } from "@/types/seat-type";
 import { memo } from "react";
-import { SeatItem } from "@/types/seat-type";
-import { SeatRow as SeatRowType } from "@/types/seat-utils-type";
-import { SeatRowProps } from "@/types/seat-map-component-type";
 
 /**
  * Memoized SeatRow component for optimal rendering performance
@@ -20,35 +19,40 @@ const SeatRow = memo(function SeatRow({
     // CRITICAL: Always use flightSeatId as the primary identifier
     // If flightSeatId is missing, use fallback but log warning
     if (!seat.flightSeatId) {
-      console.warn(`[SeatRow] Seat ${seat.seatNumber} (${side}) missing flightSeatId. Using fallback ID.`);
+      console.warn(
+        `[SeatRow] Seat ${seat.seatNumber} (${side}) missing flightSeatId. Using fallback ID.`
+      );
     }
     // Use flightSeatId as primary, fallback to generated ID for display/tracking
     const seatId = seat.flightSeatId || `${seat.seatNumber}-${side}`;
-    const seatSelectable = seat.isSelectable !== false && seat.isAvailable && sectionSelectable && !!seat.flightSeatId; // Disable if no flightSeatId
+    const seatSelectable =
+      seat.isSelectable !== false && seat.isAvailable && sectionSelectable && !!seat.flightSeatId; // Disable if no flightSeatId
     // CRITICAL: Check if seat is selected by seatNumber (for display) or by flightSeatId (for logic)
     // This ensures deselect works correctly
     // Ensure isSelected is always a boolean (not boolean | "")
     const isSelected = Boolean(
-      selectedSeats.includes(seat.seatNumber) || 
-      (seat.flightSeatId && selectedSeats.includes(seat.flightSeatId))
+      selectedSeats.includes(seat.seatNumber) ||
+        (seat.flightSeatId && selectedSeats.includes(seat.flightSeatId))
     );
     const isOccupied = !seat.isAvailable;
 
-    const baseClasses = "rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase transition ease-linear";
-    
-    const colorClasses = cabinType === "business"
-      ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white"
-      : "text-[var(--cl-five)] hover:bg-[var(--cl-five)] hover:text-white";
+    const baseClasses =
+      "rounded-[0.5rem] overflow-hidden p-[0.5rem] w-full bg-[var(--cl-seven)] text-[1.2rem] font-bold flex flex-col text-center justify-center items-center uppercase transition ease-linear";
+
+    const colorClasses =
+      cabinType === "business"
+        ? "text-[var(--cl-pri)] hover:bg-[var(--cl-pri)] hover:text-white"
+        : "text-[var(--cl-five)] hover:bg-[var(--cl-five)] hover:text-white";
 
     const stateClasses = isSelected
       ? cabinType === "business"
         ? "!bg-[var(--cl-pri)] !text-white"
         : "!bg-[var(--cl-five)] !text-white"
       : isOccupied
-      ? "!bg-gray-400 !text-white opacity-75"
-      : "";
+        ? "!bg-gray-400 !text-white opacity-75"
+        : "";
 
-    const disabledClasses = !seatSelectable ? "opacity-50 pointer-events-none" : "cursor-pointer";
+    const disabledClasses = seatSelectable ? "cursor-pointer" : "opacity-50 pointer-events-none";
 
     const widthClass = cabinType === "business" ? "w-[calc(100%/2)]" : "w-[calc(100%/3)]";
     const heightClass = cabinType === "business" ? "h-[6rem]" : "h-[5rem]";
@@ -70,9 +74,7 @@ const SeatRow = memo(function SeatRow({
         />
         <span className={`${baseClasses} ${colorClasses} ${stateClasses} ${heightClass}`}>
           <span>{seat.seatNumber}</span>
-          {seat.note && (
-            <span className="text-[1rem] font-medium">{seat.note}</span>
-          )}
+          {seat.note && <span className="text-[1rem] font-medium">{seat.note}</span>}
         </span>
       </label>
     );
@@ -87,9 +89,7 @@ const SeatRow = memo(function SeatRow({
 
       {/* Row Number Label (Centered) */}
       <div className="flex items-center justify-center w-[2rem] flex-shrink-0">
-        <span className="text-[1rem] font-bold text-[var(--cl-four)]">
-          {row.rowNumber}
-        </span>
+        <span className="text-[1rem] font-bold text-[var(--cl-four)]">{row.rowNumber}</span>
       </div>
 
       {/* Right Side Seats */}
@@ -103,4 +103,3 @@ const SeatRow = memo(function SeatRow({
 SeatRow.displayName = "SeatRow";
 
 export default SeatRow;
-

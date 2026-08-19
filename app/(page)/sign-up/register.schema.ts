@@ -1,5 +1,9 @@
+import {
+  STRONG_PASSWORD_REGEX,
+  VALIDATION_MESSAGES,
+  VIETNAMESE_PHONE_REGEX,
+} from "@/lib/validation-messages";
 import * as Yup from "yup";
-import { VALIDATION_MESSAGES, VIETNAMESE_PHONE_REGEX, STRONG_PASSWORD_REGEX } from "@/lib/validation-messages";
 
 /**
  * Register Schema - Đồng bộ với BE RegisterDto
@@ -14,7 +18,7 @@ export const RegisterSchema = Yup.object().shape({
     .min(2, VALIDATION_MESSAGES.AUTH.FULLNAME_MIN_LENGTH)
     .max(100, VALIDATION_MESSAGES.AUTH.FULLNAME_MAX_LENGTH)
     .matches(/^[A-Za-zÀ-ỹ\s]+$/, "Họ tên không được chứa số hoặc ký tự đặc biệt"),
-  
+
   email: Yup.string()
     .required(VALIDATION_MESSAGES.AUTH.EMAIL_REQUIRED)
     .email(VALIDATION_MESSAGES.AUTH.EMAIL_INVALID),
@@ -23,10 +27,7 @@ export const RegisterSchema = Yup.object().shape({
     .required(VALIDATION_MESSAGES.AUTH.PASSWORD_REQUIRED)
     .min(6, VALIDATION_MESSAGES.AUTH.PASSWORD_MIN_LENGTH)
     .max(20, VALIDATION_MESSAGES.AUTH.PASSWORD_MAX_LENGTH)
-    .matches(
-      STRONG_PASSWORD_REGEX,
-      VALIDATION_MESSAGES.AUTH.PASSWORD_TOO_WEAK
-    ),
+    .matches(STRONG_PASSWORD_REGEX, VALIDATION_MESSAGES.AUTH.PASSWORD_TOO_WEAK),
 
   rePassword: Yup.string()
     .required(VALIDATION_MESSAGES.AUTH.PASSWORD_REQUIRED)
@@ -34,5 +35,5 @@ export const RegisterSchema = Yup.object().shape({
 
   phone: Yup.string()
     .required(VALIDATION_MESSAGES.AUTH.PHONE_REQUIRED)
-    .matches(VIETNAMESE_PHONE_REGEX, VALIDATION_MESSAGES.AUTH.PHONE_INVALID)
+    .matches(VIETNAMESE_PHONE_REGEX, VALIDATION_MESSAGES.AUTH.PHONE_INVALID),
 });

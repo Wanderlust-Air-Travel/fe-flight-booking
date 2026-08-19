@@ -6,7 +6,7 @@
  */
 export const convertToYMD = (d: string): string => {
   if (!d) return "";
-  
+
   const parts = d.split("/");
   if (parts.length !== 3) {
     // If already in YYYY-MM-DD format, return as is (after validation)
@@ -20,19 +20,23 @@ export const convertToYMD = (d: string): string => {
     }
     return d; // Return as is if format is unrecognized
   }
-  
+
   const [day, month, year] = parts;
-  
+
   // Normalize to ensure leading zeros
   const normalizedYear = year.padStart(4, "0");
   const normalizedMonth = month.padStart(2, "0");
   const normalizedDay = day.padStart(2, "0");
-  
+
   return `${normalizedYear}-${normalizedMonth}-${normalizedDay}`;
 };
 
-export function convertToDMY(date: string | Date) {
+const FALLBACK = "—";
+
+export function convertToDMY(date: string | Date | null | undefined) {
+  if (!date) return FALLBACK;
   const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return FALLBACK;
 
   const day = String(d.getDate()).padStart(2, "0");
   const month = String(d.getMonth() + 1).padStart(2, "0");
@@ -41,9 +45,11 @@ export function convertToDMY(date: string | Date) {
   return `${day}/${month}/${year}`;
 }
 
+export function convertToLocalTime(date: string | Date | null | undefined) {
+  if (!date) return FALLBACK;
+  const d = new Date(date); // đang ở UTC
+  if (Number.isNaN(d.getTime())) return FALLBACK;
 
-export function convertToLocalTime(date: string | Date) {
-  const d = new Date(date);            // đang ở UTC
   const local = new Date(d.getTime() + 7 * 60 * 60 * 1000); // +7 giờ
 
   const hour = String(local.getHours()).padStart(2, "0");

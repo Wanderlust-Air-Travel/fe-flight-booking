@@ -18,105 +18,105 @@
    * ----------------------------------------------------------- */
   --cl-pri: #00558f;
   --cl-sec: #ffffff;
-  --cl-third: #3775A4;
-  --cl-four: #7ED957;
-  --cl-five: #64AF53;
-  --cl-six: #DBDFEA;
-  --cl-seven: #D3DAD9;
+  --cl-third: #3775a4;
+  --cl-four: #7ed957;
+  --cl-five: #64af53;
+  --cl-six: #dbdfea;
+  --cl-seven: #d3dad9;
   --cl-white: #ffffff;
   --cl-gray: #667085;
-  --cl-red: #D83D32;
+  --cl-red: #d83d32;
 
   /* -----------------------------------------------------------
    *  Font sizes  —  no !important, maps Tailwind text-* utilities
    * ----------------------------------------------------------- */
   /* 12px — micro (badge, timestamp, helper) */
-  --text-xs:   1.2rem;
+  --text-xs: 1.2rem;
   /* 13px — caption / small helper (base minimum desktop) */
-  --text-sm:   1.3rem;
-  --text-base: 1.4rem;   /* 14px  — body small */
-  --text-md:   1.6rem;   /* 16px  — body default */
-  --text-lg:   1.8rem;   /* 18px  — body large */
-  --text-xl:   2rem;     /* 20px  — h6 */
-  --text-2xl:  2.4rem;  /* 24px  — h5 */
-  --text-3xl:  2.8rem;  /* 28px  — h4 */
-  --text-4xl:  3.2rem;  /* 32px  — h3 */
-  --text-5xl:  4rem;    /* 40px  — h2 */
-  --text-6xl:  4.8rem;  /* 48px  — h1 */
-  --text-7xl:  5.6rem;  /* 56px  — display */
-  --text-8xl:  6.4rem;  /* 64px  — hero */
+  --text-sm: 1.3rem;
+  --text-base: 1.4rem; /* 14px  — body small */
+  --text-md: 1.6rem; /* 16px  — body default */
+  --text-lg: 1.8rem; /* 18px  — body large */
+  --text-xl: 2rem; /* 20px  — h6 */
+  --text-2xl: 2.4rem; /* 24px  — h5 */
+  --text-3xl: 2.8rem; /* 28px  — h4 */
+  --text-4xl: 3.2rem; /* 32px  — h3 */
+  --text-5xl: 4rem; /* 40px  — h2 */
+  --text-6xl: 4.8rem; /* 48px  — h1 */
+  --text-7xl: 5.6rem; /* 56px  — display */
+  --text-8xl: 6.4rem; /* 64px  — hero */
 
   /* Backward-compat aliases (--text-mn / --text-normal existed in code) */
-  --text-mn:      var(--text-base);   /* was 1.4rem ✓ */
-  --text-normal:  var(--text-md);     /* was 1.6rem ✓ */
+  --text-mn: var(--text-base); /* was 1.4rem ✓ */
+  --text-normal: var(--text-md); /* was 1.6rem ✓ */
   /* NOTE: old --text-md was 2rem (20px). New --text-xl = 2rem. */
   /* NOTE: old --text-lg was 3.2rem (32px). New --text-4xl = 3.2rem. */
 
   /* -----------------------------------------------------------
    *  Spacing  —  4px grid, base 10px
    * ----------------------------------------------------------- */
-  --space-0:     0;
-  --space-px:    1px;
-  --space-0-5:   0.2rem;   /* 2px */
-  --space-1:     0.4rem;   /* 4px */
-  --space-1-5:   0.6rem;   /* 6px */
-  --space-2:     0.8rem;   /* 8px */
-  --space-2-5:   1rem;     /* 10px */
-  --space-3:     1.2rem;   /* 12px */
-  --space-4:     1.6rem;   /* 16px */
-  --space-5:     2rem;     /* 20px */
-  --space-6:     2.4rem;   /* 24px */
-  --space-7:     2.8rem;   /* 28px */
-  --space-8:     3.2rem;   /* 32px */
-  --space-9:     3.6rem;   /* 36px */
-  --space-10:    4rem;     /* 40px */
-  --space-11:    4.4rem;   /* 44px */
-  --space-12:    4.8rem;   /* 48px */
-  --space-14:    5.6rem;   /* 56px */
-  --space-16:    6.4rem;   /* 64px */
-  --space-20:    8rem;     /* 80px */
-  --space-24:    9.6rem;   /* 96px */
-  --space-28:    11.2rem;  /* 112px */
-  --space-32:    12.8rem;  /* 128px */
+  --space-0: 0;
+  --space-px: 1px;
+  --space-0-5: 0.2rem; /* 2px */
+  --space-1: 0.4rem; /* 4px */
+  --space-1-5: 0.6rem; /* 6px */
+  --space-2: 0.8rem; /* 8px */
+  --space-2-5: 1rem; /* 10px */
+  --space-3: 1.2rem; /* 12px */
+  --space-4: 1.6rem; /* 16px */
+  --space-5: 2rem; /* 20px */
+  --space-6: 2.4rem; /* 24px */
+  --space-7: 2.8rem; /* 28px */
+  --space-8: 3.2rem; /* 32px */
+  --space-9: 3.6rem; /* 36px */
+  --space-10: 4rem; /* 40px */
+  --space-11: 4.4rem; /* 44px */
+  --space-12: 4.8rem; /* 48px */
+  --space-14: 5.6rem; /* 56px */
+  --space-16: 6.4rem; /* 64px */
+  --space-20: 8rem; /* 80px */
+  --space-24: 9.6rem; /* 96px */
+  --space-28: 11.2rem; /* 112px */
+  --space-32: 12.8rem; /* 128px */
 
   /* -----------------------------------------------------------
    *  Control heights  —  button / input / select
    * ----------------------------------------------------------- */
-  --control-xs:  2.8rem;   /* 28px — icon-only small */
-  --control-sm:  3.2rem;   /* 32px — sm button */
-  --control-md:  4rem;     /* 40px — default */
-  --control-lg:  4.8rem;   /* 48px — lg button */
-  --control-xl:  5.6rem;   /* 56px */
+  --control-xs: 2.8rem; /* 28px — icon-only small */
+  --control-sm: 3.2rem; /* 32px — sm button */
+  --control-md: 4rem; /* 40px — default */
+  --control-lg: 4.8rem; /* 48px — lg button */
+  --control-xl: 5.6rem; /* 56px */
 
   /* -----------------------------------------------------------
    *  Icon sizes
    * ----------------------------------------------------------- */
-  --icon-xs:  1.2rem;   /* 12px */
-  --icon-sm:  1.6rem;   /* 16px */
-  --icon-md:  2rem;     /* 20px */
-  --icon-lg:  2.4rem;   /* 24px */
-  --icon-xl:  3.2rem;   /* 32px */
+  --icon-xs: 1.2rem; /* 12px */
+  --icon-sm: 1.6rem; /* 16px */
+  --icon-md: 2rem; /* 20px */
+  --icon-lg: 2.4rem; /* 24px */
+  --icon-xl: 3.2rem; /* 32px */
 
   /* -----------------------------------------------------------
    *  Border radius  —  perfect-pixel
    * ----------------------------------------------------------- */
   --radius-none: 0;
-  --radius-xs:   0.2rem;   /* 2px */
-  --radius-sm:   0.4rem;   /* 4px */
-  --radius-md:   0.6rem;   /* 6px */
-  --radius-lg:   0.8rem;   /* 8px */
-  --radius-xl:   1.2rem;   /* 12px */
-  --radius-2xl:  1.6rem;  /* 16px */
-  --radius-3xl:  2.4rem;  /* 24px */
+  --radius-xs: 0.2rem; /* 2px */
+  --radius-sm: 0.4rem; /* 4px */
+  --radius-md: 0.6rem; /* 6px */
+  --radius-lg: 0.8rem; /* 8px */
+  --radius-xl: 1.2rem; /* 12px */
+  --radius-2xl: 1.6rem; /* 16px */
+  --radius-3xl: 2.4rem; /* 24px */
   --radius-full: 9999px;
 
   /* Backward-compat alias */
-  --radius: 0.6rem;   /* --radius (old) = --radius-md */
+  --radius: 0.6rem; /* --radius (old) = --radius-md */
 
   /* -----------------------------------------------------------
    *  Header height  —  responsive
    * ----------------------------------------------------------- */
-  --header-height: 7rem;   /* default (mobile-first) */
+  --header-height: 7rem; /* default (mobile-first) */
 
   /* -----------------------------------------------------------
    *  Row / layout helpers
@@ -167,80 +167,80 @@
 @theme inline {
   /* Font sizes — text-* utilities */
   /* Font sizes — text-* utilities */
-  --text-xs:    var(--text-xs);   /* 12px — increased from 11px */
-  --text-sm:    var(--text-sm);   /* 13px — increased from 12px */
-  --text-base:  var(--text-base);
-  --text-md:    var(--text-md);
-  --text-lg:    var(--text-lg);
-  --text-xl:    var(--text-xl);
-  --text-2xl:   var(--text-2xl);
-  --text-3xl:   var(--text-3xl);
-  --text-4xl:   var(--text-4xl);
-  --text-5xl:   var(--text-5xl);
-  --text-6xl:   var(--text-6xl);
-  --text-7xl:   var(--text-7xl);
-  --text-8xl:   var(--text-8xl);
+  --text-xs: var(--text-xs); /* 12px — increased from 11px */
+  --text-sm: var(--text-sm); /* 13px — increased from 12px */
+  --text-base: var(--text-base);
+  --text-md: var(--text-md);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+  --text-4xl: var(--text-4xl);
+  --text-5xl: var(--text-5xl);
+  --text-6xl: var(--text-6xl);
+  --text-7xl: var(--text-7xl);
+  --text-8xl: var(--text-8xl);
 
   /* Line heights */
-  --leading-tight:   1.2;
-  --leading-snug:    1.3;
-  --leading-normal:  1.5;
+  --leading-tight: 1.2;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
   --leading-relaxed: 1.625;
-  --leading-loose:   1.8;
+  --leading-loose: 1.8;
 
   /* Spacing — p-*, m-*, gap-*, inset-*, etc. */
-  --spacing-0:    0;
-  --spacing-px:   1px;
-  --spacing-0-5:  0.2rem;
-  --spacing-1:    0.4rem;
-  --spacing-1-5:  0.6rem;
-  --spacing-2:    0.8rem;
+  --spacing-0: 0;
+  --spacing-px: 1px;
+  --spacing-0-5: 0.2rem;
+  --spacing-1: 0.4rem;
+  --spacing-1-5: 0.6rem;
+  --spacing-2: 0.8rem;
   --spacing-2-5: 1rem;
-  --spacing-3:    1.2rem;
-  --spacing-4:    1.6rem;
-  --spacing-5:    2rem;
-  --spacing-6:    2.4rem;
-  --spacing-7:    2.8rem;
-  --spacing-8:    3.2rem;
-  --spacing-9:    3.6rem;
-  --spacing-10:   4rem;
-  --spacing-11:   4.4rem;
-  --spacing-12:   4.8rem;
-  --spacing-14:   5.6rem;
-  --spacing-16:   6.4rem;
-  --spacing-20:   8rem;
-  --spacing-24:   9.6rem;
-  --spacing-28:   11.2rem;
-  --spacing-32:   12.8rem;
+  --spacing-3: 1.2rem;
+  --spacing-4: 1.6rem;
+  --spacing-5: 2rem;
+  --spacing-6: 2.4rem;
+  --spacing-7: 2.8rem;
+  --spacing-8: 3.2rem;
+  --spacing-9: 3.6rem;
+  --spacing-10: 4rem;
+  --spacing-11: 4.4rem;
+  --spacing-12: 4.8rem;
+  --spacing-14: 5.6rem;
+  --spacing-16: 6.4rem;
+  --spacing-20: 8rem;
+  --spacing-24: 9.6rem;
+  --spacing-28: 11.2rem;
+  --spacing-32: 12.8rem;
 
   /* Control heights — h-control-*, size-control-* */
-  --height-control-xs:  var(--control-xs);
-  --height-control-sm:  var(--control-sm);
-  --height-control-md:  var(--control-md);
-  --height-control-lg:  var(--control-lg);
-  --height-control-xl:  var(--control-xl);
-  --size-control-xs:    var(--control-xs);
-  --size-control-sm:    var(--control-sm);
-  --size-control-md:    var(--control-md);
-  --size-control-lg:    var(--control-lg);
-  --size-control-xl:    var(--control-xl);
+  --height-control-xs: var(--control-xs);
+  --height-control-sm: var(--control-sm);
+  --height-control-md: var(--control-md);
+  --height-control-lg: var(--control-lg);
+  --height-control-xl: var(--control-xl);
+  --size-control-xs: var(--control-xs);
+  --size-control-sm: var(--control-sm);
+  --size-control-md: var(--control-md);
+  --size-control-lg: var(--control-lg);
+  --size-control-xl: var(--control-xl);
 
   /* Icon sizes — size-icon-* */
-  --size-icon-xs:  var(--icon-xs);
-  --size-icon-sm:  var(--icon-sm);
-  --size-icon-md:  var(--icon-md);
-  --size-icon-lg:  var(--icon-lg);
-  --size-icon-xl:  var(--icon-xl);
+  --size-icon-xs: var(--icon-xs);
+  --size-icon-sm: var(--icon-sm);
+  --size-icon-md: var(--icon-md);
+  --size-icon-lg: var(--icon-lg);
+  --size-icon-xl: var(--icon-xl);
 
   /* Border radius */
   --radius-none: 0;
-  --radius-xs:   0.2rem;
-  --radius-sm:   0.4rem;
-  --radius-md:   0.6rem;
-  --radius-lg:   0.8rem;
-  --radius-xl:   1.2rem;
-  --radius-2xl:  1.6rem;
-  --radius-3xl:  2.4rem;
+  --radius-xs: 0.2rem;
+  --radius-sm: 0.4rem;
+  --radius-md: 0.6rem;
+  --radius-lg: 0.8rem;
+  --radius-xl: 1.2rem;
+  --radius-2xl: 1.6rem;
+  --radius-3xl: 2.4rem;
   --radius-full: 9999px;
 
   /* Radius aliases for Tailwind (radius-sm → --radius-sm etc.) */
@@ -250,47 +250,47 @@
   --radius-xl: 1.2rem;
 
   /* Shadcn color tokens */
-  --color-background:        var(--background);
-  --color-foreground:        var(--foreground);
-  --color-card:               var(--card);
-  --color-card-foreground:   var(--card-foreground);
-  --color-popover:            var(--popover);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary:            var(--primary);
+  --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary:          var(--secondary);
+  --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted:              var(--muted);
-  --color-muted-foreground:   var(--muted-foreground);
-  --color-accent:             var(--accent);
-  --color-accent-foreground:  var(--accent-foreground);
-  --color-destructive:         var(--destructive);
-  --color-border:             var(--border);
-  --color-input:              var(--input);
-  --color-ring:               var(--ring);
-  --color-chart-1:            var(--chart-1);
-  --color-chart-2:            var(--chart-2);
-  --color-chart-3:            var(--chart-3);
-  --color-chart-4:            var(--chart-4);
-  --color-chart-5:            var(--chart-5);
-  --color-sidebar:            var(--sidebar);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary:    var(--sidebar-primary);
+  --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent:     var(--sidebar-accent);
+  --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border:     var(--sidebar-border);
-  --color-sidebar-ring:       var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 
   /* Z-index */
-  --z-raised:    10;
-  --z-dropdown:  100;
-  --z-sticky:   200;
-  --z-overlay:   300;
-  --z-modal:     400;
-  --z-popover:   500;
-  --z-toast:     600;
-  --z-tooltip:   700;
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-popover: 500;
+  --z-toast: 600;
+  --z-tooltip: 700;
 }
 
 /* ================================================================
@@ -334,16 +334,36 @@ main {
 }
 
 /* Font size helpers using CSS vars (no !important) */
-.text-base  { font-size: var(--text-base); }
-.text-mn    { font-size: var(--text-mn); }
-.text-sm    { font-size: var(--text-sm); }
-.text-xs    { font-size: var(--text-xs); }
-.text-md    { font-size: var(--text-md); }
-.text-lg    { font-size: var(--text-lg); }
-.text-xl    { font-size: var(--text-xl); }
-.text-2xl   { font-size: var(--text-2xl); }
-.text-3xl   { font-size: var(--text-3xl); }
-.text-4xl   { font-size: var(--text-4xl); }
+.text-base {
+  font-size: var(--text-base);
+}
+.text-mn {
+  font-size: var(--text-mn);
+}
+.text-sm {
+  font-size: var(--text-sm);
+}
+.text-xs {
+  font-size: var(--text-xs);
+}
+.text-md {
+  font-size: var(--text-md);
+}
+.text-lg {
+  font-size: var(--text-lg);
+}
+.text-xl {
+  font-size: var(--text-xl);
+}
+.text-2xl {
+  font-size: var(--text-2xl);
+}
+.text-3xl {
+  font-size: var(--text-3xl);
+}
+.text-4xl {
+  font-size: var(--text-4xl);
+}
 
 /* ================================================================
  *  LAYOUT
@@ -399,28 +419,52 @@ header {
 /* ================================================================
  *  COLORS
  * ================================================================ */
-.cl-pri   { color: var(--cl-pri); }
-.cl-sec   { color: var(--cl-sec); }
-.cl-white { color: var(--cl-white); }
+.cl-pri {
+  color: var(--cl-pri);
+}
+.cl-sec {
+  color: var(--cl-sec);
+}
+.cl-white {
+  color: var(--cl-white);
+}
 
 /* ================================================================
  *  SHADOWS
  * ================================================================ */
-.shadow   { box-shadow: 0 0 0.1rem #000000; }
-.shadow2  { box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; }
-.shadow3  { box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px; }
+.shadow {
+  box-shadow: 0 0 0.1rem #000000;
+}
+.shadow2 {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+.shadow3 {
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+}
 
 /* ================================================================
  *  AUTH PANEL — responsive scale on large screens
  * ================================================================ */
-.auth-form-panel .text-mn    { font-size: var(--text-base); }
-.auth-form-panel .text-base  { font-size: var(--text-md); }
-.auth-form-panel h2          { font-size: var(--text-2xl); }
+.auth-form-panel .text-mn {
+  font-size: var(--text-base);
+}
+.auth-form-panel .text-base {
+  font-size: var(--text-md);
+}
+.auth-form-panel h2 {
+  font-size: var(--text-2xl);
+}
 
 @media (min-width: 1920px) {
-  .auth-form-panel .text-mn   { font-size: 1.65rem; }
-  .auth-form-panel .text-base { font-size: 1.85rem; }
-  .auth-form-panel h2         { font-size: 2.4rem; }
+  .auth-form-panel .text-mn {
+    font-size: 1.65rem;
+  }
+  .auth-form-panel .text-base {
+    font-size: 1.85rem;
+  }
+  .auth-form-panel h2 {
+    font-size: 2.4rem;
+  }
   .auth-form-panel [data-slot="input"] {
     font-size: 1.65rem;
     height: 4.2rem;
@@ -437,9 +481,15 @@ header {
 }
 
 @media (min-width: 2560px) {
-  .auth-form-panel .text-mn   { font-size: 1.9rem; }
-  .auth-form-panel .text-base { font-size: 2.1rem; }
-  .auth-form-panel h2         { font-size: 2.8rem; }
+  .auth-form-panel .text-mn {
+    font-size: 1.9rem;
+  }
+  .auth-form-panel .text-base {
+    font-size: 2.1rem;
+  }
+  .auth-form-panel h2 {
+    font-size: 2.8rem;
+  }
   .auth-form-panel [data-slot="input"] {
     font-size: 1.9rem;
     height: 4.8rem;
@@ -458,7 +508,9 @@ header {
 /* ================================================================
  *  CLIPATH & MODAL
  * ================================================================ */
-.clipath { clip-path: inset(0 0 0 0); }
+.clipath {
+  clip-path: inset(0 0 0 0);
+}
 
 .modal::before {
   content: "";
@@ -479,8 +531,12 @@ header {
 }
 
 @keyframes anHien {
-  0%   { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* ================================================================
@@ -494,7 +550,7 @@ header {
   padding: 0.4rem 0.6rem;
   color: #ffffff;
   font-size: var(--text-sm);
-  background: #D83D32;
+  background: #d83d32;
   border-radius: var(--radius-xs);
   height: auto;
   display: flex;
@@ -527,7 +583,9 @@ header {
 /* ================================================================
  *  REACT DATE RANGE OVERRIDES
  * ================================================================ */
-.rdrMonth { padding: unset; }
+.rdrMonth {
+  padding: unset;
+}
 
 .rdrSelected,
 .rdrInRange,
@@ -543,7 +601,7 @@ header {
   position: relative;
   width: 100%;
   height: 4.8rem;
-  background: #F5F5F5;
+  background: #f5f5f5;
   display: block;
   overflow: hidden;
   border-radius: var(--radius-sm);
@@ -554,18 +612,17 @@ header {
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #ffffff80,
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, #ffffff80, transparent);
   animation: luotQua 1.2s infinite linear;
 }
 
 @keyframes luotQua {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* ================================================================
@@ -687,7 +744,8 @@ header {
 }
 
 .filter-white {
-  filter: brightness(0) saturate(100%) invert(100%) sepia(12%) saturate(7454%) hue-rotate(187deg) brightness(117%) contrast(109%);
+  filter: brightness(0) saturate(100%) invert(100%) sepia(12%) saturate(7454%) hue-rotate(187deg)
+    brightness(117%) contrast(109%);
 }
 
 /* (removed react-toastify specific styles; SweetAlert2 toasts are inline-styled) */

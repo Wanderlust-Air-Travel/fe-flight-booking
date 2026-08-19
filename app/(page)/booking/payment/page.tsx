@@ -1,18 +1,17 @@
 "use client";
 
-import { useCallback, useState, Suspense, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import axiosInstance from "@/lib/axios-instance";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
+import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { usePaymentStatus } from "@/app/hooks/use-payment-status";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
-import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
-import { PaymentStatus } from "@/types/payment";
-import { usePaymentStatus } from "@/app/hooks/use-payment-status";
-import { showSuccess, showError } from "@/lib/toast";
+import { Button } from "@/components/ui/button";
+import axiosInstance from "@/lib/axios-instance";
+import { showError, showSuccess } from "@/lib/toast";
+import type { PaymentStatus } from "@/types/payment";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 const PaymentPageContent = () => {
   const searchParams = useSearchParams();
@@ -27,13 +26,13 @@ const PaymentPageContent = () => {
   const [pollingMessage, setPollingMessage] = useState<string | null>(null);
 
   // WebSocket: Real-time payment status updates
-  const { 
-    isSubscribed: isPaymentStatusSubscribed, 
-    paymentStatus, 
-    status: paymentStatusValue, 
-    isSuccess, 
-    isFailed, 
-    isPending 
+  const {
+    isSubscribed: isPaymentStatusSubscribed,
+    paymentStatus,
+    status: paymentStatusValue,
+    isSuccess,
+    isFailed,
+    isPending,
   } = usePaymentStatus(bookingId, paymentId);
 
   // Handle real-time payment status updates from WebSocket
@@ -46,7 +45,9 @@ const PaymentPageContent = () => {
       showSuccess("Payment successful! Redirecting to confirmation...");
       // Redirect to confirmation page
       setTimeout(() => {
-        router.push(`/booking/confirmation?bookingId=${bookingId}&paymentId=${paymentStatus.paymentId}`);
+        router.push(
+          `/booking/confirmation?bookingId=${bookingId}&paymentId=${paymentStatus.paymentId}`
+        );
       }, 1500);
     } else if (isFailed) {
       setStatus("failed");
@@ -96,22 +97,16 @@ const PaymentPageContent = () => {
           if (payment?.status === "failed") {
             setStatus("failed");
             setPollingMessage(null);
-            setError(
-              "Payment failed. Please check your payment or try another method."
-            );
+            setError("Payment failed. Please check your payment or try another method.");
             return;
           }
 
           // pending → tiếp tục chờ
-          setPollingMessage(
-            "Waiting for payment confirmation from gateway..."
-          );
+          setPollingMessage("Waiting for payment confirmation from gateway...");
         } catch (err: any) {
           console.error("Error polling payment status:", err);
           setError(
-            err?.response?.data?.message ||
-              err?.message ||
-              "Failed to check payment status"
+            err?.response?.data?.message || err?.message || "Failed to check payment status"
           );
           setStatus("failed");
           setPollingMessage(null);
@@ -162,14 +157,13 @@ const PaymentPageContent = () => {
       if (!payment?.paymentId) {
         setStatus("failed");
         setError(
-          "Payment was created but we couldn't get the payment ID. Please contact support with your booking ID: " +
-            bookingId
+          `Payment was created but we couldn't get the payment ID. Please contact support with your booking ID: ${bookingId}`
         );
         return;
       }
 
       setPaymentId(payment.paymentId);
-      
+
       // Mở trang thanh toán dev simulator trong tab mới để user thao tác
       if (payment.paymentUrl) {
         window.open(payment.paymentUrl, "_blank");
@@ -178,20 +172,20 @@ const PaymentPageContent = () => {
         const devPaymentUrl = `/payments/dev?paymentId=${payment.paymentId}&bookingId=${bookingId}`;
         window.open(devPaymentUrl, "_blank");
       }
-      
+
       // Use WebSocket for real-time updates (preferred)
       // Fallback to polling if WebSocket is not connected
-      if (!isPaymentStatusSubscribed) {
-        setPollingMessage("Waiting for payment confirmation from gateway...");
-        await pollPaymentStatus(payment.paymentId);
-      } else {
+      if (isPaymentStatusSubscribed) {
         // WebSocket is connected - it will handle status updates automatically
         setPollingMessage(null);
         setStatus("processing");
+      } else {
+        setPollingMessage("Waiting for payment confirmation from gateway...");
+        await pollPaymentStatus(payment.paymentId);
       }
     } catch (err: any) {
       console.error("Error processing payment:", err);
-      
+
       // Ưu tiên sử dụng message business từ BE (400), fallback sang lỗi hệ thống (5xx / network)
       const status = err?.response?.status as number | undefined;
       const serverMessage = err?.response?.data?.message as string | undefined;
@@ -206,7 +200,7 @@ const PaymentPageContent = () => {
         setStatus("success");
         setError(null);
         setPollingMessage("This booking has already been paid. Redirecting to confirmation...");
-        
+
         // Try to get paymentId from existing payments
         // Note: This API requires authentication, so we'll just redirect with bookingId
         // The confirmation page can fetch payment details if needed
@@ -224,11 +218,7 @@ const PaymentPageContent = () => {
             "Payment service is temporarily unavailable. Please try again later or contact support."
         );
       } else {
-        setError(
-          serverMessage ||
-            err?.message ||
-            "Failed to process payment. Please try again."
-        );
+        setError(serverMessage || err?.message || "Failed to process payment. Please try again.");
       }
     }
   }, [bookingId, pollPaymentStatus, router]);
@@ -242,10 +232,7 @@ const PaymentPageContent = () => {
             <p className="text-lg text-red-500">
               Booking ID is missing. Please restart the booking process.
             </p>
-            <Button
-              onClick={() => router.push("/search/flights")}
-              className="mt-[2rem]"
-            >
+            <Button onClick={() => router.push("/search/flights")} className="mt-[2rem]">
               Back to Search
             </Button>
           </div>
@@ -269,9 +256,7 @@ const PaymentPageContent = () => {
                 </h2>
 
                 <div className="mb-[2rem] p-[1.2rem] sm:p-[1.6rem] bg-[var(--cl-pri)]/5 rounded-lg border border-[var(--cl-pri)]/20">
-                  <p className="text-sm text-gray-600 mb-[0.4rem]">
-                    Booking ID
-                  </p>
+                  <p className="text-sm text-gray-600 mb-[0.4rem]">Booking ID</p>
                   <p className="text-base sm:text-lg font-semibold text-[var(--cl-pri)]">
                     {bookingId}
                   </p>
@@ -284,17 +269,13 @@ const PaymentPageContent = () => {
                     </p>
                     <div className="space-y-[0.8rem]">
                       <div className="flex justify-between items-center">
-                        <p className="text-sm sm:text-base text-gray-700">
-                          Fare:
-                        </p>
+                        <p className="text-sm sm:text-base text-gray-700">Fare:</p>
                         <p className="text-base sm:text-lg font-semibold text-[var(--cl-pri)]">
                           {ticketData.typeTicket || "Selected fare"}
                         </p>
                       </div>
                       <div className="flex justify-between items-center pt-[0.8rem] border-t border-[var(--cl-pri)]/20">
-                        <p className="text-sm sm:text-base text-gray-700">
-                          Amount to pay:
-                        </p>
+                        <p className="text-sm sm:text-base text-gray-700">Amount to pay:</p>
                         <p className="text-xl sm:text-2xl font-bold text-[var(--cl-pri)]">
                           {FormatPrice(ticketData.price || 0)}
                         </p>
@@ -305,9 +286,7 @@ const PaymentPageContent = () => {
 
                 {error && (
                   <div className="mb-[2rem] p-[1.2rem] sm:p-[1.6rem] bg-red-50 border-2 border-red-300 rounded-lg">
-                    <p className="text-sm sm:text-base text-red-700 font-medium">
-                      {error}
-                    </p>
+                    <p className="text-sm sm:text-base text-red-700 font-medium">{error}</p>
                   </div>
                 )}
 
@@ -327,9 +306,7 @@ const PaymentPageContent = () => {
                       {pollingMessage}
                     </p>
                     {paymentId && (
-                      <p className="text-sm text-yellow-600 mt-[0.8rem]">
-                        Payment ID: {paymentId}
-                      </p>
+                      <p className="text-sm text-yellow-600 mt-[0.8rem]">Payment ID: {paymentId}</p>
                     )}
                   </div>
                 )}
@@ -341,9 +318,7 @@ const PaymentPageContent = () => {
                       Waiting for payment confirmation from gateway...
                     </p>
                     {paymentId && (
-                      <p className="text-sm text-blue-600 mt-[0.8rem]">
-                        Payment ID: {paymentId}
-                      </p>
+                      <p className="text-sm text-blue-600 mt-[0.8rem]">Payment ID: {paymentId}</p>
                     )}
                   </div>
                 )}
@@ -360,9 +335,7 @@ const PaymentPageContent = () => {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() =>
-                      router.back()
-                    }
+                    onClick={() => router.back()}
                     className="w-full sm:w-auto px-[2.4rem] py-[1.2rem] sm:py-[1.4rem] text-base sm:text-lg font-semibold border-2 border-gray-300 hover:border-[var(--cl-pri)] hover:text-[var(--cl-pri)] rounded-lg transition-all duration-200"
                   >
                     Back
@@ -391,21 +364,21 @@ const PaymentPageContent = () => {
 
 const PaymentPage = () => {
   return (
-    <Suspense fallback={
-      <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
-        <Breadcrumb />
-        <div className="container">
-          <div className="text-center py-[4rem]">
-            <p className="text-lg">Loading...</p>
+    <Suspense
+      fallback={
+        <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+          <Breadcrumb />
+          <div className="container">
+            <div className="text-center py-[4rem]">
+              <p className="text-lg">Loading...</p>
+            </div>
           </div>
-        </div>
-      </main>
-    }>
+        </main>
+      }
+    >
       <PaymentPageContent />
     </Suspense>
   );
 };
 
 export default PaymentPage;
-
-

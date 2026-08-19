@@ -1,0 +1,121 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"vcs": {
+		"enabled": false
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"ignore": [
+			".next",
+			"node_modules",
+			"dist",
+			"out",
+			"build",
+			"coverage",
+			"*.js"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "space",
+		"indentWidth": 2,
+		"lineWidth": 100,
+		"bracketSpacing": true
+	},
+	"organizeImports": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"correctness": {
+				"noUnusedVariables": "warn",
+				"noUnusedImports": "error",
+				"noUndeclaredVariables": "error",
+				"noInvalidUseBeforeDeclaration": "error",
+				"noPrecisionLoss": "error",
+				"noUnreachable": "error"
+			},
+			"style": {
+				"noNonNullAssertion": "off",
+				"noNegationElse": "warn",
+				"useConst": "error",
+				"useTemplate": "error",
+				"useImportType": "error",
+				"noParameterAssign": "error",
+				"useExponentiationOperator": "error",
+				"noUnusedTemplateLiteral": "error",
+				"noUselessElse": "warn",
+				"noParameterProperties": "off",
+				"useConsistentArrayType": "error",
+				"useShorthandArrayType": "error"
+			},
+			"complexity": {
+				"noExtraBooleanCast": "error",
+				"noMultipleSpacesInRegularExpressionLiterals": "error",
+				"noStaticOnlyClass": "warn",
+				"useOptionalChain": "error",
+				"useFlatMap": "error",
+				"noBannedTypes": "error",
+				"useLiteralKeys": "error",
+				"noUselessCatch": "error",
+				"noUselessConstructor": "error",
+				"noUselessSwitchCase": "warn",
+				"noUselessThisAlias": "error"
+			},
+			"suspicious": {
+				"noExplicitAny": "warn",
+				"noArrayIndexKey": "warn",
+				"noRedeclare": "error",
+				"noShadowRestrictedNames": "error",
+				"noUnsafeNegation": "error",
+				"noGlobalIsNan": "error",
+				"noControlCharactersInRegex": "error",
+				"noMisleadingCharacterClass": "error",
+				"noImplicitAnyLet": "warn",
+				"noDebugger": "error",
+				"noDoubleEquals": "error"
+			},
+			"performance": {
+				"noReExportAll": "warn"
+			},
+			"security": {
+				"noDangerouslySetInnerHtml": "error"
+			},
+			"nursery": {
+				"noSecrets": "warn",
+				"noRestrictedTypes": "error",
+				"useConsistentCurlyBraces": "error"
+			},
+			"a11y": {
+				"noSvgWithoutTitle": "off",
+				"useButtonType": "warn"
+			}
+		}
+	},
+	"javascript": {
+		"globals": ["React", "next"],
+		"parser": {
+			"unsafeParameterDecoratorsEnabled": false
+		},
+		"formatter": {
+			"quoteStyle": "double",
+			"trailingCommas": "es5",
+			"semicolons": "always",
+			"arrowParentheses": "always",
+			"bracketSameLine": false,
+			"bracketSpacing": true,
+			"indentStyle": "space",
+			"indentWidth": 2,
+			"lineWidth": 100
+		}
+	},
+	"json": {
+		"formatter": {
+			"indentStyle": "space",
+			"indentWidth": 2,
+			"lineWidth": 100
+		}
+	}
+}

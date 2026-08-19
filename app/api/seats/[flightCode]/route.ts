@@ -1,5 +1,5 @@
 // app/api/seats/[flightCode]/route.ts
-import { LegacySeatMapRecord } from "@/types/seat-type";
+import type { LegacySeatMapRecord } from "@/types/seat-type";
 import { NextResponse } from "next/server";
 
 // 👉 DATA GHÉP TỪ DATA BẠN ĐÃ GỬI
@@ -1522,10 +1522,7 @@ const seatsData: LegacySeatMapRecord = {
     ],
   },
 };
-export async function GET(
-  req: Request,
-  context: { params: Promise<{ flightCode: string }> }
-) {
+export async function GET(_req: Request, context: { params: Promise<{ flightCode: string }> }) {
   const { flightCode } = await context.params;
 
   if (!seatsData[flightCode]) {

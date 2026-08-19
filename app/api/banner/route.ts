@@ -1,8 +1,8 @@
 // app/api/banner/route.ts
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 const bannerHomeApi = {
-  title:"Wellcome to Wanderlust",
+  title: "Wellcome to Wanderlust",
   name: "banner-home",
   url: "/banner.png",
 };

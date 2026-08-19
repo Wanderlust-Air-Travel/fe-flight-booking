@@ -5,10 +5,10 @@
 
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import type {
-    CreateReservationRequest,
-    CreateReservationResponse,
-    CreateBookingRequest,
-    CreateBookingResponse,
+  CreateBookingRequest,
+  CreateBookingResponse,
+  CreateReservationRequest,
+  CreateReservationResponse,
 } from "@/types/booking-service-type";
 
 export type { CreateReservationResponse } from "@/types/booking-service-type";
@@ -17,52 +17,49 @@ export type { CreateReservationResponse } from "@/types/booking-service-type";
  * Create a new reservation
  */
 export async function createReservation(
-    data: CreateReservationRequest,
-    accessToken?: string
+  data: CreateReservationRequest,
+  accessToken?: string
 ): Promise<CreateReservationResponse> {
-    const headers: Record<string, string> = {};
+  const headers: Record<string, string> = {};
 
-    if (accessToken) {
-        // Authenticated user: chỉ dựa vào JWT, không gửi X-Session-Id để tránh BE hiểu nhầm là guest
-        headers["Authorization"] = `Bearer ${accessToken}`;
-    } else if (typeof window !== "undefined") {
-        // Guest: gửi X-Session-Id nếu có
-        const sessionId = sessionStorage.getItem("guest_session_id");
-        if (sessionId) {
-            headers["X-Session-Id"] = sessionId;
-        }
+  if (accessToken) {
+    // Authenticated user: chỉ dựa vào JWT, không gửi X-Session-Id để tránh BE hiểu nhầm là guest
+    headers.Authorization = `Bearer ${accessToken}`;
+  } else if (typeof window !== "undefined") {
+    // Guest: gửi X-Session-Id nếu có
+    const sessionId = sessionStorage.getItem("guest_session_id");
+    if (sessionId) {
+      headers["X-Session-Id"] = sessionId;
     }
+  }
 
-    const axiosClient = accessToken ? axiosInstance : axiosPublic;
-    const response = await axiosClient.post<CreateReservationResponse>(
-        "/api/reservations",
-        data,
-        { headers }
-    );
+  const axiosClient = accessToken ? axiosInstance : axiosPublic;
+  const response = await axiosClient.post<CreateReservationResponse>("/api/reservations", data, {
+    headers,
+  });
 
-    return response.data;
+  return response.data;
 }
 
 /**
  * Create a booking from reservation
  */
 export async function createBooking(
-    reservationId: string,
-    data: CreateBookingRequest,
-    accessToken?: string
+  reservationId: string,
+  data: CreateBookingRequest,
+  accessToken?: string
 ): Promise<CreateBookingResponse> {
-    const headers: Record<string, string> = {};
-    
-    if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
-    }
+  const headers: Record<string, string> = {};
 
-    const response = await axiosInstance.post<CreateBookingResponse>(
-        `/api/bookings?reservationId=${reservationId}`,
-        data,
-        { headers }
-    );
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
 
-    return response.data;
+  const response = await axiosInstance.post<CreateBookingResponse>(
+    `/api/bookings?reservationId=${reservationId}`,
+    data,
+    { headers }
+  );
+
+  return response.data;
 }
-

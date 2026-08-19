@@ -1,11 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-const BACKEND_API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const BACKEND_API_URL =
+  process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 // Mock booking data for fallback
 const generateMockBooking = (bookingId: string) => ({
   id: bookingId,
-  code: `BK${bookingId?.slice(-6)?.toUpperCase() || '123456'}`,
+  code: `BK${bookingId?.slice(-6)?.toUpperCase() || "123456"}`,
   status: "CONFIRMED",
   passengers: [
     {
@@ -26,7 +27,11 @@ const generateMockBooking = (bookingId: string) => ({
       id: "fl_001",
       flightNumber: "VN123",
       origin: { code: "HAN", name: "Noi Bai International Airport", city: "Hanoi" },
-      destination: { code: "SGN", name: "Tan Son Nhat International Airport", city: "Ho Chi Minh City" },
+      destination: {
+        code: "SGN",
+        name: "Tan Son Nhat International Airport",
+        city: "Ho Chi Minh City",
+      },
       departureTime: "2026-06-15T08:00:00Z",
       arrivalTime: "2026-06-15T10:30:00Z",
       duration: "2h 30m",
@@ -50,7 +55,7 @@ const generateMockBooking = (bookingId: string) => ({
 
 /**
  * GET /api/bookings/[bookingId]
- * 
+ *
  * Proxy request to Go backend to get booking details
  * Falls back to mock data if backend is unavailable
  */
@@ -71,9 +76,9 @@ export async function GET(
 
     if (!bookingId) {
       return NextResponse.json(
-        { 
+        {
           message: "Booking ID is required. Please ensure you have a valid booking ID.",
-          error: "MISSING_BOOKING_ID"
+          error: "MISSING_BOOKING_ID",
         },
         { status: 400 }
       );
@@ -84,9 +89,9 @@ export async function GET(
     const backendHeaders: Record<string, string> = {
       "Content-Type": "application/json",
     };
-    
+
     if (authHeader) {
-      backendHeaders["Authorization"] = authHeader;
+      backendHeaders.Authorization = authHeader;
     }
 
     const response = await fetch(
@@ -99,11 +104,14 @@ export async function GET(
 
     if (response.status === 404) {
       console.log(`[API /api/bookings/${bookingId}] Backend returned 404, returning mock data`);
-      return NextResponse.json({
-        data: generateMockBooking(bookingId),
-        success: true,
-        _mock: true,
-      }, { status: 200 });
+      return NextResponse.json(
+        {
+          data: generateMockBooking(bookingId),
+          success: true,
+          _mock: true,
+        },
+        { status: 200 }
+      );
     }
 
     const data = await response.json();
@@ -124,10 +132,13 @@ export async function GET(
       bookingId = bookingsIndex !== -1 ? pathParts[bookingsIndex + 1] : undefined;
     }
     // Return mock data on connection error
-    return NextResponse.json({
-      data: generateMockBooking(bookingId || "unknown"),
-      success: true,
-      _mock: true,
-    }, { status: 200 });
+    return NextResponse.json(
+      {
+        data: generateMockBooking(bookingId || "unknown"),
+        success: true,
+        _mock: true,
+      },
+      { status: 200 }
+    );
   }
 }

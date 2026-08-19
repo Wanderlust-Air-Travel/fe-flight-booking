@@ -3,157 +3,152 @@
  * Separates business logic from UI components
  */
 
-import { useState, useCallback, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { createReservation, createBooking, type CreateReservationResponse } from "@/lib/services/booking-service";
 import { getFlightDate } from "@/lib/passenger-utils";
+import {
+  type CreateReservationResponse,
+  createBooking,
+  createReservation,
+} from "@/lib/services/booking-service";
 import { getInitialBookingValues, transformBookingData } from "@/lib/utils/booking-utils";
 import type { BookingFormData } from "@/types/booking-form-type";
 import type { UseBookingInfoParams, UseBookingInfoReturn } from "@/types/use-booking-info-type";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Main business logic hook for booking info page
  */
 export function useBookingInfo({
-    flightInstanceId,
-    reservationIdFromUrl,
-    accessToken,
-    user,
-    ticketData,
-    searchBarData,
-    isAuthHydrated,
+  flightInstanceId,
+  reservationIdFromUrl,
+  accessToken,
+  user,
+  ticketData,
+  searchBarData,
+  isAuthHydrated,
 }: UseBookingInfoParams): UseBookingInfoReturn {
-    const router = useRouter();
-    const [reservationId, setReservationId] = useState<string | null>(reservationIdFromUrl || null);
-    const [reservationData, setReservationData] = useState<CreateReservationResponse | null>(null);
-    const [isCreatingReservation, setIsCreatingReservation] = useState(false);
-    const [isCreatingBooking, setIsCreatingBooking] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const hasCreatedReservationRef = useRef<boolean>(false);
+  const router = useRouter();
+  const [reservationId, setReservationId] = useState<string | null>(reservationIdFromUrl || null);
+  const [reservationData, setReservationData] = useState<CreateReservationResponse | null>(null);
+  const [isCreatingReservation, setIsCreatingReservation] = useState(false);
+  const [isCreatingBooking, setIsCreatingBooking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const hasCreatedReservationRef = useRef<boolean>(false);
 
-    const flightDate = getFlightDate(ticketData);
-    const numberOfPassengers = searchBarData?.totalPerson || 1;
-    const initialValues = getInitialBookingValues(user, numberOfPassengers);
+  const flightDate = getFlightDate(ticketData);
+  const numberOfPassengers = searchBarData?.totalPerson || 1;
+  const initialValues = getInitialBookingValues(user, numberOfPassengers);
 
-    // Create reservation when component mounts (idempotent: nếu URL đã có reservationId thì không tạo lại)
-    useEffect(() => {
-        // Chờ cho đến khi trạng thái auth đã hydrate xong.
-        // Tránh call API như guest trong khi user thực tế đã đăng nhập (F5 trên /booking/info).
-        if (!isAuthHydrated) return;
+  // Create reservation when component mounts (idempotent: nếu URL đã có reservationId thì không tạo lại)
+  useEffect(() => {
+    // Chờ cho đến khi trạng thái auth đã hydrate xong.
+    // Tránh call API như guest trong khi user thực tế đã đăng nhập (F5 trên /booking/info).
+    if (!isAuthHydrated) return;
 
-        // Prevent multiple fetches - only fetch once on mount
-        if (hasCreatedReservationRef.current) return;
+    // Prevent multiple fetches - only fetch once on mount
+    if (hasCreatedReservationRef.current) return;
 
-        if (!flightInstanceId) {
-            setError("Please select a flight");
-            return;
+    if (!flightInstanceId) {
+      setError("Please select a flight");
+      return;
+    }
+
+    // Nếu URL đã có reservationId → không tạo lại reservation, chỉ dùng id đó
+    if (reservationIdFromUrl) {
+      hasCreatedReservationRef.current = true;
+      setReservationId(reservationIdFromUrl);
+      return;
+    }
+
+    hasCreatedReservationRef.current = true;
+
+    const createReservationAsync = async () => {
+      setIsCreatingReservation(true);
+      setError(null);
+
+      try {
+        const response = await createReservation(
+          {
+            segments: [
+              {
+                flightInstanceId,
+                segmentType: "outbound",
+              },
+            ],
+            numberOfPassengers,
+            currencyCode: "VND",
+          },
+          accessToken || undefined
+        );
+
+        if (response?.reservationId) {
+          setReservationId(response.reservationId);
+          setReservationData(response);
+
+          // Cập nhật URL để chứa reservationId, giúp F5 không tạo reservation lần nữa
+          if (typeof window !== "undefined" && flightInstanceId) {
+            const params = new URLSearchParams(window.location.search);
+            params.set("flightInstanceId", flightInstanceId);
+            params.set("reservationId", response.reservationId);
+            router.replace(`/booking/info?${params.toString()}`);
+          }
+        } else {
+          setError("Failed to create reservation");
+          // Reset ref on error so user can retry
+          hasCreatedReservationRef.current = false;
         }
-
-        // Nếu URL đã có reservationId → không tạo lại reservation, chỉ dùng id đó
-        if (reservationIdFromUrl) {
-            hasCreatedReservationRef.current = true;
-            setReservationId(reservationIdFromUrl);
-            return;
-        }
-
-        hasCreatedReservationRef.current = true;
-
-        const createReservationAsync = async () => {
-            setIsCreatingReservation(true);
-            setError(null);
-
-            try {
-                const response = await createReservation(
-                    {
-                        segments: [
-                            {
-                                flightInstanceId,
-                                segmentType: "outbound",
-                            },
-                        ],
-                        numberOfPassengers,
-                        currencyCode: "VND",
-                    },
-                    accessToken || undefined
-                );
-
-                if (response?.reservationId) {
-                    setReservationId(response.reservationId);
-                    setReservationData(response);
-
-                    // Cập nhật URL để chứa reservationId, giúp F5 không tạo reservation lần nữa
-                    if (typeof window !== "undefined" && flightInstanceId) {
-                        const params = new URLSearchParams(window.location.search);
-                        params.set("flightInstanceId", flightInstanceId);
-                        params.set("reservationId", response.reservationId);
-                        router.replace(`/booking/info?${params.toString()}`);
-                    }
-                } else {
-                    setError("Failed to create reservation");
-                    // Reset ref on error so user can retry
-                    hasCreatedReservationRef.current = false;
-                }
-            } catch (err: any) {
-                console.error("Error creating reservation:", err);
-                setError(
-                    err.response?.data?.message ||
-                        err.message ||
-                        "Failed to create reservation"
-                );
-                // Reset ref on error so user can retry
-                hasCreatedReservationRef.current = false;
-            } finally {
-                setIsCreatingReservation(false);
-            }
-        };
-
-        createReservationAsync();
-    }, [accessToken, flightInstanceId, numberOfPassengers, isAuthHydrated]);
-
-    const handleSubmit = useCallback(
-        async (values: BookingFormData) => {
-            if (!reservationId) {
-                setError("Reservation not found");
-                return;
-            }
-
-            setIsCreatingBooking(true);
-            setError(null);
-
-            try {
-                const bookingData = transformBookingData(values);
-                const response = await createBooking(reservationId, bookingData, accessToken || undefined);
-
-                if (response?.bookingId) {
-                    // Sau khi tạo booking thành công → chuyển sang trang Payment
-                    // Booking ID được truyền qua query param để FE stateless, BE là source of truth
-                    router.push(`/booking/payment?bookingId=${response.bookingId}`);
-                } else {
-                    setError("Failed to create booking");
-                }
-            } catch (err: any) {
-                console.error("Error creating booking:", err);
-                setError(
-                    err.response?.data?.message ||
-                        err.message ||
-                        "Failed to create booking"
-                );
-            } finally {
-                setIsCreatingBooking(false);
-            }
-        },
-        [reservationId, router, accessToken]
-    );
-
-    return {
-        reservationId,
-        reservationData,
-        isCreatingReservation,
-        isCreatingBooking,
-        error,
-        handleSubmit,
-        initialValues,
-        flightDate,
+      } catch (err: any) {
+        console.error("Error creating reservation:", err);
+        setError(err.response?.data?.message || err.message || "Failed to create reservation");
+        // Reset ref on error so user can retry
+        hasCreatedReservationRef.current = false;
+      } finally {
+        setIsCreatingReservation(false);
+      }
     };
-}
 
+    createReservationAsync();
+  }, [accessToken, flightInstanceId, numberOfPassengers, isAuthHydrated]);
+
+  const handleSubmit = useCallback(
+    async (values: BookingFormData) => {
+      if (!reservationId) {
+        setError("Reservation not found");
+        return;
+      }
+
+      setIsCreatingBooking(true);
+      setError(null);
+
+      try {
+        const bookingData = transformBookingData(values);
+        const response = await createBooking(reservationId, bookingData, accessToken || undefined);
+
+        if (response?.bookingId) {
+          // Sau khi tạo booking thành công → chuyển sang trang Payment
+          // Booking ID được truyền qua query param để FE stateless, BE là source of truth
+          router.push(`/booking/payment?bookingId=${response.bookingId}`);
+        } else {
+          setError("Failed to create booking");
+        }
+      } catch (err: any) {
+        console.error("Error creating booking:", err);
+        setError(err.response?.data?.message || err.message || "Failed to create booking");
+      } finally {
+        setIsCreatingBooking(false);
+      }
+    },
+    [reservationId, router, accessToken]
+  );
+
+  return {
+    reservationId,
+    reservationData,
+    isCreatingReservation,
+    isCreatingBooking,
+    error,
+    handleSubmit,
+    initialValues,
+    flightDate,
+  };
+}

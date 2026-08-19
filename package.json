@@ -6,7 +6,9 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "biome check ./app/ ./components/ ./lib/ ./hooks/",
+    "lint:fix": "biome check --write ./app/ ./components/ ./lib/ ./hooks/",
+    "lint:all": "biome check ./ && biome check ./app/ ./components/ ./lib/ ./hooks/",
     "update:browser-data": "npm install --save-dev baseline-browser-mapping@latest caniuse-lite@latest && npx update-browserslist-db@latest"
   },
   "dependencies": {
@@ -48,6 +50,7 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.555.0",
     "next": "16.0.1",
+    "next-intl": "^4.13.7",
     "next-themes": "^0.4.6",
     "react": "19.2.0",
     "react-date-range": "^2.0.1",
@@ -67,6 +70,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@tailwindcss/postcss": "^4",
     "@types/aos": "^3.0.7",
     "@types/node": "^20",

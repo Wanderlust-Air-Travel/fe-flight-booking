@@ -1,9 +1,9 @@
 // app/zustand/storeFightSearchBar.ts
 "use client";
 
-import { FightSearchBarStoreState } from "@/types/fight-search-bar";
+import type { FightSearchBarStoreState } from "@/types/fight-search-bar";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 const useFightSearchBarStore = create<FightSearchBarStoreState>()(
   persist(

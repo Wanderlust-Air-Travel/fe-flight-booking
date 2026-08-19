@@ -1,11 +1,11 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { useState, Suspense } from "react";
-import axiosInstance from "@/lib/axios-instance";
-import { Button } from "@/components/ui/button";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
-import { Check, X, AlertCircle, Loader2, CreditCard } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import axiosInstance from "@/lib/axios-instance";
+import { AlertCircle, Check, CreditCard, Loader2, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
 const DevPaymentPageContent = () => {
   const searchParams = useSearchParams();
@@ -32,11 +32,7 @@ const DevPaymentPageContent = () => {
       }
     } catch (err: any) {
       console.error("Error sending dev webhook:", err);
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Failed to send dev payment result"
-      );
+      setError(err?.response?.data?.message || err?.message || "Failed to send dev payment result");
     } finally {
       setSubmitting(false);
     }
@@ -54,9 +50,7 @@ const DevPaymentPageContent = () => {
                   <AlertCircle className="w-5 h-5 text-[var(--cl-red)]" />
                 </div>
                 <div>
-                  <h1 className="text-base font-bold text-gray-900">
-                    Payment ID missing
-                  </h1>
+                  <h1 className="text-base font-bold text-gray-900">Payment ID missing</h1>
                   <p className="text-[var(--cl-gray)] text-sm mt-0.5">
                     Start the payment flow again from checkout.
                   </p>
@@ -86,9 +80,7 @@ const DevPaymentPageContent = () => {
                   <span className="inline-block text-[10px] font-semibold uppercase tracking-widest text-white/80 mb-0.5">
                     Dev only
                   </span>
-                  <h1 className="text-lg font-bold text-white tracking-tight">
-                    Payment Simulator
-                  </h1>
+                  <h1 className="text-lg font-bold text-white tracking-tight">Payment Simulator</h1>
                 </div>
               </div>
             </div>

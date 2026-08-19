@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { SearchOption, SearchOptionsTabsProps } from "@/types/search-options-tabs-type";
+import type { SearchOption, SearchOptionsTabsProps } from "@/types/search-options-tabs-type";
 
 const SearchOptionsTabs = ({ activeOption, onOptionChange }: SearchOptionsTabsProps) => {
   // These tabs are only used in check-in page, not on landing page
@@ -16,7 +16,7 @@ const SearchOptionsTabs = ({ activeOption, onOptionChange }: SearchOptionsTabsPr
 
   return (
     <div className="flex items-center gap-0 border-b border-gray-200">
-      {visibleOptions.map((option, index) => (
+      {visibleOptions.map((option, _index) => (
         <button
           key={option.value}
           type="button"
@@ -37,4 +37,3 @@ const SearchOptionsTabs = ({ activeOption, onOptionChange }: SearchOptionsTabsPr
 };
 
 export default SearchOptionsTabs;
-

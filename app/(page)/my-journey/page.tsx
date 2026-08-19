@@ -1,57 +1,61 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb"
-import axiosInstance from "@/lib/axios-instance"
-import { convertToDMY, convertToLocalTime } from "@/app/components/FormatDate/FormatDate"
-import { Plane, Calendar, MapPin, Users, Ticket as TicketIcon, XCircle, X } from "lucide-react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import type { MyJourneyResponse } from "@/types/my-journey-type"
+import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
+import { convertToDMY, convertToLocalTime } from "@/app/components/FormatDate/FormatDate";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import axiosInstance from "@/lib/axios-instance";
+import type { MyJourneyResponse } from "@/types/my-journey-type";
+import { Calendar, MapPin, Plane, Users, X, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const MyJourneyPage = () => {
-  const [data, setData] = useState<MyJourneyResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [cancellingId, setCancellingId] = useState<string | null>(null)
+  const [data, setData] = useState<MyJourneyResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchJourneys = async () => {
       try {
-        setLoading(true)
-        setError(null)
-        const response = await axiosInstance.get("/api/bookings/my-journey")
-        setData(response.data)
+        setLoading(true);
+        setError(null);
+        const response = await axiosInstance.get("/api/bookings/my-journey");
+        setData(response.data);
       } catch (err: any) {
-        console.error("Error fetching journeys:", err)
-        setError(err.response?.data?.message || "Không thể tải lịch sử hành trình. Vui lòng thử lại sau.")
+        console.error("Error fetching journeys:", err);
+        setError(
+          err.response?.data?.message || "Không thể tải lịch sử hành trình. Vui lòng thử lại sau."
+        );
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchJourneys()
-  }, [])
+    fetchJourneys();
+  }, []);
 
   const handleCancelBooking = async (bookingId: string) => {
-    if (!confirm("Bạn có chắc chắn muốn hủy đặt chỗ này không? Hành động này không thể hoàn tác.")) {
-      return
+    if (
+      !confirm("Bạn có chắc chắn muốn hủy đặt chỗ này không? Hành động này không thể hoàn tác.")
+    ) {
+      return;
     }
 
     try {
-      setCancellingId(bookingId)
-      await axiosInstance.patch(`/api/bookings/${bookingId}/cancel`)
-      alert("Hủy đặt chỗ thành công!")
+      setCancellingId(bookingId);
+      await axiosInstance.patch(`/api/bookings/${bookingId}/cancel`);
+      alert("Hủy đặt chỗ thành công!");
       // Refresh the journeys list
-      const response = await axiosInstance.get("/api/bookings/my-journey")
-      setData(response.data)
+      const response = await axiosInstance.get("/api/bookings/my-journey");
+      setData(response.data);
     } catch (err: any) {
-      console.error("Error cancelling booking:", err)
-      alert(err.response?.data?.message || "Không thể hủy đặt chỗ. Vui lòng thử lại sau.")
+      console.error("Error cancelling booking:", err);
+      alert(err.response?.data?.message || "Không thể hủy đặt chỗ. Vui lòng thử lại sau.");
     } finally {
-      setCancellingId(null)
+      setCancellingId(null);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -60,13 +64,13 @@ const MyJourneyPage = () => {
         <div className="container py-[4rem]">
           <div className="flex justify-center items-center min-h-[50vh]">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--cl-pri)] mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--cl-pri)] mx-auto mb-4" />
               <p className="text-lg text-[var(--cl-pri)]">Đang tải...</p>
             </div>
           </div>
         </div>
       </main>
-    )
+    );
   }
 
   if (error) {
@@ -82,7 +86,7 @@ const MyJourneyPage = () => {
           </div>
         </div>
       </main>
-    )
+    );
   }
 
   if (!data || data.journeys.length === 0) {
@@ -98,7 +102,7 @@ const MyJourneyPage = () => {
           </div>
         </div>
       </main>
-    )
+    );
   }
 
   return (
@@ -106,13 +110,20 @@ const MyJourneyPage = () => {
       <Breadcrumb />
       <div className="container py-6 sm:py-8 lg:py-[4rem]">
         <div className="mb-6 sm:mb-8 lg:mb-[3rem]">
-          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-[var(--cl-pri)] mb-2">Hành trình của tôi</h1>
-          <p className="text-base sm:text-lg lg:text-xl text-gray-600">Tổng số hành trình: {data.totalJourneys}</p>
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-[var(--cl-pri)] mb-2">
+            Hành trình của tôi
+          </h1>
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600">
+            Tổng số hành trình: {data.totalJourneys}
+          </p>
         </div>
 
         <div className="grid gap-4 md:gap-6">
           {data.journeys.map((journey) => (
-            <Card key={journey.journeyId} className="p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
+            <Card
+              key={journey.journeyId}
+              className="p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow"
+            >
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
                 {/* Left: Journey Info */}
                 <div className="flex-1">
@@ -124,15 +135,20 @@ const MyJourneyPage = () => {
                     <div className="px-3 py-1 rounded-full bg-[var(--cl-pri)] text-white text-sm sm:text-base font-medium">
                       {journey.pnrCode}
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-sm sm:text-base font-medium ${
-                      journey.status === 'confirmed' 
-                        ? 'bg-green-100 text-green-800' 
-                        : journey.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {journey.status === 'confirmed' ? 'Đã xác nhận' : 
-                       journey.status === 'pending' ? 'Đang chờ' : journey.status}
+                    <div
+                      className={`px-3 py-1 rounded-full text-sm sm:text-base font-medium ${
+                        journey.status === "confirmed"
+                          ? "bg-green-100 text-green-800"
+                          : journey.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {journey.status === "confirmed"
+                        ? "Đã xác nhận"
+                        : journey.status === "pending"
+                          ? "Đang chờ"
+                          : journey.status}
                     </div>
                     {journey.isDomestic && (
                       <div className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm sm:text-base font-medium">
@@ -163,7 +179,9 @@ const MyJourneyPage = () => {
                         <MapPin className="w-4 h-4 text-[var(--cl-pri)]" />
                         <span className="text-sm text-gray-600">Điểm đến</span>
                       </div>
-                      <p className="font-semibold text-base sm:text-lg">{journey.destinationCity}</p>
+                      <p className="font-semibold text-base sm:text-lg">
+                        {journey.destinationCity}
+                      </p>
                       <p className="text-sm text-gray-600">{journey.destinationAirportName}</p>
                       <p className="text-sm text-gray-500">({journey.destinationAirport})</p>
                     </div>
@@ -176,7 +194,9 @@ const MyJourneyPage = () => {
                         <p className="text-gray-600">Ngày khởi hành</p>
                       </div>
                       <p className="font-semibold">{convertToDMY(journey.departureDateTime)}</p>
-                      <p className="text-gray-500">{convertToLocalTime(journey.departureDateTime)}</p>
+                      <p className="text-gray-500">
+                        {convertToLocalTime(journey.departureDateTime)}
+                      </p>
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
@@ -205,7 +225,7 @@ const MyJourneyPage = () => {
 
                 {/* Right: Actions */}
                 <div className="md:w-[15rem] border-t mt-4 pt-4 md:mt-0 md:border-t-0 md:border-l md:pl-6 md:pt-0">
-                  {(journey.status === 'confirmed' || journey.status === 'pending') && (
+                  {(journey.status === "confirmed" || journey.status === "pending") && (
                     <Button
                       variant="destructive"
                       size="sm"
@@ -223,7 +243,7 @@ const MyJourneyPage = () => {
                       )}
                     </Button>
                   )}
-                  {journey.status === 'cancelled' && (
+                  {journey.status === "cancelled" && (
                     <div className="text-center">
                       <p className="text-sm text-red-600 font-medium">Đã hủy</p>
                     </div>
@@ -235,8 +255,7 @@ const MyJourneyPage = () => {
         </div>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default MyJourneyPage
-
+export default MyJourneyPage;

@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
-import { Button } from "@/components/ui/button";
-import useUserStore from "@/app/zustand/storeUser";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
-import { CheckCircle2, Calendar, MapPin, Clock, User, CreditCard, Package } from "lucide-react";
+import useUserStore from "@/app/zustand/storeUser";
+import { Button } from "@/components/ui/button";
+import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import type { BookingDetails, PaymentDetails } from "@/types/confirmation-page-type";
+import { Calendar, CheckCircle2, Clock, CreditCard, MapPin, Package, User } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 const ConfirmationPageContent = () => {
   const searchParams = useSearchParams();
@@ -33,7 +33,7 @@ const ConfirmationPageContent = () => {
 
       try {
         // Try with authenticated client first if user is logged in
-        let axiosClient = accessToken ? axiosInstance : axiosPublic;
+        const axiosClient = accessToken ? axiosInstance : axiosPublic;
         let bookingResponse;
         let usedPublicClient = false;
 
@@ -46,15 +46,17 @@ const ConfirmationPageContent = () => {
           // try again with public client (for guest bookings)
           if (
             accessToken &&
-            (err?.response?.data?.message?.includes("Booking does not belong to the current user") ||
-             err?.response?.data?.message?.includes("does not belong"))
+            (err?.response?.data?.message?.includes(
+              "Booking does not belong to the current user"
+            ) ||
+              err?.response?.data?.message?.includes("does not belong"))
           ) {
             console.log("Retrying with public client for guest booking...");
             try {
               bookingResponse = await axiosPublic.get(`/api/bookings/${bookingId}`);
               setBooking(bookingResponse.data);
               usedPublicClient = true; // Mark that we used public client
-            } catch (retryErr: any) {
+            } catch (_retryErr: any) {
               // If retry also fails, throw the original error
               throw err;
             }
@@ -182,7 +184,8 @@ const ConfirmationPageContent = () => {
                   Booking Confirmed
                 </h1>
                 <p className="text-sm sm:text-base md:text-lg text-white/80 mt-2">
-                  Your Wanderlust Airways trip is ready. A confirmation email has been sent to your inbox.
+                  Your Wanderlust Airways trip is ready. A confirmation email has been sent to your
+                  inbox.
                 </p>
               </div>
             </div>
@@ -213,7 +216,9 @@ const ConfirmationPageContent = () => {
                 </div>
                 <div className="flex justify-between items-center text-sm sm:text-base md:text-lg gap-4">
                   <span className="text-gray-600 shrink-0">Booking ID:</span>
-                  <span className="font-mono text-[0.75rem] sm:text-sm text-gray-800 break-all">{booking.bookingId}</span>
+                  <span className="font-mono text-[0.75rem] sm:text-sm text-gray-800 break-all">
+                    {booking.bookingId}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center text-sm sm:text-base md:text-lg gap-4">
                   <span className="text-gray-600 shrink-0">Status:</span>
@@ -238,7 +243,7 @@ const ConfirmationPageContent = () => {
                   Flight Details
                 </h2>
                 <div className="space-y-6">
-                  {booking.segments.map((segment, index) => (
+                  {booking.segments.map((segment, _index) => (
                     <div
                       key={segment.segmentId}
                       className="border-b border-dashed border-[var(--cl-third)]/40 pb-4 last:border-b-0 last:pb-0"
@@ -246,7 +251,8 @@ const ConfirmationPageContent = () => {
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3">
                         <div className="flex-1">
                           <p className="font-semibold text-lg text-[var(--cl-pri)]">
-                            {segment.flightInstance.origin.cityName} ({segment.flightInstance.origin.airportCode})
+                            {segment.flightInstance.origin.cityName} (
+                            {segment.flightInstance.origin.airportCode})
                           </p>
                           <p className="text-sm text-gray-600">
                             {segment.flightInstance.origin.airportName}
@@ -259,7 +265,8 @@ const ConfirmationPageContent = () => {
                         </div>
                         <div className="flex-1 text-right">
                           <p className="font-semibold text-lg text-[var(--cl-pri)]">
-                            {segment.flightInstance.destination.cityName} ({segment.flightInstance.destination.airportCode})
+                            {segment.flightInstance.destination.cityName} (
+                            {segment.flightInstance.destination.airportCode})
                           </p>
                           <p className="text-sm text-gray-600">
                             {segment.flightInstance.destination.airportName}
@@ -272,7 +279,8 @@ const ConfirmationPageContent = () => {
                             Departure
                           </p>
                           <p className="font-semibold text-[var(--cl-pri)] text-base md:text-lg">
-                            {formatDate(segment.flightInstance.departureDatetimeLocal)} at {formatTime(segment.flightInstance.departureDatetimeLocal)}
+                            {formatDate(segment.flightInstance.departureDatetimeLocal)} at
+                            {formatTime(segment.flightInstance.departureDatetimeLocal)}
                           </p>
                         </div>
                         <div>
@@ -280,30 +288,38 @@ const ConfirmationPageContent = () => {
                             Arrival
                           </p>
                           <p className="font-semibold text-[var(--cl-pri)] text-base md:text-lg">
-                            {formatDate(segment.flightInstance.arrivalDatetimeLocal)} at {formatTime(segment.flightInstance.arrivalDatetimeLocal)}
+                            {formatDate(segment.flightInstance.arrivalDatetimeLocal)} at
+                            {formatTime(segment.flightInstance.arrivalDatetimeLocal)}
                           </p>
                         </div>
                       </div>
                       <div className="mt-5 flex flex-wrap items-center gap-5 text-base">
                         <div>
                           <p className="text-sm text-gray-500 font-medium">Flight Number</p>
-                          <p className="font-semibold text-[var(--cl-pri)]">{segment.flightInstance.flight.flightNumber}</p>
+                          <p className="font-semibold text-[var(--cl-pri)]">
+                            {segment.flightInstance.flight.flightNumber}
+                          </p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 font-medium">Cabin Class</p>
-                          <p className="font-semibold text-[var(--cl-pri)]">{segment.fareClass.fareClassName}</p>
+                          <p className="font-semibold text-[var(--cl-pri)]">
+                            {segment.fareClass.fareClassName}
+                          </p>
                         </div>
                         {segment.flightSeat && (
                           <div>
                             <p className="text-sm text-gray-500 font-medium">Seat</p>
-                            <p className="font-semibold text-[var(--cl-pri)]">{segment.flightSeat.seatNumber}</p>
+                            <p className="font-semibold text-[var(--cl-pri)]">
+                              {segment.flightSeat.seatNumber}
+                            </p>
                           </div>
                         )}
                       </div>
                       <div className="mt-5 p-4 bg-[var(--cl-pri)]/5 border border-[var(--cl-pri)]/10 rounded-lg">
                         <p className="text-base text-[var(--cl-pri)]">
                           <Clock className="w-5 h-5 inline mr-1" />
-                          <strong>Recommended Check-in Time:</strong> {getRecommendedCheckInTime(segment.flightInstance.departureDatetimeLocal)}
+                          <strong>Recommended Check-in Time:</strong>
+                          {getRecommendedCheckInTime(segment.flightInstance.departureDatetimeLocal)}
                         </p>
                       </div>
                       {segment.services && segment.services.length > 0 && (
@@ -317,7 +333,11 @@ const ConfirmationPageContent = () => {
                               <li key={i} className="flex justify-between items-center">
                                 <span>{svc.serviceName ?? svc.serviceType ?? "Dịch vụ"}</span>
                                 <span className="font-medium">
-                                  {svc.isIncluded ? "Đã bao gồm" : (svc.price != null ? `${FormatPrice(svc.price)} ${booking.currencyCode}` : "—")}
+                                  {svc.isIncluded
+                                    ? "Đã bao gồm"
+                                    : svc.price != null
+                                      ? `${FormatPrice(svc.price)} ${booking.currencyCode}`
+                                      : "—"}
                                 </span>
                               </li>
                             ))}
@@ -357,7 +377,9 @@ const ConfirmationPageContent = () => {
                         </div>
                         <div className="col-span-2">
                           <span className="text-gray-500 font-medium">Document Number:</span>
-                          <span className="ml-2 font-mono font-semibold">{passenger.documentNumber}</span>
+                          <span className="ml-2 font-mono font-semibold">
+                            {passenger.documentNumber}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -379,15 +401,21 @@ const ConfirmationPageContent = () => {
                 <div className="space-y-4 text-base md:text-lg">
                   <div className="flex justify-between items-start">
                     <span className="text-gray-500 font-medium shrink-0">Payment ID:</span>
-                    <span className="font-mono text-[0.7rem] sm:text-sm text-gray-800 break-all text-right">{payment.paymentId}</span>
+                    <span className="font-mono text-[0.7rem] sm:text-sm text-gray-800 break-all text-right">
+                      {payment.paymentId}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500 font-medium shrink-0">Status:</span>
-                    <span className={`font-semibold capitalize ${
-                      payment.status === "success" ? "text-green-600" :
-                      payment.status === "failed" ? "text-red-600" :
-                      "text-yellow-600"
-                    }`}>
+                    <span
+                      className={`font-semibold capitalize ${
+                        payment.status === "success"
+                          ? "text-green-600"
+                          : payment.status === "failed"
+                            ? "text-red-600"
+                            : "text-yellow-600"
+                      }`}
+                    >
                       {payment.status}
                     </span>
                   </div>
@@ -404,13 +432,17 @@ const ConfirmationPageContent = () => {
                   {payment.transactionRef && (
                     <div className="flex justify-between items-start">
                       <span className="text-gray-500 font-medium shrink-0">Transaction Ref:</span>
-                      <span className="font-mono text-[0.7rem] sm:text-sm text-gray-800 break-all text-right">{payment.transactionRef}</span>
+                      <span className="font-mono text-[0.7rem] sm:text-sm text-gray-800 break-all text-right">
+                        {payment.transactionRef}
+                      </span>
                     </div>
                   )}
                   {payment.paidAt && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-500 font-medium shrink-0">Paid At:</span>
-                      <span className="font-semibold text-right">{formatDateTime(payment.paidAt)}</span>
+                      <span className="font-semibold text-right">
+                        {formatDateTime(payment.paidAt)}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -420,9 +452,7 @@ const ConfirmationPageContent = () => {
             {/* Contact Information */}
             {(booking.contactFullname || booking.contactEmail || booking.contactPhone) && (
               <div className="bg-white rounded-xl border border-[var(--cl-third)]/40 shadow-sm p-5 sm:p-6 md:p-7">
-                <h2 className="text-xl font-bold text-[var(--cl-pri)] mb-4">
-                  Contact Information
-                </h2>
+                <h2 className="text-xl font-bold text-[var(--cl-pri)] mb-4">Contact Information</h2>
                 <div className="space-y-3 text-base md:text-lg">
                   {booking.contactFullname && (
                     <div className="flex justify-between items-start gap-2">
@@ -433,7 +463,9 @@ const ConfirmationPageContent = () => {
                   {booking.contactEmail && (
                     <div className="flex justify-between items-start gap-2">
                       <span className="text-gray-500 font-medium shrink-0">Email:</span>
-                      <span className="font-semibold text-right break-all">{booking.contactEmail}</span>
+                      <span className="font-semibold text-right break-all">
+                        {booking.contactEmail}
+                      </span>
                     </div>
                   )}
                   {booking.contactPhone && (
@@ -475,20 +507,21 @@ const ConfirmationPageContent = () => {
 
 const ConfirmationPage = () => {
   return (
-    <Suspense fallback={
-      <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
-        <Breadcrumb />
-        <div className="container">
-          <div className="text-center py-[4rem]">
-            <p className="text-lg">Loading...</p>
+    <Suspense
+      fallback={
+        <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
+          <Breadcrumb />
+          <div className="container">
+            <div className="text-center py-[4rem]">
+              <p className="text-lg">Loading...</p>
+            </div>
           </div>
-        </div>
-      </main>
-    }>
+        </main>
+      }
+    >
       <ConfirmationPageContent />
     </Suspense>
   );
 };
 
 export default ConfirmationPage;
-
