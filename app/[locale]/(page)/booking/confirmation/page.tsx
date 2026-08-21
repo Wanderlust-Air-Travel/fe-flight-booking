@@ -2,6 +2,7 @@
 
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
+import PageSuspense from "@/app/components/PageSuspense/PageSuspense";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
 import { type Locale, localizedHref } from "@/i18n/config";
@@ -10,7 +11,7 @@ import type { BookingDetails, PaymentDetails } from "@/types/confirmation-page-t
 import { Calendar, CheckCircle2, Clock, CreditCard, MapPin, Package, User } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const ConfirmationPageContent = () => {
   const searchParams = useSearchParams();
@@ -513,20 +514,9 @@ const ConfirmationPageContent = () => {
 
 const ConfirmationPage = () => {
   return (
-    <Suspense
-      fallback={
-        <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
-          <Breadcrumb />
-          <div className="container">
-            <div className="text-center py-[4rem]">
-              <p className="text-lg">Loading...</p>
-            </div>
-          </div>
-        </main>
-      }
-    >
+    <PageSuspense>
       <ConfirmationPageContent />
-    </Suspense>
+    </PageSuspense>
   );
 };
 

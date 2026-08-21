@@ -4,6 +4,7 @@ import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import { convertToDMY, convertToLocalTime } from "@/app/components/FormatDate/FormatDate";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import MainNavigationTabs from "@/app/components/MainNavigationTabs/MainNavigationTabs";
+import PageSuspense from "@/app/components/PageSuspense/PageSuspense";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,7 +18,7 @@ import { AlertCircle, MapPin, Plane, User } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const MyBookingsPageContent = () => {
   const t = useTranslations("myBookings");
@@ -419,27 +420,10 @@ const MyBookingsPageContent = () => {
 };
 
 const MyBookingsPage = () => {
-  const t = useTranslations("common");
   return (
-    <Suspense
-      fallback={
-        <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)] min-h-screen bg-gray-50">
-          <Breadcrumb />
-          <div className="container flex justify-center items-center py-24">
-            <div className="w-full max-w-md">
-              <div className="bg-white rounded-2xl border border-[var(--cl-six)] shadow-sm p-8">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-12 h-12 rounded-full border-4 border-[var(--cl-pri)] border-t-transparent animate-spin" />
-                  <p className="text-lg text-[var(--cl-pri)] font-semibold">{t("loading")}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-      }
-    >
+    <PageSuspense>
       <MyBookingsPageContent />
-    </Suspense>
+    </PageSuspense>
   );
 };
 

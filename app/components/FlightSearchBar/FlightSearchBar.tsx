@@ -1,4 +1,4 @@
-import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
+import useFlightSearchBarStore from "@/app/zustand/storeFlightSearchBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { axiosPublic } from "@/lib/axios-instance";
@@ -13,7 +13,7 @@ import Person from "../Person/Person";
 import { SelectComponent } from "../Select/SelectComponent";
 
 const FlightSearchBar = () => {
-  const { data, setData } = useFightSearchBarStore();
+  const { data, setData } = useFlightSearchBarStore();
   const [from, setFrom] = useState<string>(data.from || "");
   const [to, setTo] = useState<string>(data.to || "");
   const [airports, setAirports] = useState<AirportItem[]>([]);

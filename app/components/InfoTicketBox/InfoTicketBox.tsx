@@ -1,5 +1,5 @@
 "use client";
-import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
+import useFlightSearchBarStore from "@/app/zustand/storeFlightSearchBar";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ const InfoTicketBox = () => {
   const { data, isHydrated } = useInfoTicket();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { data: dataPerson } = useInfoTicket();
-  const { data: searchBarData, isHydrated: isSearchBarHydrated } = useFightSearchBarStore();
+  const { data: searchBarData, isHydrated: isSearchBarHydrated } = useFlightSearchBarStore();
   const { user, accessToken } = useUserStore();
   const isLoggedIn = Boolean(accessToken || user?.id);
 

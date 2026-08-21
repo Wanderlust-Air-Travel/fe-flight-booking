@@ -1,18 +1,15 @@
 "use client";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { type Locale, localizedHref } from "@/i18n/config";
 import { axiosPublic } from "@/lib/axios-instance";
 import { dismissToast, showError, showLoading, showSuccess } from "@/lib/toast";
 import type { BannerApi } from "@/types/banner";
 import axios from "axios";
-import { AlertCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BookingLookupForm } from "../BookingLookupForm/BookingLookupForm";
 import FlightSearchBar from "../FlightSearchBar/FlightSearchBar";
 import MainNavigationTabs from "../MainNavigationTabs/MainNavigationTabs";
 
@@ -27,19 +24,6 @@ const BannerHome = () => {
   const [activeMyBookingsTab, setActiveMyBookingsTab] =
     useState<MyBookingsTab>("booking-code-ticket");
 
-  // Check-in form states
-  const [bookingCode, setBookingCode] = useState("");
-  const [ticketNumber, setTicketNumber] = useState("");
-  const [membershipNumber, setMembershipNumber] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [checkInError, setCheckInError] = useState<string | null>(null);
-  const [isCheckInLoading, setIsCheckInLoading] = useState(false);
-
-  // My bookings form states
-  const [myBookingCode, setMyBookingCode] = useState("");
-  const [myBookingError, setMyBookingError] = useState<string | null>(null);
-  const [isMyBookingLoading, setIsMyBookingLoading] = useState(false);
-
   const router = useRouter();
   const locale = useLocale() as Locale;
   const tCheckIn = useTranslations("checkIn");
@@ -52,497 +36,110 @@ const BannerHome = () => {
       .then((res) => {
         setData(res.data);
       })
-      .catch((error) => {
-        console.log(error);
-        // Error toast sẽ tự động hiển thị từ axios interceptor
+      .catch(() => {
+        // Error toast is shown by the axios interceptor
       });
   }, []);
 
-  const handleCheckInSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!bookingCode.trim()) {
-      setCheckInError(tCheckIn("pnrRequired"));
+  const handleCheckInSubmit = async (code: string) => {
+    const response = await axiosPublic.get(`/api/bookings/code/${code}`);
+    if (response.status === 200 && response.data) {
+      router.push(
+        `${localizedHref("/check-in/seat-selection", locale)}?bookingCode=${encodeURIComponent(code)}`
+      );
       return;
     }
-
-    setIsCheckInLoading(true);
-    setCheckInError(null);
-
-    try {
-      const response = await axiosPublic.get(`/api/bookings/code/${bookingCode.trim()}`);
-
-      if (response.status === 200 && response.data) {
-        router.push(
-          `${localizedHref("/check-in/seat-selection", locale)}?bookingCode=${encodeURIComponent(bookingCode.trim())}`
-        );
-      } else {
-        setCheckInError(tCheckIn("notFoundToast"));
-      }
-    } catch (err: any) {
-      console.error("Error fetching booking:", err);
-      const errorMessage = err.response?.data?.message || err.message || tCheckIn("notFoundToast");
-      setCheckInError(errorMessage);
-    } finally {
-      setIsCheckInLoading(false);
-    }
+    throw new Error(tCheckIn("notFoundToast"));
   };
 
-  const handleMyBookingsSearch = async () => {
-    if (!myBookingCode.trim()) {
-      setMyBookingError(tMyBk("pnrRequired"));
-      return;
-    }
-
-    setIsMyBookingLoading(true);
-    setMyBookingError(null);
+  const handleMyBookingsSearch = async (code: string) => {
     const loadingToastId = showLoading(tMyBk("searchingToast"));
-
     try {
-      const response = await axiosPublic.get(`/api/bookings/code/${myBookingCode.trim()}`);
-
+      const response = await axiosPublic.get(`/api/bookings/code/${code.trim()}`);
       if (response.data) {
         dismissToast(loadingToastId);
         showSuccess(tMyBk("foundToast"));
         router.push(
-          `${localizedHref("/my-bookings", locale)}?bookingCode=${encodeURIComponent(myBookingCode.trim())}`
+          `${localizedHref("/my-bookings", locale)}?bookingCode=${encodeURIComponent(code.trim())}`
         );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       dismissToast(loadingToastId);
-      const errorMessage = err.response?.data?.message || tMyBk("notFoundToast");
-      setMyBookingError(errorMessage);
+      const errorMessage =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        tMyBk("notFoundToast");
       showError(errorMessage);
-    } finally {
-      setIsMyBookingLoading(false);
+      throw err;
     }
   };
 
-  const renderFormContent = () => {
-    switch (activeMainTab) {
-      case "book-ticket":
+  const renderCheckInForm = () => {
+    switch (activeCheckInTab) {
+      case "booking-code":
         return (
-          <div className="p-4 md:p-6">
-            <FlightSearchBar />
+          <BookingLookupForm
+            onSubmit={handleCheckInSubmit}
+            description={tCheckIn("enterPnr")}
+            helper={tCheckIn("pnrConfirmHelp")}
+            submitLabel={tCheckIn("checkInButton")}
+            submittingLabel={tCheckIn("checkInSubmitting")}
+          />
+        );
+
+      case "ticket-number":
+        return (
+          <div className="bg-white rounded-lg p-6 text-center text-gray-600">
+            {tCheckIn("featureComingSoon")}
           </div>
         );
 
-      case "check-in":
+      case "membership":
         return (
-          <div className="w-full rounded-b-lg bg-white">
-            <div className="flex items-center gap-0 border-b border-gray-200 bg-gray-50 rounded-t-lg">
-              <button
-                type="button"
-                onClick={() => setActiveCheckInTab("booking-code")}
-                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${
-                  activeCheckInTab === "booking-code"
-                    ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
-                    : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
-                }`}
-              >
-                <span className="font-medium">{tCheckIn("tabByCode")}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveCheckInTab("ticket-number")}
-                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${
-                  activeCheckInTab === "ticket-number"
-                    ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
-                    : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
-                }`}
-              >
-                <span className="font-medium">
-                  {tMyBk("tabByCode").split("/")[1]?.trim() || tMyBk("tabByCode")}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveCheckInTab("membership")}
-                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${
-                  activeCheckInTab === "membership"
-                    ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
-                    : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
-                }`}
-              >
-                <span className="font-medium">{tMyBk("tabMembership")}</span>
-              </button>
-            </div>
-
-            {activeCheckInTab === "booking-code" && (
-              <form onSubmit={handleCheckInSubmit} className="bg-white rounded-lg">
-                <div className="flex justify-between gap-x-[2rem] p-6">
-                  {/* Header Section */}
-                  <div className="flex flex-col gap-y-[0.4rem]  w-fit">
-                    <p className="text-base text-gray-700 font-medium">{tCheckIn("enterPnr")}</p>
-                    <p className="text-sm  text-gray-600 font-medium">
-                      <strong className="text-red-600 ">*</strong> {tCheckIn("pnrConfirmHelp")}
-                    </p>
-                  </div>
-
-                  {/* Input Section */}
-                  <div className="w-[50%] relative">
-                    <div className="">
-                      <Input
-                        id="bookingCode"
-                        type="text"
-                        placeholder="Ví dụ: ABC123"
-                        value={bookingCode}
-                        onChange={(e) => {
-                          setBookingCode(e.target.value.toUpperCase());
-                          setCheckInError(null);
-                        }}
-                        className="h-[4.8rem]! text-center text-xl md:text-2xl font-mono tracking-[0.2em] border-2 border-gray-300 focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]/20 h-14 md:h-16 transition-all duration-200 rounded-lg bg-white"
-                        maxLength={10}
-                        disabled={isCheckInLoading}
-                        autoFocus
-                      />
-                    </div>
-
-                    {/* Error Message */}
-                    {checkInError && (
-                      <Alert
-                        variant="destructive"
-                        className="border-red-300 bg-red-50 rounded-lg absolute left-0 w-full top-[105%]"
-                      >
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription className="text-sm font-medium">
-                          {checkInError}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                  </div>
-
-                  {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    className="w-full h-[4.8rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md flex-1"
-                    disabled={isCheckInLoading || !bookingCode.trim()}
-                  >
-                    {isCheckInLoading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg
-                          className="animate-spin h-5 w-5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                        {tCheckIn("checkInSubmitting")}
-                      </span>
-                    ) : (
-                      tCheckIn("checkInButton")
-                    )}
-                  </Button>
-                </div>
-              </form>
-            )}
-
-            {activeCheckInTab === "ticket-number" && (
-              <div className="bg-white rounded-lg ">
-                <div className="flex justify-between gap-x-[2rem] p-6">
-                  {/* Header Section */}
-                  <div className=" w-fit flex flex-col gap-y-[0.4rem]">
-                    <p className="text-base text-gray-700 font-medium ">
-                      {tCheckIn("tabByTicket")}
-                    </p>
-                    <p className="text-sm  text-gray-600 font-medium">
-                      <strong className="text-red-600 ">*</strong> {tCheckIn("featureComingSoon")}
-                    </p>
-                  </div>
-
-                  {/* Input Section */}
-                  <div className="w-[55%] flex gap-x-[0.8rem] h-full">
-                    <div className="flex-1 flex items-center gap-x-[0.8rem]">
-                      <Label
-                        htmlFor="ticketNumber"
-                        className="text-mn font-semibold text-gray-70 block text-nowrap"
-                      >
-                        {tCheckIn("ticketNumberLabel")}
-                      </Label>
-                      <Input
-                        id="ticketNumber"
-                        type="text"
-                        placeholder={tCheckIn("ticketPlaceholder")}
-                        value={ticketNumber}
-                        onChange={(e) => setTicketNumber(e.target.value)}
-                        disabled={true}
-                        className="text-base h-[4.8rem]! border-2 border-gray-300 bg-gray-100 cursor-not-allowed h-14 md:h-16 rounded-lg"
-                      />
-                    </div>
-                    <div className="flex-1 flex items-center gap-x-[0.8rem]">
-                      <Label
-                        htmlFor="lastName"
-                        className="text-mn font-semibold text-gray-700 mb-2 block"
-                      >
-                        {tCheckIn("lastNameLabel")}
-                      </Label>
-                      <Input
-                        id="lastName"
-                        type="text"
-                        placeholder={tCheckIn("lastNamePlaceholder")}
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value.toUpperCase())}
-                        disabled={true}
-                        className="text-base h-[4.8rem]! border-2 border-gray-300 bg-gray-100 cursor-not-allowed h-14 md:h-16 rounded-lg uppercase"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <Button
-                    onClick={() => showError(tCheckIn("ticketSearchComingSoon"))}
-                    disabled={isCheckInLoading || !ticketNumber.trim() || !lastName.trim()}
-                    className="w-full flex-1 h-[4.8rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-xl rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
-                  >
-                    {isCheckInLoading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg
-                          className="animate-spin h-5 w-5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                        {tCommon("searching")}
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center gap-2">
-                        {tCommon("search")}
-                      </span>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {activeCheckInTab === "membership" && (
-              <div className="bg-white rounded-lg">
-                <div className="flex justify-between gap-x-[2rem] p-6">
-                  {/* Header Section */}
-                  <div className="flex flex-col gap-y-[0.4rem] w-fit">
-                    <p className="text-base text-gray-700 font-medium">{tMyBk("searchCardDesc")}</p>
-                    <p className="text-sm  text-gray-600 font-medium">
-                      <strong className="text-red-600 ">*</strong> {tMyBk("pnrHelper")}
-                    </p>
-                  </div>
-
-                  {/* Input Section */}
-                  <div className="w-[55%]">
-                    <Input
-                      id="membershipNumber"
-                      type="text"
-                      placeholder={tMyBk("pnrPlaceholder")}
-                      value={membershipNumber}
-                      onChange={(e) => setMembershipNumber(e.target.value)}
-                      disabled={true}
-                      className="text-base border-2 border-gray-300 bg-gray-100 cursor-not-allowed md:h-16 rounded-lg h-[4.8rem]!"
-                    />
-                  </div>
-
-                  {/* Submit Button */}
-                  <Button
-                    onClick={() => showError(tCheckIn("membershipSearchComingSoon"))}
-                    disabled={isCheckInLoading || !membershipNumber.trim()}
-                    className="w-full flex-1 bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-xl rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md h-[4.8rem]!"
-                  >
-                    {isCheckInLoading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg
-                          className="animate-spin h-5 w-5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                        {tCommon("searching")}
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center gap-2">
-                        {tCommon("search")}
-                      </span>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-
-      case "my-bookings":
-        return (
-          <div className="w-full rounded-b-lg bg-white">
-            <div className="flex items-center gap-0 border-b border-gray-200  bg-gray-50 rounded-t-lg">
-              <button
-                type="button"
-                onClick={() => setActiveMyBookingsTab("booking-code-ticket")}
-                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${
-                  activeMyBookingsTab === "booking-code-ticket"
-                    ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
-                    : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
-                }`}
-              >
-                <span className="font-medium">{tMyBk("tabByCode")}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveMyBookingsTab("membership")}
-                className={`flex-1 relative px-4 py-4 text-base md:text-lg font-semibold transition-all duration-200 flex items-center justify-center border-b-2 ${
-                  activeMyBookingsTab === "membership"
-                    ? "text-[var(--cl-pri)] bg-white border-[var(--cl-pri)]"
-                    : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
-                }`}
-              >
-                <span className="font-medium">Hội Viên Wanderlust Club</span>
-              </button>
-            </div>
-
-            {activeMyBookingsTab === "booking-code-ticket" && (
-              <div className="bg-white rounded-lg">
-                <div className="flex justify-between gap-x-[2rem] p-6">
-                  {/* Header Section */}
-                  <div className=" w-fit flex flex-col gap-y-[0.4rem]">
-                    <p className="text-base text-gray-700 font-medium">{tMyBk("searchCardDesc")}</p>
-                    <p className="text-sm  text-gray-600 font-medium">
-                      <strong className="text-red-600 ">*</strong>{" "}
-                      {tMyBk("pnrConfirmHelp") || tMyBk("pnrHelper")}
-                    </p>
-                  </div>
-
-                  {/* Input Section */}
-                  <div className="w-[50%] relative">
-                    <div>
-                      <Input
-                        id="myBookingCode"
-                        type="text"
-                        placeholder="Ví dụ: ABC123"
-                        value={myBookingCode}
-                        onChange={(e) => {
-                          setMyBookingCode(e.target.value.toUpperCase());
-                          setMyBookingError(null);
-                        }}
-                        className="text-center text-xl md:text-2xl font-mono tracking-[0.2em] border-2 border-gray-300 focus:border-[var(--cl-pri)] focus:ring-2 focus:ring-[var(--cl-pri)]/20 h-[4.8rem]! md:h-16 transition-all duration-200 rounded-lg bg-white"
-                        maxLength={10}
-                        disabled={isMyBookingLoading}
-                        autoFocus
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleMyBookingsSearch();
-                          }
-                        }}
-                      />
-                    </div>
-                    {/* Error Message */}
-                    {myBookingError && (
-                      <Alert
-                        variant="destructive"
-                        className="border-red-300 bg-red-50 rounded-lg absolute left-0 w-full top-[105%]"
-                      >
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription className="text-sm font-medium">
-                          {myBookingError}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                  </div>
-
-                  {/* Submit Button */}
-                  <Button
-                    onClick={handleMyBookingsSearch}
-                    disabled={isMyBookingLoading || !myBookingCode.trim()}
-                    className="w-full flex-1 bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md h-[4.8rem]!"
-                  >
-                    {isMyBookingLoading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg
-                          className="animate-spin h-5 w-5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                        {tCommon("searching")}
-                      </span>
-                    ) : (
-                      tMyBk("searchButton")
-                    )}
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {activeMyBookingsTab === "membership" && (
-              <div className="bg-white rounded-lg">
-                <div className="p-6 flex flex-col  gap-y-[1.2rem]">
-                  {/* Header Section */}
-                  <div className="text-center">
-                    <p className="text-base text-gray-700 font-medium">{tMyBk("membershipDesc")}</p>
-                  </div>
-
-                  {/* Submit Button */}
-                  <Button
-                    onClick={() => router.push(localizedHref("/sign-in", locale))}
-                    className="w-full max-w-[20rem] mx-auto flex-1 h-[4rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-                  >
-                    {tMyBk("membershipLogin")}
-                  </Button>
-                </div>
-              </div>
-            )}
+          <div className="bg-white rounded-lg p-6 text-center text-gray-600">
+            {tCheckIn("featureComingSoon")}
           </div>
         );
     }
+  };
+
+  const renderMyBookingsForm = () => {
+    if (activeMyBookingsTab === "booking-code-ticket") {
+      return (
+        <BookingLookupForm
+          onSubmit={handleMyBookingsSearch}
+          description={tMyBk("searchCardDesc")}
+          helper={tMyBk("pnrConfirmHelp") || tMyBk("pnrHelper")}
+          submitLabel={tMyBk("searchButton")}
+          submittingLabel={tCommon("searching")}
+        />
+      );
+    }
+
+    return (
+      <div className="bg-white rounded-lg p-6 flex flex-col gap-y-[1.2rem]">
+        <p className="text-center text-base text-gray-700 font-medium">{tMyBk("membershipDesc")}</p>
+        <Button
+          onClick={() => router.push(localizedHref("/sign-in", locale))}
+          className="w-full max-w-[20rem] mx-auto h-[4rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+        >
+          {tMyBk("membershipLogin")}
+        </Button>
+      </div>
+    );
+  };
+
+  const renderFormContent = () => {
+    if (activeMainTab === "book-ticket") {
+      return (
+        <div className="p-4 md:p-6">
+          <FlightSearchBar />
+        </div>
+      );
+    }
+    if (activeMainTab === "check-in") {
+      return <div className="w-full rounded-b-lg bg-white">{renderCheckInForm()}</div>;
+    }
+    return <div className="w-full rounded-b-lg bg-white">{renderMyBookingsForm()}</div>;
   };
 
   return (

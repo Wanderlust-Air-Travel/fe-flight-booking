@@ -1,7 +1,8 @@
-import { useDeals } from "@/app/hooks/useDeals";
+import type { ItemServiceProp } from "@/types/item-service-type";
 import { generateServiceKey } from "@/app/utils/key-utils";
+import axios from "axios";
 import dynamic from "next/dynamic";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import LazyLoad from "../LazyLoad/LazyLoad";
 
 // Lazy load ItemService component
@@ -34,7 +35,28 @@ const ItemService = dynamic(() => import("../ItemService/ItemService"), {
 });
 
 const ServiceHome = () => {
-  const { services, loading } = useDeals();
+  const [services, setServices] = useState<ItemServiceProp[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await axios.get("/api/services/deals");
+        if (!cancelled && response.data?.deals && Array.isArray(response.data.deals)) {
+          setServices(response.data.deals);
+        }
+      } catch {
+        // Silent fail; empty deals list will be rendered.
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
 
   const LoadingPlaceholder = () => (
     <div className="group flex flex-col shadow2 rounded-[1rem] overflow-hidden h-full">

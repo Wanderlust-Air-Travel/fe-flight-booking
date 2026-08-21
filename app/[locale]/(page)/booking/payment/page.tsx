@@ -3,6 +3,7 @@
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
+import PageSuspense from "@/app/components/PageSuspense/PageSuspense";
 import { usePaymentStatus } from "@/app/hooks/use-payment-status";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
@@ -13,7 +14,7 @@ import { showError, showSuccess } from "@/lib/toast";
 import type { PaymentStatus } from "@/types/payment";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const PaymentPageContent = () => {
   const searchParams = useSearchParams();
@@ -371,20 +372,9 @@ const PaymentPageContent = () => {
 
 const PaymentPage = () => {
   return (
-    <Suspense
-      fallback={
-        <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
-          <Breadcrumb />
-          <div className="container">
-            <div className="text-center py-[4rem]">
-              <p className="text-lg">Loading...</p>
-            </div>
-          </div>
-        </main>
-      }
-    >
+    <PageSuspense>
       <PaymentPageContent />
-    </Suspense>
+    </PageSuspense>
   );
 };
 

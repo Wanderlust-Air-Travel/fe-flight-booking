@@ -33,6 +33,12 @@ export async function POST(req: NextRequest) {
     });
 
     if (response.status === 404) {
+      if (process.env.NODE_ENV === "production") {
+        return NextResponse.json(
+          { message: "Refresh endpoint not found", error: "NOT_FOUND" },
+          { status: 404 }
+        );
+      }
       console.log("[API /api/auth/refresh] Backend returned 404, returning mock tokens");
       return NextResponse.json(
         {
@@ -56,7 +62,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error("[API /api/auth/refresh] Error:", error);
-    // Return mock tokens on connection error
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { message: "Internal server error", error: "INTERNAL_ERROR" },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       {
         access_token: `mock_access_token_${Date.now()}`,

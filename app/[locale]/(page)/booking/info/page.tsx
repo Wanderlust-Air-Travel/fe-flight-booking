@@ -5,7 +5,7 @@ import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import InfoTicketBox from "@/app/components/InfoTicketBox/InfoTicketBox";
 import { useBookingInfo } from "@/app/hooks/use-booking-info";
 import { useReservationCountdown } from "@/app/hooks/use-reservation-countdown";
-import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
+import useFlightSearchBarStore from "@/app/zustand/storeFlightSearchBar";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -38,7 +38,7 @@ const BookingInfoContent = () => {
   const router = useRouter();
   const { accessToken, user, hydrated } = useUserStore();
   const { data: ticketData } = useInfoTicket();
-  const { data: searchBarData } = useFightSearchBarStore();
+  const { data: searchBarData } = useFlightSearchBarStore();
   const t = useTranslations("booking");
   const tCommon = useTranslations("common");
 

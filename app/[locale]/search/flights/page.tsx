@@ -1,20 +1,21 @@
 "use client";
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import EnhancedFlightSearchBar from "@/app/components/FlightSearchBar/EnhancedFlightSearchBar";
+import PageSuspense from "@/app/components/PageSuspense/PageSuspense";
 import ServiceSlide from "@/app/components/Services/ServiceSlide";
 import TripList from "@/app/components/TripList/TripList";
-import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
+import useFlightSearchBarStore from "@/app/zustand/storeFlightSearchBar";
 import { axiosPublic } from "@/lib/axios-instance";
 import type { TripListProps } from "@/types/trip-list-type";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const ServiceDetailsResultSearchContent = () => {
   const [trips, setTrips] = useState<TripListProps | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   const searchParams = useSearchParams();
-  const { setData } = useFightSearchBarStore();
+  const { setData } = useFlightSearchBarStore();
 
   const origin = searchParams.get("origin") || "";
   const destination = searchParams.get("destination") || "";
@@ -111,20 +112,9 @@ const ServiceDetailsResultSearchContent = () => {
 
 const ServiceDetailsResultSearch = () => {
   return (
-    <Suspense
-      fallback={
-        <main className="pt-[var(--hd)] flex flex-col gap-y-[var(--rowY)]">
-          <Breadcrumb />
-          <div className="container">
-            <div className="text-center py-[4rem]">
-              <p className="text-lg">Loading...</p>
-            </div>
-          </div>
-        </main>
-      }
-    >
+    <PageSuspense>
       <ServiceDetailsResultSearchContent />
-    </Suspense>
+    </PageSuspense>
   );
 };
 

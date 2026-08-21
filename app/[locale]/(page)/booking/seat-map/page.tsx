@@ -5,18 +5,19 @@ import CabinSection from "@/app/components/SeatMap/CabinSection";
 import SectionNavigation from "@/app/components/SeatMap/SectionNavigation";
 import { useSeatAvailability } from "@/app/hooks/use-seat-availability";
 import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils";
-import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
+import useFlightSearchBarStore from "@/app/zustand/storeFlightSearchBar";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { type Locale, localizedHref } from "@/i18n/config";
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
+import { debug, logError } from "@/lib/logger";
 import type { SeatGroup, SeatItem } from "@/types/seat-type";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const SeatMapPageContent = () => {
   const [seatBusiness, setSeatBusiness] = useState<SeatGroup | null>(null);
@@ -34,14 +35,13 @@ const SeatMapPageContent = () => {
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const hasFetchedRef = useRef<boolean>(false);
   const locale = useLocale() as Locale;
   const tCommon = useTranslations("common");
   const tBk = useTranslations("booking");
 
   const { data, isHydrated } = useInfoTicket();
   const { accessToken, isLoggedIn, hydrated: isAuthHydrated } = useUserStore();
-  const { data: searchBarData, isHydrated: isSearchBarHydrated } = useFightSearchBarStore();
+  const { data: searchBarData, isHydrated: isSearchBarHydrated } = useFlightSearchBarStore();
 
   // Lấy flightInstanceId và cabinType từ query params (theo docs BE)
   const flightInstanceId = searchParams.get("flightInstanceId");
@@ -58,18 +58,6 @@ const SeatMapPageContent = () => {
       return;
     }
   }, [flightInstanceId, router]);
-
-  // Debug: Log search bar data when it changes
-  useEffect(() => {
-    console.log("[SeatMap] Search bar data updated:", {
-      isHydrated: isSearchBarHydrated,
-      searchBarData,
-      adults: searchBarData?.adult,
-      children: searchBarData?.child,
-      infants: searchBarData?.infant,
-      totalPerson: searchBarData?.totalPerson,
-    });
-  }, [searchBarData, isSearchBarHydrated]);
 
   // Helper function to find seat by seatId (which can be flightSeatId or generated ID)
   const findSeatBySeatId = useCallback(
@@ -92,7 +80,7 @@ const SeatMapPageContent = () => {
 
       // Validate that found seat has required fields
       if (foundSeat && (!foundSeat.flightSeatId || !foundSeat.seatNumber)) {
-        console.error("[SeatMap] Found seat but missing required fields:", foundSeat);
+        logError("[SeatMap] Found seat but missing required fields:", foundSeat);
         return null;
       }
 
@@ -103,25 +91,8 @@ const SeatMapPageContent = () => {
 
   // Calculate passengers needing seats (adults + children, excluding infants)
   const passengersNeedingSeats = useMemo(() => {
-    // Wait for hydration before calculating
-    if (!isSearchBarHydrated) {
-      return 0;
-    }
-
-    const adults = searchBarData?.adult || 0;
-    const children = searchBarData?.child || 0;
-    const total = adults + children; // Infants don't need seats
-
-    // Debug logging
-    console.log("[SeatMap] Passengers calculation:", {
-      isHydrated: isSearchBarHydrated,
-      searchBarData,
-      adults,
-      children,
-      total,
-    });
-
-    return total;
+    if (!isSearchBarHydrated) return 0;
+    return (searchBarData?.adult || 0) + (searchBarData?.child || 0);
   }, [searchBarData?.adult, searchBarData?.child, isSearchBarHydrated, searchBarData]);
 
   // Optimized seat toggle handlers with useCallback
@@ -133,14 +104,14 @@ const SeatMapPageContent = () => {
       const seat = findSeatBySeatId(seatId);
 
       if (!seat) {
-        console.error("[SeatMap] Seat not found for seatId:", seatId);
+        logError("[SeatMap] Seat not found for seatId:", seatId);
         setSaveError("Seat not found. Please try selecting again.");
         return; // Invalid seat
       }
 
       // CRITICAL: Validate that seat has flightSeatId (required for backend)
       if (!seat.flightSeatId) {
-        console.error("[SeatMap] Seat missing flightSeatId:", seat);
+        logError("[SeatMap] Seat missing flightSeatId:", seat);
         setSaveError(`Seat ${seat.seatNumber} is missing required information. Please try again.`);
         return;
       }
@@ -231,22 +202,14 @@ const SeatMapPageContent = () => {
 
   // Bước 2: Gọi API Get Seat Map
   useEffect(() => {
-    // Prevent multiple fetches - only fetch once on mount
-    if (hasFetchedRef.current) {
-      return;
-    }
-
-    if (!flightInstanceId) {
-      return;
-    }
+    if (!flightInstanceId) return;
 
     const fetchSeatMap = async () => {
-      hasFetchedRef.current = true;
       setLoading(true);
       setError(null);
 
       const axiosClient = accessToken ? axiosInstance : axiosPublic;
-      const params: any = { flightInstanceId };
+      const params: Record<string, string> = { flightInstanceId };
 
       // Priority 1: Get cabinType from URL query params
       if (cabinTypeFromUrl) {
@@ -265,9 +228,8 @@ const SeatMapPageContent = () => {
           if (bookingStateResponse.data?.cabin?.cabinType) {
             params.cabinType = bookingStateResponse.data.cabin.cabinType;
           }
-        } catch (bookingStateError) {
-          console.warn("Could not get cabinType from booking state:", bookingStateError);
-          // Continue without cabinType - backend will try to get from booking state
+        } catch {
+          // Backend will try to get from booking state as fallback.
         }
       }
       // Priority 4: For guest users, try to get from booking state API with session ID
@@ -275,19 +237,15 @@ const SeatMapPageContent = () => {
         const sessionId = sessionStorage.getItem("guest_session_id");
         if (sessionId) {
           try {
-            const headers: Record<string, string> = {
-              "X-Session-Id": sessionId,
-            };
             const bookingStateResponse = await axiosPublic.get(
               `/api/booking-state/${flightInstanceId}`,
-              { headers }
+              { headers: { "X-Session-Id": sessionId } }
             );
             if (bookingStateResponse.data?.cabin?.cabinType) {
               params.cabinType = bookingStateResponse.data.cabin.cabinType;
             }
-          } catch (bookingStateError) {
-            console.warn("Could not get cabinType from booking state:", bookingStateError);
-            // Continue without cabinType - backend will try to get from booking state
+          } catch {
+            // Backend will try to get from booking state as fallback.
           }
         }
       }
@@ -298,13 +256,11 @@ const SeatMapPageContent = () => {
           "Cabin type is required. Please select a cabin type first or go back to cabin selection."
         );
         setLoading(false);
-        hasFetchedRef.current = false;
         return;
       }
 
       try {
         const res = await axiosClient.get("/api/search/seats", { params });
-        console.log("Seat map response:", res.data);
 
         // Backend response format: { seats: [{ id: 'business', list: [...] }, { id: 'economy', list: [...] }] }
         if (res.data?.seats && Array.isArray(res.data.seats)) {
@@ -328,33 +284,19 @@ const SeatMapPageContent = () => {
           setSeatBusiness(business ? { ...business, list: businessSeats } : null);
           setSeatEconomy(economy ? { ...economy, list: economySeats } : null);
         } else {
-          console.error("Invalid seat map data format:", res.data);
+          logError("Invalid seat map data format:", res.data);
           setError("Invalid seat map data format");
-          hasFetchedRef.current = false;
         }
       } catch (err: any) {
-        console.error("Error fetching seat map:", err);
-        console.error("Error details:", err.response?.data || err.message);
+        logError("Error fetching seat map:", err?.response?.data || err?.message || err);
         setError(
           err.response?.data?.message || err.message || "Failed to load seat map. Please try again."
         );
-        // Reset ref on error so user can retry
-        hasFetchedRef.current = false;
       } finally {
         setLoading(false);
       }
     };
 
-    // Wait for Zustand store to hydrate before fetching (if no cabinType from URL)
-    if (!isHydrated && !cabinTypeFromUrl) {
-      // Wait a bit for hydration, then fetch
-      const timer = setTimeout(() => {
-        fetchSeatMap();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-
-    // If hydrated or cabinType from URL, fetch immediately
     fetchSeatMap();
   }, [
     flightInstanceId,
@@ -428,7 +370,7 @@ const SeatMapPageContent = () => {
     // Validate selected seats data
     const invalidSeats = selectedSeatsInfo.filter((seat) => !seat.flightSeatId || !seat.seatNumber);
     if (invalidSeats.length > 0) {
-      console.error("[SeatMap] Invalid seat data:", invalidSeats);
+      logError("[SeatMap] Invalid seat data:", invalidSeats);
       setSaveError(
         "Some selected seats have invalid data. Please deselect and reselect the seats."
       );
@@ -441,22 +383,12 @@ const SeatMapPageContent = () => {
     try {
       // Always save to backend Redis (both authenticated and guest users)
       const headers: Record<string, string> = {};
-
-      // BEST PRACTICE: Always send X-Session-Id if available, regardless of accessToken
-      // This ensures backend can fallback to guest session if JWT token is invalid/expired
-      // Session ID should have been saved when cabin selection was made in TripList component
       const sessionId = sessionStorage.getItem("guest_session_id");
-      console.log("[SeatMap] Current sessionId from sessionStorage:", sessionId);
-      console.log("[SeatMap] accessToken exists:", !!accessToken);
-      console.log("[SeatMap] flightInstanceId:", flightInstanceId);
-      console.log("[SeatMap] selectedSeatsInfo:", selectedSeatsInfo);
-
       const isGuest = !isLoggedIn;
 
       if (isGuest) {
-        // Guest users: sessionId là bắt buộc
         if (!sessionId) {
-          console.error("[SeatMap] No sessionId found for guest user");
+          logError("[SeatMap] No sessionId found for guest user");
           setSaveError("Session ID not found. Please select a cabin type first, then try again.");
           setIsSaving(false);
           setTimeout(() => {
@@ -465,35 +397,19 @@ const SeatMapPageContent = () => {
           return;
         }
 
-        // Gửi X-Session-Id cho guest, BE dùng sessionId để lookup booking-state
         headers["X-Session-Id"] = sessionId;
-        console.log("[SeatMap] Sending X-Session-Id header for guest user:", sessionId);
       }
 
-      // Prepare request payload
-      // CRITICAL: Validate and ensure all required fields are present
-      const validatedSeats = selectedSeatsInfo.map((seat, index) => {
-        if (!seat.flightSeatId || !seat.seatNumber) {
-          console.error(`[SeatMap] Invalid seat at index ${index}:`, seat);
-          throw new Error(`Seat at index ${index} is missing flightSeatId or seatNumber`);
-        }
-        return {
-          flightSeatId: seat.flightSeatId.trim(), // Ensure no whitespace
-          seatNumber: seat.seatNumber.trim(), // Ensure no whitespace
-        };
-      });
+      // Prepare request payload - ensure all required fields are present
+      const validatedSeats = selectedSeatsInfo.map((seat) => ({
+        flightSeatId: seat.flightSeatId.trim(),
+        seatNumber: seat.seatNumber.trim(),
+      }));
 
       const requestPayload = {
-        flightInstanceId: flightInstanceId.trim(), // Ensure no whitespace
+        flightInstanceId: flightInstanceId.trim(),
         seats: validatedSeats,
       };
-
-      console.log("[SeatMap] Request payload:", JSON.stringify(requestPayload, null, 2));
-      console.log("[SeatMap] Validated seats count:", validatedSeats.length);
-      console.log(
-        "[SeatMap] Each seat has flightSeatId and seatNumber:",
-        validatedSeats.every((s) => s.flightSeatId && s.seatNumber)
-      );
 
       const axiosClient = isGuest ? axiosPublic : axiosInstance;
       const response = await axiosClient.post("/api/booking-state/seat", requestPayload, {
@@ -501,8 +417,6 @@ const SeatMapPageContent = () => {
       });
 
       if (response.status === 200 || response.status === 201) {
-        console.log("Seat selection saved to backend:", response.data);
-
         // For guest users, update sessionId if returned
         if (!accessToken && response.data.sessionId) {
           sessionStorage.setItem("guest_session_id", response.data.sessionId);
@@ -514,9 +428,9 @@ const SeatMapPageContent = () => {
 
       // Navigate to booking information page
       router.push(`/booking/info?flightInstanceId=${flightInstanceId}`);
-    } catch (error: any) {
-      console.error("Error saving seat selection:", error);
-      setSaveError(error.response?.data?.message || error.message || tBk("paymentFailed"));
+    } catch (err: any) {
+      logError("Error saving seat selection:", err);
+      setSaveError(err.response?.data?.message || err.message || tBk("paymentFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -737,22 +651,13 @@ const SeatMapPageContent = () => {
   );
 };
 
+import PageSuspense from "@/app/components/PageSuspense/PageSuspense";
+
 const SeatMapPage = () => {
   return (
-    <Suspense
-      fallback={
-        <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
-          <Breadcrumb />
-          <div className="container">
-            <div className="text-center py-[4rem]">
-              <p className="text-lg">Loading...</p>
-            </div>
-          </div>
-        </main>
-      }
-    >
+    <PageSuspense>
       <SeatMapPageContent />
-    </Suspense>
+    </PageSuspense>
   );
 };
 

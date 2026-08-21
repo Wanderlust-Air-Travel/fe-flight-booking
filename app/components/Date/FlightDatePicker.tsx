@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Calendar, DateRange, type Range, type RangeKeyDict } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
+import useFlightSearchBarStore from "@/app/zustand/storeFlightSearchBar";
 import type { FlightDatePickerProps, TripType } from "@/types/flight-date-picker";
 
 export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps) {
@@ -17,7 +17,7 @@ export default function FlightDatePicker({ onChangeDate }: FlightDatePickerProps
   });
   const [initializedFromStore, setInitializedFromStore] = useState(false);
 
-  const { data, isHydrated, setData } = useFightSearchBarStore();
+  const { data, isHydrated, setData } = useFlightSearchBarStore();
 
   const handleRangeSelect = (ranges: RangeKeyDict) => {
     const selected = ranges.selection;

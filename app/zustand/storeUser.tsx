@@ -1,17 +1,16 @@
 import type { AuthState } from "@/types/user-login-type";
-// "use client"
+import { refreshAccessToken as refreshAccessTokenRequest } from "@/lib/auth/refresh";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 const useUserStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       accessToken: null,
       refreshToken: null,
       isLoggedIn: false,
 
-      // trạng thái hydrate
       hydrated: false,
 
       login: (data) => {
@@ -40,42 +39,14 @@ const useUserStore = create<AuthState>()(
 
       refreshAccessToken: async (refreshToken: string, userId: string) => {
         try {
-          const response = await fetch("/api/auth/refresh", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userId,
-              refresh_token: refreshToken,
-            }),
-          });
-
-          const data = await response.json();
-
-          if (response.ok && data.access_token) {
-            set({
-              accessToken: data.access_token,
-              refreshToken: data.refresh_token || refreshToken,
-            });
-            return data.access_token;
-          }
-          // Refresh token cũng hết hạn, logout
+          const data = await refreshAccessTokenRequest(refreshToken, userId);
           set({
-            user: null,
-            accessToken: null,
-            refreshToken: null,
-            isLoggedIn: false,
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token ?? get().refreshToken,
           });
-          throw new Error("Refresh token expired");
+          return data.access_token;
         } catch (error) {
-          // Refresh failed, logout
-          set({
-            user: null,
-            accessToken: null,
-            refreshToken: null,
-            isLoggedIn: false,
-          });
+          get().logout();
           throw error;
         }
       },
@@ -86,16 +57,12 @@ const useUserStore = create<AuthState>()(
       skipHydration: false,
 
       storage: createJSONStorage(() => {
-        // nếu có remember → dùng localStorage
         if (typeof window !== "undefined" && localStorage.getItem("remember") === "1") {
           return localStorage;
         }
-
-        // ngược lại sessionStorage
         return sessionStorage;
       }),
 
-      // khi storage được hydrate xong → đánh dấu
       onRehydrateStorage: () => (state) => {
         if (state) state.hydrated = true;
       },

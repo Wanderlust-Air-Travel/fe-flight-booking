@@ -9,7 +9,6 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// ─── Backend API response shape ───────────────────────────────────────────────
 interface ApiSegment {
   segmentId: string;
   flightInstanceId: string;
@@ -39,20 +38,6 @@ interface ApiPassenger {
   documentNumber: string;
 }
 
-interface ApiBooking {
-  bookingId: string;
-  pnrCode: string;
-  status: string;
-  totalAmount: number;
-  currencyCode: string;
-  contactFullname?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  segments: ApiSegment[];
-  passengers: ApiPassenger[];
-}
-
-// ─── UI component types (for display) ───────────────────────────────────────
 interface BookingData {
   bookingId: string;
   pnrCode: string;

@@ -1,14 +1,36 @@
 "use client";
-import { useDeals } from "@/app/hooks/useDeals";
+import type { ItemServiceProp } from "@/types/item-service-type";
 import { generateServiceKey } from "@/app/utils/key-utils";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import ItemService from "../ItemService/ItemService";
 
 const ServiceSlide = () => {
-  const { services, loading } = useDeals();
+  const [services, setServices] = useState<ItemServiceProp[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await axios.get("/api/services/deals");
+        if (!cancelled && response.data?.deals && Array.isArray(response.data.deals)) {
+          setServices(response.data.deals);
+        }
+      } catch {
+        // Silent fail; empty deals list will be rendered.
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <section className="flex w-full overflow-hidden">

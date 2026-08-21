@@ -1,5 +1,5 @@
 "use client";
-import { useDeals } from "@/app/hooks/useDeals";
+import type { ItemServiceProp } from "@/types/item-service-type";
 import { generateServiceKey } from "@/app/utils/key-utils";
 import {
   Pagination,
@@ -9,14 +9,35 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import ItemService from "../ItemService/ItemService";
 
 const PAGE_SIZE = 20;
 
 const ServiceAll = () => {
-  const { services, loading } = useDeals();
+  const [services, setServices] = useState<ItemServiceProp[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await axios.get("/api/services/deals");
+        if (!cancelled && response.data?.deals && Array.isArray(response.data.deals)) {
+          setServices(response.data.deals);
+        }
+      } catch {
+        // Silent fail; empty deals list will be rendered.
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const totalPages = Math.max(1, Math.ceil((services?.length || 0) / PAGE_SIZE));
   const safePage = Math.min(currentPage, totalPages);

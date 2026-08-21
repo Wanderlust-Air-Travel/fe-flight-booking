@@ -1,13 +1,14 @@
 "use client";
 
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
+import PageSuspense from "@/app/components/PageSuspense/PageSuspense";
 import { Button } from "@/components/ui/button";
 import { type Locale, localizedHref } from "@/i18n/config";
 import axiosInstance from "@/lib/axios-instance";
 import { AlertCircle, Check, CreditCard, Loader2, X } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 
 const DevPaymentPageContent = () => {
   const searchParams = useSearchParams();
@@ -152,18 +153,9 @@ const DevPaymentPageContent = () => {
 
 const DevPaymentPage = () => {
   return (
-    <Suspense
-      fallback={
-        <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
-          <Breadcrumb />
-          <div className="container flex justify-center items-center py-24">
-            <Loader2 className="w-8 h-8 animate-spin text-[var(--cl-pri)]" />
-          </div>
-        </main>
-      }
-    >
+    <PageSuspense>
       <DevPaymentPageContent />
-    </Suspense>
+    </PageSuspense>
   );
 };
 

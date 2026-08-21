@@ -1,10 +1,10 @@
 "use client";
-import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
+import useFlightSearchBarStore from "@/app/zustand/storeFlightSearchBar";
 import { Minus, Plus } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const Person = ({ classNameParent, classNameChild }: any) => {
-  const { data: storeData, setData, isHydrated } = useFightSearchBarStore();
+  const { data: storeData, setData, isHydrated } = useFlightSearchBarStore();
 
   // Initialize state from store if available, otherwise use defaults
   const [adult, setAdult] = useState<number>(storeData?.adult || 1);
