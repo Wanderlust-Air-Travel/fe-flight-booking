@@ -9,11 +9,11 @@ import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils"
 import useUserStore from "@/app/zustand/storeUser";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { localizedHref, type Locale } from "@/i18n/config";
+import { type Locale, localizedHref } from "@/i18n/config";
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import type { SeatGroup, SeatItem } from "@/types/seat-type";
-import { useLocale, useTranslations } from "next-intl";
 import { AlertCircle } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -593,7 +593,10 @@ const CheckInSeatSelectionContent = () => {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
-            <Button onClick={() => router.push(localizedHref("/check-in", locale))} className="mt-4 w-full">
+            <Button
+              onClick={() => router.push(localizedHref("/check-in", locale))}
+              className="mt-4 w-full"
+            >
               Quay lại
             </Button>
           </div>

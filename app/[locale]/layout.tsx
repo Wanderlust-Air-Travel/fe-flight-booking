@@ -1,10 +1,10 @@
-import { notFound } from "next/navigation";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
-import { locales, type Locale } from "@/i18n/config";
 import AOSWrapper from "@/app/components/Aos/AOSWrapper";
 import Footer from "@/app/components/Footer/Footer";
 import Header from "@/app/components/Header/Header";
+import { type Locale, locales } from "@/i18n/config";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

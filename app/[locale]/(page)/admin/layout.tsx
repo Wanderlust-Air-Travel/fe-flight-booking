@@ -1,21 +1,23 @@
 "use client";
 
 import useUserStore from "@/app/zustand/storeUser";
-import { localizedHref, type Locale, stripLocale } from "@/i18n/config";
+import { type Locale, localizedHref, stripLocale } from "@/i18n/config";
 import {
+  Building2,
   DollarSign,
   Home,
   LayoutDashboard,
   LogOut,
   Luggage,
   Plane,
+  Route,
   Sparkles,
   TrendingUp,
   Users,
 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 interface MenuItem {
@@ -34,8 +36,10 @@ interface DashboardResponse {
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Building2,
   DollarSign,
   Plane,
+  Route,
   Users,
   TrendingUp,
   Luggage,
@@ -136,7 +140,9 @@ export default function AdminLayout({
   }, [accessToken, hydrated, locale]);
 
   if (!hydrated || !isLoggedIn || loading) {
-    return <div className="flex items-center justify-center min-h-screen">{tCommon("loading")}</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">{tCommon("loading")}</div>
+    );
   }
 
   return (
@@ -152,7 +158,8 @@ export default function AdminLayout({
           {menuItems.map((item) => {
             const Icon = iconMap[item.icon] || LayoutDashboard;
             const strippedItemHref = stripLocale(item.href);
-            const isActive = strippedPath === strippedItemHref || strippedPath.startsWith(`${strippedItemHref}/`);
+            const isActive =
+              strippedPath === strippedItemHref || strippedPath.startsWith(`${strippedItemHref}/`);
             return (
               <Link
                 key={item.id || item.href}

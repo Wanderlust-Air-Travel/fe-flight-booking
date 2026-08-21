@@ -4,11 +4,11 @@ import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import FormatPrice from "@/app/components/FormatPrice/FormatPrice";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
-import { localizedHref, type Locale } from "@/i18n/config";
+import { type Locale, localizedHref } from "@/i18n/config";
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import type { BookingDetails, PaymentDetails } from "@/types/confirmation-page-type";
-import { useLocale, useTranslations } from "next-intl";
 import { Calendar, CheckCircle2, Clock, CreditCard, MapPin, Package, User } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 

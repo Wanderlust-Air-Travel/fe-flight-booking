@@ -1,5 +1,9 @@
 "use client";
 
+import { AircraftTypeSelect } from "@/components/admin/AircraftTypeSelect";
+import { DayChipPicker } from "@/components/admin/DayChipPicker";
+import { FlightNumberInput } from "@/components/admin/FlightNumberInput";
+import { RouteSelect } from "@/components/admin/RouteSelect";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -72,6 +76,8 @@ const formatOperatingDays = (days: string) => {
 export default function FlightSchedulesPage() {
   const [schedules, setSchedules] = useState<FlightSchedule[]>([]);
   const [routes, setRoutes] = useState<any[]>([]);
+  const [airlines, setAirlines] = useState<any[]>([]);
+  const [aircraftTypes, setAircraftTypes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -87,6 +93,7 @@ export default function FlightSchedulesPage() {
   const isChangingPageSizeRef = useRef(false);
 
   const [formData, setFormData] = useState({
+    airlineCode: "",
     flightNumber: "",
     routeId: "",
     aircraftTypeId: "",
@@ -110,9 +117,11 @@ export default function FlightSchedulesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, pageSize]);
 
-  // Fetch routes only once on mount
+  // Fetch master data only once on mount
   useEffect(() => {
     fetchRoutes();
+    fetchAirlines();
+    fetchAircraftTypes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -125,6 +134,32 @@ export default function FlightSchedulesPage() {
       setRoutes(rawData);
     } catch (err) {
       console.error("Error fetching routes:", err);
+    }
+  };
+
+  const fetchAirlines = async () => {
+    try {
+      const response = await axiosInstance.get("/api/admin/airlines").catch(() => ({ data: [] }));
+      const rawData = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || response.data?.items || [];
+      setAirlines(rawData);
+    } catch (err) {
+      console.error("Error fetching airlines:", err);
+    }
+  };
+
+  const fetchAircraftTypes = async () => {
+    try {
+      const response = await axiosInstance
+        .get("/api/admin/aircraft-types")
+        .catch(() => ({ data: [] }));
+      const rawData = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || response.data?.items || [];
+      setAircraftTypes(rawData);
+    } catch (err) {
+      console.error("Error fetching aircraft types:", err);
     }
   };
 
@@ -193,7 +228,11 @@ export default function FlightSchedulesPage() {
 
   const handleCreate = async () => {
     try {
-      await axiosInstance.post("/api/admin/flight-schedules", formData);
+      const fullFlightNumber = formData.airlineCode + formData.flightNumber;
+      await axiosInstance.post("/api/admin/flight-schedules", {
+        ...formData,
+        flightNumber: fullFlightNumber,
+      });
       setIsCreateDialogOpen(false);
       resetForm();
       await fetchSchedules(currentPage, pageSize);
@@ -204,8 +243,11 @@ export default function FlightSchedulesPage() {
 
   const handleEdit = (schedule: FlightSchedule) => {
     setEditingSchedule(schedule);
+    const airlineCode = schedule.flightNumber.substring(0, 2);
+    const flightNum = schedule.flightNumber.substring(2);
     setFormData({
-      flightNumber: schedule.flightNumber,
+      airlineCode: airlineCode,
+      flightNumber: flightNum,
       routeId: schedule.routeId || "",
       aircraftTypeId: schedule.aircraftTypeId || "",
       departureTime: schedule.departureTime || "",
@@ -254,6 +296,7 @@ export default function FlightSchedulesPage() {
 
   const resetForm = () => {
     setFormData({
+      airlineCode: "",
       flightNumber: "",
       routeId: "",
       aircraftTypeId: "",
@@ -403,67 +446,23 @@ export default function FlightSchedulesPage() {
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-6 overflow-y-auto max-h-[calc(90vh-200px)] pr-2">
-                  <div className="grid gap-3">
-                    <Label htmlFor="flightNumber" className="text-base font-semibold text-gray-700">
-                      Số hiệu chuyến bay <span className="text-red-500 ml-1">*</span>
-                    </Label>
-                    <Input
-                      id="flightNumber"
-                      value={formData.flightNumber}
-                      onChange={(e) =>
-                        setFormData({ ...formData, flightNumber: e.target.value.toUpperCase() })
-                      }
-                      placeholder="VD: QH101"
-                      className="h-14 text-base"
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="routeId" className="text-base font-semibold text-gray-700">
-                      Route <span className="text-red-500 ml-1">*</span>
-                    </Label>
-                    <Select
-                      value={formData.routeId}
-                      onValueChange={(value) => setFormData({ ...formData, routeId: value })}
-                    >
-                      <SelectTrigger className="h-14 text-base">
-                        <SelectValue placeholder="Chọn route" />
-                      </SelectTrigger>
-                      <SelectContent className="text-base">
-                        {routes.map((route) => {
-                          const origin =
-                            route.origin_airport?.city || route.originAirport?.city || "N/A";
-                          const dest =
-                            route.destination_airport?.city ||
-                            route.destinationAirport?.city ||
-                            "N/A";
-                          return (
-                            <SelectItem
-                              key={route.route_id || route.routeId}
-                              value={route.route_id || route.routeId}
-                              className="text-base py-3"
-                            >
-                              {origin} → {dest}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-3">
-                    <Label
-                      htmlFor="aircraftTypeId"
-                      className="text-base font-semibold text-gray-700"
-                    >
-                      Aircraft Type ID (UUID) <span className="text-red-500 ml-1">*</span>
-                    </Label>
-                    <Input
-                      id="aircraftTypeId"
-                      value={formData.aircraftTypeId}
-                      onChange={(e) => setFormData({ ...formData, aircraftTypeId: e.target.value })}
-                      placeholder="UUID của aircraft type"
-                      className="h-14 text-base"
-                    />
-                  </div>
+                  <FlightNumberInput
+                    airlineCode={formData.airlineCode}
+                    flightNumber={formData.flightNumber}
+                    airlines={airlines}
+                    onAirlineChange={(code) => setFormData({ ...formData, airlineCode: code })}
+                    onFlightNumberChange={(num) => setFormData({ ...formData, flightNumber: num })}
+                  />
+                  <RouteSelect
+                    value={formData.routeId}
+                    routes={routes}
+                    onChange={(routeId) => setFormData({ ...formData, routeId })}
+                  />
+                  <AircraftTypeSelect
+                    value={formData.aircraftTypeId}
+                    aircraftTypes={aircraftTypes}
+                    onChange={(aircraftTypeId) => setFormData({ ...formData, aircraftTypeId })}
+                  />
                   <div className="grid grid-cols-2 gap-6">
                     <div className="grid gap-3">
                       <Label
@@ -498,26 +497,10 @@ export default function FlightSchedulesPage() {
                       />
                     </div>
                   </div>
-                  <div className="grid gap-3">
-                    <Label
-                      htmlFor="operatingDays"
-                      className="text-base font-semibold text-gray-700"
-                    >
-                      Ngày hoạt động <span className="text-red-500 ml-1">*</span>
-                    </Label>
-                    <Input
-                      id="operatingDays"
-                      value={formData.operatingDays}
-                      onChange={(e) => setFormData({ ...formData, operatingDays: e.target.value })}
-                      placeholder="1111111"
-                      maxLength={7}
-                      className="h-14 text-base"
-                    />
-                    <p className="text-sm text-gray-500 mt-1">
-                      Ví dụ: 1111111 = Tất cả các ngày, 1111100 = Thứ 2-6 (7 ký tự: 0=Chủ nhật,
-                      1=Thứ 2...)
-                    </p>
-                  </div>
+                  <DayChipPicker
+                    value={formData.operatingDays}
+                    onChange={(days) => setFormData({ ...formData, operatingDays: days })}
+                  />
                   <div className="grid grid-cols-2 gap-6">
                     <div className="grid gap-3">
                       <Label
@@ -905,6 +888,15 @@ export default function FlightSchedulesPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-6 overflow-y-auto max-h-[calc(90vh-200px)] pr-2">
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-sm text-gray-600 mb-2">Số hiệu chuyến bay:</p>
+              <p className="text-xl font-mono font-bold text-[#00558f]">
+                {editingSchedule?.flightNumber}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Không thể thay đổi số hiệu chuyến bay khi chỉnh sửa
+              </p>
+            </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="grid gap-3">
                 <Label
@@ -934,23 +926,10 @@ export default function FlightSchedulesPage() {
                 />
               </div>
             </div>
-            <div className="grid gap-3">
-              <Label htmlFor="edit-operatingDays" className="text-base font-semibold text-gray-700">
-                Ngày hoạt động <span className="text-red-500 ml-1">*</span>
-              </Label>
-              <Input
-                id="edit-operatingDays"
-                value={formData.operatingDays}
-                onChange={(e) => setFormData({ ...formData, operatingDays: e.target.value })}
-                placeholder="1111111"
-                maxLength={7}
-                className="h-14 text-base"
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Ví dụ: 1111111 = Tất cả các ngày, 1111100 = Thứ 2-6 (7 ký tự: 0=Chủ nhật, 1=Thứ
-                2...)
-              </p>
-            </div>
+            <DayChipPicker
+              value={formData.operatingDays}
+              onChange={(days) => setFormData({ ...formData, operatingDays: days })}
+            />
             <div className="grid grid-cols-2 gap-6">
               <div className="grid gap-3">
                 <Label

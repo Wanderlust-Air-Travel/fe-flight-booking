@@ -2,10 +2,10 @@
 
 import Breadcrumb from "@/app/components/Breadcrumb/Breadcrumb";
 import { Button } from "@/components/ui/button";
-import { localizedHref, type Locale } from "@/i18n/config";
+import { type Locale, localizedHref } from "@/i18n/config";
 import axiosInstance from "@/lib/axios-instance";
-import { useLocale } from "next-intl";
 import { AlertCircle, Check, CreditCard, Loader2, X } from "lucide-react";
+import { useLocale } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 

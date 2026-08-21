@@ -2,14 +2,14 @@
 import LocaleSwitcher from "@/app/components/LocaleSwitcher/LocaleSwitcher";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
+import { type Locale, localizedHref, stripLocale } from "@/i18n/config";
 import axiosInstance from "@/lib/axios-instance";
-import { localizedHref, type Locale, stripLocale } from "@/i18n/config";
 import { ChevronDown, LogOut, Menu, Settings, X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
 
 interface MenuItemConfig {
   key: "home" | "about" | "service";
@@ -163,10 +163,10 @@ const Header = () => {
               {hydrated && !isLoggedIn && (
                 <>
                   <Link
-className={`p-[1rem] text-md transition ease-linear h-full flex uppercase justify-center items-center gap-x-2 ${strippedPath === "/sign-in" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"} hover:text-[var(--cl-four)]`}
-                  href={localizedHref("/sign-in", locale)}
-                >
-                  {t("signIn")}
+                    className={`p-[1rem] text-md transition ease-linear h-full flex uppercase justify-center items-center gap-x-2 ${strippedPath === "/sign-in" ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"} hover:text-[var(--cl-four)]`}
+                    href={localizedHref("/sign-in", locale)}
+                  >
+                    {t("signIn")}
                   </Link>
                   <Link
                     className={`h-auto flex flex-col justify-center px-[2rem] py-[0.6rem] rounded-lg transition ${
@@ -176,9 +176,9 @@ className={`p-[1rem] text-md transition ease-linear h-full flex uppercase justif
                     }`}
                     href={localizedHref("/sign-up", locale)}
                   >
-<span className="p-[1rem] text-md h-full flex justify-center items-center gap-x-2 uppercase">
-                        {t("signUp")}
-                      </span>
+                    <span className="p-[1rem] text-md h-full flex justify-center items-center gap-x-2 uppercase">
+                      {t("signUp")}
+                    </span>
                   </Link>
                 </>
               )}
@@ -250,7 +250,10 @@ className={`p-[1rem] text-md transition ease-linear h-full flex uppercase justif
             ) : (
               <>
                 {hydrated && !isLoggedIn && (
-                  <Link href={localizedHref("/sign-in", locale)} className="text-[var(--cl-white)] text-sm uppercase">
+                  <Link
+                    href={localizedHref("/sign-in", locale)}
+                    className="text-[var(--cl-white)] text-sm uppercase"
+                  >
                     {t("signIn")}
                   </Link>
                 )}
@@ -283,7 +286,9 @@ className={`p-[1rem] text-md transition ease-linear h-full flex uppercase justif
                   href={localizedHref(menuList.path, locale)}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`py-2 text-sm font-medium uppercase border-b border-white/10 last:border-b-0 ${
-                    strippedPath === menuList.path ? "text-[var(--cl-four)]" : "text-[var(--cl-white)]"
+                    strippedPath === menuList.path
+                      ? "text-[var(--cl-four)]"
+                      : "text-[var(--cl-white)]"
                   }`}
                 >
                   {t(menuList.key)}

@@ -1,6 +1,6 @@
 import { convertToYMD } from "@/app/components/FormatDate/FormatDate";
+import { type Locale, localizedHref } from "@/i18n/config";
 import { getApiUrl } from "@/lib/api-config";
-import { localizedHref, type Locale } from "@/i18n/config";
 import type { ItemServiceProp } from "@/types/item-service-type";
 import { ArrowRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -29,9 +29,7 @@ const ItemService = ({
       const destinationCode = matches[1]?.replace(/[()]/g, "") || "";
 
       if (!originCode || !destinationCode) {
-        return link
-          ? localizedHref(link, locale)
-          : localizedHref("/search/flights", locale);
+        return link ? localizedHref(link, locale) : localizedHref("/search/flights", locale);
       }
 
       const departDate = convertToYMD(startDate);
@@ -39,9 +37,7 @@ const ItemService = ({
       const searchBase = localizedHref("/search/flights", locale);
       return `${searchBase}?origin=${originCode}&destination=${destinationCode}&departDate=${departDate}&returnDate=&tripType=one_way&adults=1&minors=0`;
     } catch {
-      return link
-        ? localizedHref(link, locale)
-        : localizedHref("/search/flights", locale);
+      return link ? localizedHref(link, locale) : localizedHref("/search/flights", locale);
     }
   };
 
@@ -66,8 +62,16 @@ const ItemService = ({
           <h2 className="text-[2rem] font-medium hover:text-[var(--cl-four)] transition ease-linear">
             <Link href={searchHref}>{title}</Link>
           </h2>
-          {startDate && <p className="title-sm">{t("departureLabel")} {startDate}</p>}
-          {endDate && <p className="title-sm">{t("returnLabel")} {endDate}</p>}
+          {startDate && (
+            <p className="title-sm">
+              {t("departureLabel")} {startDate}
+            </p>
+          )}
+          {endDate && (
+            <p className="title-sm">
+              {t("returnLabel")} {endDate}
+            </p>
+          )}
         </div>
 
         <div className="flex gap-x-[0.8rem] justify-between items-end">

@@ -7,7 +7,7 @@ import useFightSearchBarStore from "@/app/zustand/storeFightSearchBar";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { localizedHref, type Locale } from "@/i18n/config";
+import { type Locale, localizedHref } from "@/i18n/config";
 import { Form, Formik } from "formik";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
@@ -155,7 +155,11 @@ const InfoTicket = () => {
                         />
                       </div>
                       <div className="w-full px-[1.2rem]">
-                        <InputFormat name="address" label={tCommon("address")} placeholder={tCommon("addressPlaceholder")} />
+                        <InputFormat
+                          name="address"
+                          label={tCommon("address")}
+                          placeholder={tCommon("addressPlaceholder")}
+                        />
                       </div>
                     </div>
                   </div>
@@ -166,7 +170,11 @@ const InfoTicket = () => {
                       Loyal Customer
                     </h2>
                     <div className="w-full px-[1.2rem]">
-                      <InputFormat name="code" label={tCommon("code")} placeholder={tCommon("codePlaceholder")} />
+                      <InputFormat
+                        name="code"
+                        label={tCommon("code")}
+                        placeholder={tCommon("codePlaceholder")}
+                      />
                     </div>
                   </div>
 

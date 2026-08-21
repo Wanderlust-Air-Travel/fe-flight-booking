@@ -23,6 +23,7 @@
 		"from": "From",
 		"to": "To",
 		"required": "Required",
+		"optional": "Optional",
 		"fullName": "Full name",
 		"fullNamePlaceholder": "Enter fullname",
 		"email": "Email",
@@ -321,7 +322,51 @@
 		},
 		"fareClasses": {
 			"title": "Fare classes",
-			"addFare": "Add fare"
+			"addFare": "Add fare",
+			"code": "Fare class code",
+			"cabinClass": "Cabin class",
+			"cabinClassPlaceholder": "Select cabin class",
+			"loadingCabinClasses": "Loading cabin classes...",
+			"description": "Description",
+			"descriptionPlaceholder": "E.g. Economy Smart",
+			"changeRule": "Change rule",
+			"changeRulePlaceholder": "E.g. Change before departure: 450,000 VND",
+			"refundRule": "Refund rule",
+			"refundRulePlaceholder": "E.g. Refund before departure: 450,000 VND",
+			"codePlaceholder": "E.g. YS",
+			"createTitle": "Add new fare class",
+			"createDescription": "Create a new fare class for the system",
+			"editTitle": "Edit fare class",
+			"editDescription": "Update fare class information",
+			"searchPlaceholder": "Search by fare class code, description, cabin class...",
+			"emptyTitle": "No fare classes yet",
+			"emptyHint": "Add a new fare class",
+			"tableTitle": "Fare classes list",
+			"tableCount": "Showing {filtered} / {total} fare classes",
+			"statsTotal": "Total fare classes",
+			"statsCabin": "Cabin classes in use",
+			"statsFiltered": "Search results",
+			"statsFilteredHint": "(after filter)",
+			"headerTitle": "Fare class management",
+			"headerSubtitle": "Manage fare classes and pricing",
+			"deleteConfirm": "Are you sure you want to delete fare class {code}?",
+			"errors": {
+				"load": "Unable to load fare classes",
+				"create": "Unable to create fare class",
+				"update": "Unable to update fare class",
+				"delete": "Unable to delete fare class",
+				"loadCabinClasses": "Unable to load cabin classes"
+			},
+			"actions": {
+				"create": "Create",
+				"update": "Update",
+				"cancel": "Cancel"
+			},
+			"validation": {
+				"codeRequired": "Please enter fare class code",
+				"cabinClassRequired": "Please select a cabin class"
+			},
+			"readonlyEdit": "Code and cabin class cannot be changed after creation"
 		},
 		"routeFarePrices": {
 			"title": "Route fare prices",

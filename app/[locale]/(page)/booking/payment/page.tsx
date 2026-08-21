@@ -7,7 +7,7 @@ import { usePaymentStatus } from "@/app/hooks/use-payment-status";
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
-import { localizedHref, type Locale } from "@/i18n/config";
+import { type Locale, localizedHref } from "@/i18n/config";
 import axiosInstance from "@/lib/axios-instance";
 import { showError, showSuccess } from "@/lib/toast";
 import type { PaymentStatus } from "@/types/payment";
@@ -21,6 +21,8 @@ const PaymentPageContent = () => {
   const { accessToken } = useUserStore();
   const locale = useLocale() as Locale;
   const tErrors = useTranslations("errors");
+  const tCommon = useTranslations("common");
+  const tBk = useTranslations("booking");
 
   const bookingId = searchParams.get("bookingId");
   const { data: ticketData } = useInfoTicket();
@@ -109,9 +111,7 @@ const PaymentPageContent = () => {
           setPollingMessage("Waiting for payment confirmation from gateway...");
         } catch (err: any) {
           console.error("Error polling payment status:", err);
-          setError(
-            err?.response?.data?.message || err?.message || tErrors("notFound")
-          );
+          setError(err?.response?.data?.message || err?.message || tErrors("notFound"));
           setStatus("failed");
           setPollingMessage(null);
           return;
@@ -236,7 +236,10 @@ const PaymentPageContent = () => {
             <p className="text-lg text-red-500">
               Booking ID is missing. Please restart the booking process.
             </p>
-            <Button onClick={() => router.push(localizedHref("/search/flights", locale))} className="mt-[2rem]">
+            <Button
+              onClick={() => router.push(localizedHref("/search/flights", locale))}
+              className="mt-[2rem]"
+            >
               Back to Search
             </Button>
           </div>

@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { type Locale, localizedHref } from "@/i18n/config";
 import { axiosPublic } from "@/lib/axios-instance";
 import { dismissToast, showError, showLoading, showSuccess } from "@/lib/toast";
-import { localizedHref, type Locale } from "@/i18n/config";
 import type { Booking } from "@/types/my-bookings-type";
 import { AlertCircle, MapPin, Plane, User } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -83,17 +83,17 @@ const MyBookingsPageContent = () => {
     }
   };
 
-	const statusBadge = (status: string) => {
-		const className = `px-3 py-1 rounded-full text-sm font-medium ${
-			status === "paid"
-				? "bg-green-100 text-green-800"
-				: status === "pending"
-					? "bg-yellow-100 text-yellow-800"
-					: status === "confirmed"
-						? "bg-blue-100 text-blue-800"
-						: "bg-gray-100 text-gray-800"
-		}`;
-		const label =
+  const statusBadge = (status: string) => {
+    const className = `px-3 py-1 rounded-full text-sm font-medium ${
+      status === "paid"
+        ? "bg-green-100 text-green-800"
+        : status === "pending"
+          ? "bg-yellow-100 text-yellow-800"
+          : status === "confirmed"
+            ? "bg-blue-100 text-blue-800"
+            : "bg-gray-100 text-gray-800"
+    }`;
+    const label =
       status === "paid"
         ? t("statusPaid")
         : status === "pending"

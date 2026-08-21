@@ -2,9 +2,9 @@
 import { InputFormat } from "@/app/hook/InputFormat";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
+import { type Locale, localizedHref } from "@/i18n/config";
 import { getErrorMessage, showError, showSuccess } from "@/lib/toast";
 import type { SignupFormValue } from "@/types/auth-form-type";
-import { localizedHref, type Locale } from "@/i18n/config";
 import axios from "axios";
 import { Formik } from "formik";
 import { useLocale, useTranslations } from "next-intl";
@@ -103,7 +103,11 @@ const SignUpPage = () => {
                             />
                           </div>
                           <div className="md:w-[50%] w-full px-[0.6rem]">
-                            <InputFormat name="email" placeholder={t("emailPlaceholder")} label={t("emailLabel")} />
+                            <InputFormat
+                              name="email"
+                              placeholder={t("emailPlaceholder")}
+                              label={t("emailLabel")}
+                            />
                           </div>
                           <div className="md:w-[50%] w-full px-[0.6rem]">
                             <InputFormat

@@ -6,10 +6,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { type Locale, localizedHref } from "@/i18n/config";
 import { axiosPublic } from "@/lib/axios-instance";
-import { localizedHref, type Locale } from "@/i18n/config";
-import { useLocale, useTranslations } from "next-intl";
 import { AlertCircle } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 

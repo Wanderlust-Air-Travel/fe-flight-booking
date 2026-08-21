@@ -23,6 +23,7 @@
 		"from": "Từ",
 		"to": "Đến",
 		"required": "Bắt buộc",
+		"optional": "tùy chọn",
 		"fullName": "Họ và tên",
 		"fullNamePlaceholder": "Nhập họ và tên",
 		"email": "Email",
@@ -321,7 +322,51 @@
 		},
 		"fareClasses": {
 			"title": "Hạng vé",
-			"addFare": "Thêm hạng"
+			"addFare": "Thêm hạng",
+			"code": "Mã hạng vé",
+			"cabinClass": "Hạng cabin",
+			"cabinClassPlaceholder": "Chọn hạng cabin",
+			"loadingCabinClasses": "Đang tải hạng cabin...",
+			"description": "Mô tả",
+			"descriptionPlaceholder": "VD: Economy Smart",
+			"changeRule": "Quy tắc đổi vé",
+			"changeRulePlaceholder": "VD: Change before departure: 450,000 VND",
+			"refundRule": "Quy tắc hoàn vé",
+			"refundRulePlaceholder": "VD: Refund before departure: 450,000 VND",
+			"codePlaceholder": "VD: YS",
+			"createTitle": "Thêm hạng vé mới",
+			"createDescription": "Tạo một hạng vé mới cho hệ thống",
+			"editTitle": "Chỉnh sửa hạng vé",
+			"editDescription": "Cập nhật thông tin hạng vé",
+			"searchPlaceholder": "Tìm kiếm theo mã hạng vé, mô tả, hạng cabin...",
+			"emptyTitle": "Không có hạng vé nào",
+			"emptyHint": "Hãy thêm hạng vé mới",
+			"tableTitle": "Danh sách hạng vé",
+			"tableCount": "Hiển thị {filtered} / {total} hạng vé",
+			"statsTotal": "Tổng số hạng vé",
+			"statsCabin": "Số hạng cabin",
+			"statsFiltered": "Kết quả tìm kiếm",
+			"statsFilteredHint": "(sau khi lọc)",
+			"headerTitle": "Quản lý hạng vé",
+			"headerSubtitle": "Quản lý hạng vé và giá cả",
+			"deleteConfirm": "Bạn có chắc muốn xóa hạng vé {code}?",
+			"errors": {
+				"load": "Không thể tải danh sách hạng vé",
+				"create": "Không thể tạo hạng vé",
+				"update": "Không thể cập nhật hạng vé",
+				"delete": "Không thể xóa hạng vé",
+				"loadCabinClasses": "Không thể tải danh sách hạng cabin"
+			},
+			"actions": {
+				"create": "Tạo mới",
+				"update": "Cập nhật",
+				"cancel": "Hủy"
+			},
+			"validation": {
+				"codeRequired": "Vui lòng nhập mã hạng vé",
+				"cabinClassRequired": "Vui lòng chọn hạng cabin"
+			},
+			"readonlyEdit": "Mã và hạng cabin không thể thay đổi sau khi tạo"
 		},
 		"routeFarePrices": {
 			"title": "Giá vé theo tuyến",

@@ -10,7 +10,7 @@ import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { localizedHref, type Locale } from "@/i18n/config";
+import { type Locale, localizedHref } from "@/i18n/config";
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import type { SeatGroup, SeatItem } from "@/types/seat-type";
 import { useLocale, useTranslations } from "next-intl";
@@ -516,9 +516,7 @@ const SeatMapPageContent = () => {
       router.push(`/booking/info?flightInstanceId=${flightInstanceId}`);
     } catch (error: any) {
       console.error("Error saving seat selection:", error);
-      setSaveError(
-        error.response?.data?.message || error.message || tBk("paymentFailed")
-      );
+      setSaveError(error.response?.data?.message || error.message || tBk("paymentFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -549,7 +547,9 @@ const SeatMapPageContent = () => {
       <main className="flex flex-col pt-[var(--hd)] gap-y-[var(--rowY)]">
         <div className="container flex flex-col items-center justify-center min-h-[400px] gap-4">
           <p className="text-lg text-red-500">{error}</p>
-          <Button onClick={() => router.push(localizedHref("/search/flights", locale))}>Back to Search</Button>
+          <Button onClick={() => router.push(localizedHref("/search/flights", locale))}>
+            Back to Search
+          </Button>
         </div>
       </main>
     );

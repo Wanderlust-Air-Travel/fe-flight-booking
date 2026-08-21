@@ -3,13 +3,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { type Locale, localizedHref } from "@/i18n/config";
 import { axiosPublic } from "@/lib/axios-instance";
 import { dismissToast, showError, showLoading, showSuccess } from "@/lib/toast";
-import { localizedHref, type Locale } from "@/i18n/config";
 import type { BannerApi } from "@/types/banner";
 import axios from "axios";
-import { useLocale, useTranslations } from "next-intl";
 import { AlertCircle } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -81,10 +81,7 @@ const BannerHome = () => {
       }
     } catch (err: any) {
       console.error("Error fetching booking:", err);
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        tCheckIn("notFoundToast");
+      const errorMessage = err.response?.data?.message || err.message || tCheckIn("notFoundToast");
       setCheckInError(errorMessage);
     } finally {
       setIsCheckInLoading(false);
@@ -107,12 +104,13 @@ const BannerHome = () => {
       if (response.data) {
         dismissToast(loadingToastId);
         showSuccess(tMyBk("foundToast"));
-        router.push(`${localizedHref("/my-bookings", locale)}?bookingCode=${encodeURIComponent(myBookingCode.trim())}`);
+        router.push(
+          `${localizedHref("/my-bookings", locale)}?bookingCode=${encodeURIComponent(myBookingCode.trim())}`
+        );
       }
     } catch (err: any) {
       dismissToast(loadingToastId);
-      const errorMessage =
-        err.response?.data?.message || tMyBk("notFoundToast");
+      const errorMessage = err.response?.data?.message || tMyBk("notFoundToast");
       setMyBookingError(errorMessage);
       showError(errorMessage);
     } finally {
@@ -153,7 +151,9 @@ const BannerHome = () => {
                     : "text-gray-600 bg-gray-50 border-transparent hover:text-[var(--cl-pri)] hover:bg-gray-100"
                 }`}
               >
-                <span className="font-medium">{tMyBk("tabByCode").split("/")[1]?.trim() || tMyBk("tabByCode")}</span>
+                <span className="font-medium">
+                  {tMyBk("tabByCode").split("/")[1]?.trim() || tMyBk("tabByCode")}
+                </span>
               </button>
               <button
                 type="button"
@@ -173,9 +173,7 @@ const BannerHome = () => {
                 <div className="flex justify-between gap-x-[2rem] p-6">
                   {/* Header Section */}
                   <div className="flex flex-col gap-y-[0.4rem]  w-fit">
-                    <p className="text-base text-gray-700 font-medium">
-                      {tCheckIn("enterPnr")}
-                    </p>
+                    <p className="text-base text-gray-700 font-medium">{tCheckIn("enterPnr")}</p>
                     <p className="text-sm  text-gray-600 font-medium">
                       <strong className="text-red-600 ">*</strong> {tCheckIn("pnrConfirmHelp")}
                     </p>
@@ -244,7 +242,9 @@ const BannerHome = () => {
                         </svg>
                         {tCheckIn("checkInSubmitting")}
                       </span>
-                    ) : tCheckIn("checkInButton")}
+                    ) : (
+                      tCheckIn("checkInButton")
+                    )}
                   </Button>
                 </div>
               </form>
@@ -332,7 +332,9 @@ const BannerHome = () => {
                         {tCommon("searching")}
                       </span>
                     ) : (
-                      <span className="flex items-center justify-center gap-2">{tCommon("search")}</span>
+                      <span className="flex items-center justify-center gap-2">
+                        {tCommon("search")}
+                      </span>
                     )}
                   </Button>
                 </div>
@@ -344,9 +346,7 @@ const BannerHome = () => {
                 <div className="flex justify-between gap-x-[2rem] p-6">
                   {/* Header Section */}
                   <div className="flex flex-col gap-y-[0.4rem] w-fit">
-                    <p className="text-base text-gray-700 font-medium">
-                      {tMyBk("searchCardDesc")}
-                    </p>
+                    <p className="text-base text-gray-700 font-medium">{tMyBk("searchCardDesc")}</p>
                     <p className="text-sm  text-gray-600 font-medium">
                       <strong className="text-red-600 ">*</strong> {tMyBk("pnrHelper")}
                     </p>
@@ -367,9 +367,7 @@ const BannerHome = () => {
 
                   {/* Submit Button */}
                   <Button
-                    onClick={() =>
-                      showError(tCheckIn("membershipSearchComingSoon"))
-                    }
+                    onClick={() => showError(tCheckIn("membershipSearchComingSoon"))}
                     disabled={isCheckInLoading || !membershipNumber.trim()}
                     className="w-full flex-1 bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-xl rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md h-[4.8rem]!"
                   >
@@ -398,7 +396,9 @@ const BannerHome = () => {
                         {tCommon("searching")}
                       </span>
                     ) : (
-                      <span className="flex items-center justify-center gap-2">{tCommon("search")}</span>
+                      <span className="flex items-center justify-center gap-2">
+                        {tCommon("search")}
+                      </span>
                     )}
                   </Button>
                 </div>
@@ -440,11 +440,10 @@ const BannerHome = () => {
                 <div className="flex justify-between gap-x-[2rem] p-6">
                   {/* Header Section */}
                   <div className=" w-fit flex flex-col gap-y-[0.4rem]">
-                    <p className="text-base text-gray-700 font-medium">
-                      {tMyBk("searchCardDesc")}
-                    </p>
+                    <p className="text-base text-gray-700 font-medium">{tMyBk("searchCardDesc")}</p>
                     <p className="text-sm  text-gray-600 font-medium">
-                      <strong className="text-red-600 ">*</strong> {tMyBk("pnrConfirmHelp") || tMyBk("pnrHelper")}
+                      <strong className="text-red-600 ">*</strong>{" "}
+                      {tMyBk("pnrConfirmHelp") || tMyBk("pnrHelper")}
                     </p>
                   </div>
 
@@ -528,13 +527,14 @@ const BannerHome = () => {
                 <div className="p-6 flex flex-col  gap-y-[1.2rem]">
                   {/* Header Section */}
                   <div className="text-center">
-                    <p className="text-base text-gray-700 font-medium">
-                      {tMyBk("membershipDesc")}
-                    </p>
+                    <p className="text-base text-gray-700 font-medium">{tMyBk("membershipDesc")}</p>
                   </div>
 
                   {/* Submit Button */}
-                  <Button onClick={() => router.push(localizedHref("/sign-in", locale))} className="w-full max-w-[20rem] mx-auto flex-1 h-[4rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                  <Button
+                    onClick={() => router.push(localizedHref("/sign-in", locale))}
+                    className="w-full max-w-[20rem] mx-auto flex-1 h-[4rem]! bg-[var(--cl-pri)] hover:bg-[var(--cl-third)] text-white font-bold py-5 md:py-6 text-base md:text-lg rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                  >
                     {tMyBk("membershipLogin")}
                   </Button>
                 </div>

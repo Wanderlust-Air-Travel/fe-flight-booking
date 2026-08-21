@@ -8,7 +8,7 @@ import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils"
 import useInfoTicket from "@/app/zustand/storeInfoTicket";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
-import { localizedHref, type Locale } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
 import axiosInstance, { axiosPublic } from "@/lib/axios-instance";
 import type { SeatGroup, SeatItem } from "@/types/seat-type";
 import { useLocale, useTranslations } from "next-intl";
@@ -243,9 +243,7 @@ const ChooseCabin = () => {
       router.push(`/booking/info?flightInstanceId=${flightInstanceId}`);
     } catch (error: any) {
       console.error("Error saving seat selection:", error);
-      setSaveError(
-        error.response?.data?.message || error.message || tBk("paymentFailed")
-      );
+      setSaveError(error.response?.data?.message || error.message || tBk("paymentFailed"));
     } finally {
       setIsSaving(false);
     }

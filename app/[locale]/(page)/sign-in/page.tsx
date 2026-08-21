@@ -4,8 +4,8 @@ import { InputFormat } from "@/app/hook/InputFormat";
 import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { type Locale, localizedHref } from "@/i18n/config";
 import type { SigninFormValue } from "@/types/auth-form-type";
-import { localizedHref, type Locale } from "@/i18n/config";
 import axios from "axios";
 import { Formik } from "formik";
 import { useLocale, useTranslations } from "next-intl";
@@ -29,19 +29,25 @@ const SignInPage = () => {
   const t = useTranslations("auth.signIn");
 
   const handleDirectLogin = useCallback(
-    async (email: string, password: string) => {
+    async (email: string) => {
       try {
-        const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`, {
-          email,
-          password,
+        const res = await fetch("/api/dev/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+          cache: "no-store",
         });
-        if (res.data) {
-          login(res.data);
+        const data = await res.json().catch(() => null);
+        if (res.ok && data) {
+          login(data);
           router.push(localizedHref("/", locale));
+          return { success: true };
         }
-        return { success: true };
+        const message =
+          (data && (data.message || data.error)) || `Đăng nhập thất bại (HTTP ${res.status})`;
+        return { success: false, error: message };
       } catch (err: any) {
-        const message = err.response?.data?.message || err.message || "Đăng nhập thất bại";
+        const message = err?.message || "Đăng nhập thất bại";
         return { success: false, error: message };
       }
     },
@@ -116,7 +122,11 @@ const SignInPage = () => {
                     <form onSubmit={handleSubmit}>
                       <div className="flex flex-col gap-y-[3.2rem]">
                         <div className="flex flex-col gap-y-[1.2rem]">
-                          <InputFormat name="email" placeholder={t("emailPlaceholder")} label={t("emailLabel")} />
+                          <InputFormat
+                            name="email"
+                            placeholder={t("emailPlaceholder")}
+                            label={t("emailLabel")}
+                          />
                           <InputFormat
                             name="password"
                             placeholder={t("passwordPlaceholder")}

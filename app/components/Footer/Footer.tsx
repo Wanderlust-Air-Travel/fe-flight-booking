@@ -1,9 +1,9 @@
 "use client";
+import { type Locale, localizedHref, stripLocale } from "@/i18n/config";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
-import { localizedHref, type Locale, stripLocale } from "@/i18n/config";
 
 const Footer = () => {
   const fullPathname = usePathname();
@@ -36,9 +36,7 @@ const Footer = () => {
                 className="w-full h-full object-contain transition ease-linear group-hover:scale-95 filter-white"
               />
             </Link>
-            <p className="hidden sm:block text-sm md:text-base text-white/80">
-              {t("copyright")}
-            </p>
+            <p className="hidden sm:block text-sm md:text-base text-white/80">{t("copyright")}</p>
           </div>
 
           {/* Quick links + social icons (gộp cùng bên phải) */}
@@ -83,13 +81,22 @@ const Footer = () => {
 
             <div className="flex items-center gap-3 md:gap-4">
               <div className="flex items-center gap-2">
-                <Link className="hover:scale-110 transition ease-linear" href={localizedHref("/", locale)}>
+                <Link
+                  className="hover:scale-110 transition ease-linear"
+                  href={localizedHref("/", locale)}
+                >
                   <Image src="/facebook.svg" alt="facebook" width={18} height={18} priority />
                 </Link>
-                <Link className="hover:scale-110 transition ease-linear" href={localizedHref("/", locale)}>
+                <Link
+                  className="hover:scale-110 transition ease-linear"
+                  href={localizedHref("/", locale)}
+                >
                   <Image src="/instagram.svg" alt="instagram" width={18} height={18} priority />
                 </Link>
-                <Link className="hover:scale-110 transition ease-linear" href={localizedHref("/", locale)}>
+                <Link
+                  className="hover:scale-110 transition ease-linear"
+                  href={localizedHref("/", locale)}
+                >
                   <Image src="/twitter.svg" alt="twitter" width={18} height={18} priority />
                 </Link>
               </div>
