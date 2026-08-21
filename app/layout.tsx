@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { TikTok_Sans } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 
-const tiktokSans = TikTok_Sans({
-  variable: "--font-tiktok-sans",
+const manrope = Manrope({
+  variable: "--font-sans",
   subsets: ["latin", "vietnamese"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className={`${tiktokSans.variable} antialiased`}>{children}</body>
+      <body className={`${manrope.variable} antialiased`}>{children}</body>
     </html>
   );
 }

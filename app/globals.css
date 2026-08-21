@@ -302,7 +302,8 @@ html {
 }
 
 body {
-  font-family: var(--font-tiktok-sans);
+  font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
   line-height: 1.5;
   color: #000000;
 }
@@ -330,7 +331,8 @@ main {
  *  These are the DESIGN LANGUAGE classes. Use them in components.
  * ================================================================ */
 .font-pri {
-  font-family: var(--font-open-sans);
+  font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
 }
 
 /* Font size helpers using CSS vars (no !important) */
