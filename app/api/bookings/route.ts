@@ -1,24 +1,25 @@
 // app/api/bookings/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from "next/server";
 
 // Backend API base URL - In Next.js API routes, NEXT_PUBLIC_* env vars are not available
 // Use regular env var or fallback to default
-const BACKEND_API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const BACKEND_API_URL =
+  process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export async function POST(req: NextRequest) {
   try {
     // Lấy access token từ header (optional - for guest bookings)
-    const authHeader = req.headers.get('authorization');
-    
+    const authHeader = req.headers.get("authorization");
+
     // Authorization header is optional - guest bookings are allowed
 
     // Lấy reservationId từ query parameter
     const { searchParams } = new URL(req.url);
-    const reservationId = searchParams.get('reservationId');
+    const reservationId = searchParams.get("reservationId");
 
     if (!reservationId) {
       return NextResponse.json(
-        { message: 'reservationId query parameter is required' },
+        { message: "reservationId query parameter is required" },
         { status: 400 }
       );
     }
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
     // Validate required fields
     if (!passengers || !Array.isArray(passengers) || passengers.length === 0) {
       return NextResponse.json(
-        { message: 'passengers array is required and must not be empty' },
+        { message: "passengers array is required and must not be empty" },
         { status: 400 }
       );
     }
@@ -38,23 +39,23 @@ export async function POST(req: NextRequest) {
     // Proxy request to backend
     // Include Authorization header only if provided (for authenticated bookings)
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     };
     if (authHeader) {
-      headers['Authorization'] = authHeader;
+      headers.Authorization = authHeader;
     }
-    
+
     const response = await fetch(
       `${BACKEND_API_URL}/api/v1/bookings?reservationId=${encodeURIComponent(reservationId)}`,
       {
-        method: 'POST',
+        method: "POST",
         headers,
         body: JSON.stringify({
           passengers,
           contactFullname,
           contactEmail,
           contactPhone,
-          channel: channel || 'web',
+          channel: channel || "web",
         }),
       }
     );
@@ -67,11 +68,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
-    console.error('Error creating booking:', error);
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error("Error creating booking:", error);
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
-

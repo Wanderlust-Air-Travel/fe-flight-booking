@@ -19,6 +19,8 @@ export interface CabinServicesSelectorProps {
 	fareClassCode: string;
 	cabinClassCode: string;
 	onServicesChange?: (services: CabinService[]) => void;
+	/** Khi true (vd. check-in đang prime cabin), nút Lưu bị disable */
+	saveDisabled?: boolean;
 }
 
 export interface CabinServiceResponse {

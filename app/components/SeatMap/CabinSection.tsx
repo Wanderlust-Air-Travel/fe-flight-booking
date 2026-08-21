@@ -1,13 +1,9 @@
 "use client";
 
+import { divideRowsIntoSections, groupSeatsByRow } from "@/app/utils/seat-utils";
+import type { CabinSectionProps } from "@/types/seat-map-component-type";
+import type { SeatSection as SeatSectionType } from "@/types/seat-utils-type";
 import { memo, useMemo } from "react";
-import { SeatGroup } from "@/types/seat-type";
-import {
-  groupSeatsByRow,
-  divideRowsIntoSections,
-} from "@/app/utils/seat-utils";
-import { SeatSection as SeatSectionType } from "@/types/seat-utils-type";
-import { CabinSectionProps } from "@/types/seat-map-component-type";
 import SeatSection from "./SeatSection";
 
 /**
@@ -38,7 +34,7 @@ const CabinSection = memo(function CabinSection({
   return (
     <div
       className={`w-full bg-[#F5F7FA] rounded-md p-[1.2rem] ${
-        !isSelectable ? "opacity-50 pointer-events-none" : ""
+        isSelectable ? "" : "opacity-50 pointer-events-none"
       }`}
     >
       {/* Cabin Type Header */}
@@ -73,4 +69,3 @@ const CabinSection = memo(function CabinSection({
 CabinSection.displayName = "CabinSection";
 
 export default CabinSection;
-

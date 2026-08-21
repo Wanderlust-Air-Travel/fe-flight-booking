@@ -1,40 +1,70 @@
-// app/api/admin/routes/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
 
-const BACKEND_API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.headers.get('authorization');
-    
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+    const authHeader = req.headers.get("authorization");
+
+    const token = authHeader || (accessToken ? `Bearer ${accessToken}` : null);
+
     if (!token) {
-      return NextResponse.json(
-        { message: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const response = await fetch(`${BACKEND_API_URL}/api/v1/admin/routes`, {
-      method: 'GET',
+    const response = await fetch(`${API_BASE_URL}/api/v1/admin/routes`, {
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token,
+        Authorization: token,
+        "Content-Type": "application/json",
       },
+      cache: "no-store",
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      return NextResponse.json(data, { status: response.status });
+      const error = await response.json();
+      return NextResponse.json(error, { status: response.status });
     }
 
-    return NextResponse.json(data, { status: 200 });
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error fetching routes:', error);
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error("Error fetching routes:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
+export async function POST(request: Request) {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+
+    if (!accessToken) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+
+    const response = await fetch(`${API_BASE_URL}/api/v1/admin/routes`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return NextResponse.json(error, { status: response.status });
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Error creating route:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import axiosInstance from "@/lib/axios-instance";
+import { type NextRequest, NextResponse } from "next/server";
 
-const BACKEND_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const BACKEND_API_URL =
+  process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,33 +9,24 @@ export async function POST(req: NextRequest) {
     const { userId, bookingId } = body;
 
     if (!userId || !bookingId) {
-      return NextResponse.json(
-        { message: "userId and bookingId are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "userId and bookingId are required" }, { status: 400 });
     }
 
     // Get authorization header
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
-      return NextResponse.json(
-        { message: "Authorization header is required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Authorization header is required" }, { status: 401 });
     }
 
     // Call backend API
-    const response = await fetch(
-      `${BACKEND_API_URL}/api/v1/auth/otp/cancellation/send`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
-        body: JSON.stringify({ userId, bookingId }),
-      }
-    );
+    const response = await fetch(`${BACKEND_API_URL}/api/v1/auth/otp/cancellation/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
+      body: JSON.stringify({ userId, bookingId }),
+    });
 
     const data = await response.json();
 
@@ -55,4 +46,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

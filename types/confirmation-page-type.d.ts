@@ -28,6 +28,13 @@ export interface BookingSegmentDetails {
   flightSeat?: {
     seatNumber: string;
   };
+  /** Cabin services registered for this segment (meals, WiFi, etc.) */
+  services?: Array<{
+    serviceType?: string;
+    serviceName?: string;
+    price?: number;
+    isIncluded?: boolean;
+  }>;
 }
 
 export interface BookingPassengerDetails {

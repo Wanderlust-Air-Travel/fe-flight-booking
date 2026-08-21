@@ -1,12 +1,12 @@
 // app/api/banner/route.ts
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 const tripList = [
-  { 
-    id:1,
-    code:1,
-    startDate:"02/03/2026",
-    endDate:"",
+  {
+    id: 1,
+    code: 1,
+    startDate: "02/03/2026",
+    endDate: "",
     icon: "/logoBrand.png",
     totalTime: "7:00 AM",
     airline: "Hawaiian Airlines",
@@ -20,21 +20,21 @@ const tripList = [
         type: "economy",
         title: "Economy",
         price: 1000000,
-        quantity:5,
+        quantity: 5,
       },
       {
         type: "business",
         title: "Business",
         price: 10000000,
-        quantity:5,
+        quantity: 5,
       },
-    ]
+    ],
   },
   {
-    id:2,
-    code:2,
-    startDate:"02/03/2026",
-    endDate:"",
+    id: 2,
+    code: 2,
+    startDate: "02/03/2026",
+    endDate: "",
     icon: "/logoBrand.png",
     totalTime: "7h 35m",
     airline: "Japan Airlines",
@@ -48,21 +48,21 @@ const tripList = [
         type: "economy",
         title: "Economy",
         price: 1000000,
-        quantity:5,
+        quantity: 5,
       },
       {
         type: "business",
         title: "Business",
         price: 10000000,
-        quantity:5,
+        quantity: 5,
       },
-    ]
+    ],
   },
   {
-    id:3,
-    code:1,
-    startDate:"02/03/2026",
-    endDate:"",
+    id: 3,
+    code: 1,
+    startDate: "02/03/2026",
+    endDate: "",
     icon: "/logoBrand.png",
     totalTime: "8:20 AM",
     airline: "Hawaiian Airlines",
@@ -76,21 +76,21 @@ const tripList = [
         type: "economy",
         title: "Economy",
         price: 1000000,
-        quantity:5,
+        quantity: 5,
       },
       {
         type: "business",
         title: "Business",
         price: 10000000,
-        quantity:5,
+        quantity: 5,
       },
-    ]
+    ],
   },
   {
-    id:4,
-    code:1,
-    startDate:"02/03/2026",
-    endDate:"",
+    id: 4,
+    code: 1,
+    startDate: "02/03/2026",
+    endDate: "",
     icon: "/logoBrand.png",
     totalTime: "9:47 AM",
     airline: "Delta",
@@ -104,21 +104,21 @@ const tripList = [
         type: "economy",
         title: "Economy",
         price: 1000000,
-        quantity:5,
+        quantity: 5,
       },
       {
         type: "business",
         title: "Business",
         price: 10000000,
-        quantity:5,
+        quantity: 5,
       },
-    ]
+    ],
   },
   {
-    id:5,
-    code:2,
-    startDate:"02/03/2026",
-    endDate:"",
+    id: 5,
+    code: 2,
+    startDate: "02/03/2026",
+    endDate: "",
     icon: "/logoBrand.png",
     totalTime: "11:15 AM",
     airline: "Hawaiian Airlines",
@@ -132,21 +132,21 @@ const tripList = [
         type: "economy",
         title: "Economy",
         price: 1000000,
-        quantity:5,
+        quantity: 5,
       },
       {
         type: "business",
         title: "Business",
         price: 10000000,
-        quantity:5,
+        quantity: 5,
       },
-    ]
+    ],
   },
-  { 
-    id:6,
-    code:1,
-    startDate:"02/03/2026",
-    endDate:"",
+  {
+    id: 6,
+    code: 1,
+    startDate: "02/03/2026",
+    endDate: "",
     icon: "/logoBrand.png",
     totalTime: "10:55 AM",
     airline: "Delta",
@@ -160,20 +160,17 @@ const tripList = [
         type: "economy",
         title: "Economy",
         price: 1000000,
-        quantity:5,
+        quantity: 5,
       },
       {
         type: "business",
         title: "Business",
         price: 10000000,
-        quantity:5,
+        quantity: 5,
       },
-    ]
+    ],
   },
 ];
-
-
-
 
 export async function GET() {
   return NextResponse.json(tripList);

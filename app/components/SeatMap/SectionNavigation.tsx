@@ -1,8 +1,7 @@
 "use client";
 
+import type { SectionNavigationProps } from "@/types/seat-map-component-type";
 import { memo } from "react";
-import { ChevronUp, ChevronDown } from "lucide-react";
-import { SectionNavigationProps } from "@/types/seat-map-component-type";
 
 /**
  * Navigation component for scrolling between seat sections
@@ -21,9 +20,7 @@ const SectionNavigation = memo(function SectionNavigation({
 
   return (
     <div className="flex flex-col gap-y-[0.8rem]">
-      <p className="text-sm font-medium text-[var(--cl-four)] mb-[0.4rem]">
-        Navigate Sections:
-      </p>
+      <p className="text-sm font-medium text-[var(--cl-four)] mb-[0.4rem]">Navigate Sections:</p>
       <div className="flex flex-col gap-y-[0.4rem]">
         {sections.map((section) => (
           <button
@@ -42,4 +39,3 @@ const SectionNavigation = memo(function SectionNavigation({
 SectionNavigation.displayName = "SectionNavigation";
 
 export default SectionNavigation;
-

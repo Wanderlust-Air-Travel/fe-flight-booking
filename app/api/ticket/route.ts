@@ -156,7 +156,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
   const codeParam = searchParams.get("code"); // vd: "1" hoặc "2"
-  const type = searchParams.get("type");      // "economy" | "business"
+  const type = searchParams.get("type"); // "economy" | "business"
 
   // Không truyền query: trả full list
   if (!codeParam && !type) {
@@ -177,10 +177,7 @@ export async function GET(req: Request) {
   }
 
   if (!result.length) {
-    return NextResponse.json(
-      { error: "Không tìm thấy vé tương ứng" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Không tìm thấy vé tương ứng" }, { status: 404 });
   }
 
   return NextResponse.json(result);

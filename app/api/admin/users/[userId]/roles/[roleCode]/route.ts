@@ -1,29 +1,31 @@
 // app/api/admin/users/[userId]/roles/[roleCode]/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from "next/server";
 
-const BACKEND_API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const BACKEND_API_URL =
+  process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { userId: string; roleCode: string } }
+  { params }: { params: Promise<{ userId: string; roleCode: string }> }
 ) {
   try {
-    const token = req.headers.get('authorization');
-    
+    const { userId, roleCode } = await params;
+    const token = req.headers.get("authorization");
+
     if (!token) {
-      return NextResponse.json(
-        { message: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const response = await fetch(`${BACKEND_API_URL}/api/v1/admin/users/${params.userId}/roles/${params.roleCode}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token,
-      },
-    });
+    const response = await fetch(
+      `${BACKEND_API_URL}/api/v1/admin/users/${userId}/roles/${roleCode}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
 
     const data = await response.json();
 
@@ -33,11 +35,7 @@ export async function DELETE(
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error('Error removing role:', error);
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error("Error removing role:", error);
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
-

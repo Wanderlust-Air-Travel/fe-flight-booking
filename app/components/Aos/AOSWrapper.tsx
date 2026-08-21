@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import AOS from "aos";
+import { useEffect } from "react";
 
 export default function AOSWrapper() {
   useEffect(() => {

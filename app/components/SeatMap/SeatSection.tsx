@@ -1,10 +1,8 @@
 "use client";
 
-import { memo, useRef, useEffect } from "react";
-import { SeatSection as SeatSectionType } from "@/types/seat-utils-type";
-import { SeatSectionProps } from "@/types/seat-map-component-type";
+import type { SeatSectionProps } from "@/types/seat-map-component-type";
+import { memo, useRef } from "react";
 import SeatRow from "./SeatRow";
-import { SeatItem } from "@/types/seat-type";
 
 /**
  * Memoized SeatSection component that renders a group of rows
@@ -21,11 +19,7 @@ const SeatSection = memo(function SeatSection({
   const sectionRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div
-      ref={sectionRef}
-      id={sectionId}
-      className="mb-[2rem] scroll-mt-[2rem]"
-    >
+    <div ref={sectionRef} id={sectionId} className="mb-[2rem] scroll-mt-[2rem]">
       {/* Section Header */}
       <div className="mb-[1rem] pb-[0.5rem] border-b border-[var(--cl-third)]">
         <h3 className="text-[1.4rem] font-bold text-[var(--cl-four)] uppercase">
@@ -53,4 +47,3 @@ const SeatSection = memo(function SeatSection({
 SeatSection.displayName = "SeatSection";
 
 export default SeatSection;
-

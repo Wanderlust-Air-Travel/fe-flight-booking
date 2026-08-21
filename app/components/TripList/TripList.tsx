@@ -1,435 +1,474 @@
 "use client";
 
-import { TripListProps, TripListType } from "@/types/trip-list-type";
-import Image from "next/image";
-import FormatPrice from "../FormatPrice/FormatPrice";
-import { ChevronDown } from "lucide-react";
+import useInfoTicket from "@/app/zustand/storeInfoTicket";
+import useUserStore from "@/app/zustand/storeUser";
 import { Button } from "@/components/ui/button";
-import Ticket from "../Ticket/Ticket";
-import { useCallback, useRef, useState } from "react";
-import { ListProps, FareOption } from "@/types/ticket-list-type";
 import axiosInstance from "@/lib/axios-instance";
 import { axiosPublic } from "@/lib/axios-instance";
-import useInfoTicket from "@/app/zustand/storeInfoTicket";
+import type { FareOption } from "@/types/ticket-list-type";
+import type { TripListPropsType } from "@/types/trip-list-component-type";
+import type { TripListType } from "@/types/trip-list-type";
+import { ChevronDown } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useCallback, useRef, useState } from "react";
 import { convertToDMY, convertToLocalTime } from "../FormatDate/FormatDate";
-import useStoreFightInfo from "@/app/zustand/storeFightInfo";
-import useUserStore from "@/app/zustand/storeUser";
-
-import { TripListPropsType } from '@/types/trip-list-component-type';
-
+import Ticket from "../Ticket/Ticket";
 
 const TripList = ({ trips, loading }: TripListPropsType) => {
+  // FIX 1: Nhiều panel => phải dùng mảng ref
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [type, setType] = useState<string>("");
+  const [tickets, setTickets] = useState<FareOption[] | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [openPanelIndex, setOpenPanelIndex] = useState<number | null>(null); // Track which panel is open
+  // Store the selected ticket locally so handleAccept can read it synchronously
+  // (Zustand store updates are async and cause race conditions)
+  const [selectedTicket, setSelectedTicket] = useState<FareOption | null>(null);
+  const { setData, data } = useInfoTicket();
+  const router = useRouter();
+  const { accessToken, isLoggedIn } = useUserStore();
+  const [_loadingChild, setLoadingChild] = useState(false);
 
-    // FIX 1: Nhiều panel => phải dùng mảng ref
-    const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const [type, setType] = useState<string>("");
-    const [tickets, setTickets] = useState<FareOption[] | null>(null);
-    const [activeIndex, setActiveIndex] = useState<number | null>(null);
-    const [isSaving, setIsSaving] = useState(false);
-    const [openPanelIndex, setOpenPanelIndex] = useState<number | null>(null); // Track which panel is open
-    const { setData, data } = useInfoTicket();
-    const router = useRouter();
-    const { accessToken, isLoggedIn } = useUserStore()
-    const [loadingChild, setLoadingChild] = useState(false);
+  // Helper function to get cabin display info
+  const getCabinDisplayInfo = (cabinType: string) => {
+    switch (cabinType.toLowerCase()) {
+      case "economy":
+        return {
+          name: "Economy",
+          bgColor: "bg-[var(--cl-five)]",
+          hoverColor: "hover:bg-green-700",
+        };
+      case "business":
+        return {
+          name: "Business",
+          bgColor: "bg-[var(--cl-pri)]",
+          hoverColor: "hover:bg-blue-950",
+        };
+      case "first":
+        return {
+          name: "First",
+          bgColor: "bg-purple-600",
+          hoverColor: "hover:bg-purple-800",
+        };
+      default:
+        return {
+          name: cabinType,
+          bgColor: "bg-gray-600",
+          hoverColor: "hover:bg-gray-800",
+        };
+    }
+  };
 
-    // Helper function to get cabin display info
-    const getCabinDisplayInfo = (cabinType: string) => {
-        switch (cabinType.toLowerCase()) {
-            case 'economy':
-                return {
-                    name: 'Economy',
-                    bgColor: 'bg-[var(--cl-five)]',
-                    hoverColor: 'hover:bg-green-700',
-                };
-            case 'business':
-                return {
-                    name: 'Business',
-                    bgColor: 'bg-[var(--cl-pri)]',
-                    hoverColor: 'hover:bg-blue-950',
-                };
-            case 'first':
-                return {
-                    name: 'First',
-                    bgColor: 'bg-purple-600',
-                    hoverColor: 'hover:bg-purple-800',
-                };
-            default:
-                return {
-                    name: cabinType,
-                    bgColor: 'bg-gray-600',
-                    hoverColor: 'hover:bg-gray-800',
-                };
+  // Khi click cabin - generic handler
+  const handleCabinClick = useCallback((code: string, cabinType: string, index: number) => {
+    setActiveIndex(null);
+    setSelectedTicket(null); // Reset selected ticket when switching cabin type
+    setType(cabinType);
+
+    axiosPublic
+      .get(`/api/search/fare-options?flightInstanceId=${code}&cabinType=${cabinType}`)
+      .then((res) => {
+        console.log(res);
+        // Backend returns FareOptionsResponseDto with fareOptions array
+        setTickets(res.data?.fareOptions || res.data || []);
+
+        // Open the clicked panel and close others
+        setOpenPanelIndex(index);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoadingChild(false);
+      });
+  }, []);
+
+  const handleChoose = (
+    index2: number,
+    ticket: {
+      typeTicket: string;
+      price: number;
+      desc: { text: string; status: boolean }[];
+      fareClassCode?: string;
+    },
+    trip: TripListType,
+    trips: any,
+    type: string
+  ) => {
+    setActiveIndex(index2);
+
+    // Sync: store selected ticket locally for handleAccept
+    setSelectedTicket(ticket as FareOption);
+
+    setData({
+      id: trip.flightInstanceId,
+      // Quan trọng: lưu cả flightInstanceId để InfoTicketBox nhận diện đã có chuyến được chọn
+      flightInstanceId: trip.flightInstanceId,
+      icon: "/logoBrand.png",
+      airline: "Wanderlust",
+      startDate: convertToDMY(trip.departureLocal),
+      endDate: convertToDMY(trip.arrivalLocal),
+      startCode: trip.origin?.iata || "",
+      endCode: trip.destination?.iata || "",
+      start: trip.origin?.city || "",
+      end: trip.destination?.city || "",
+      service: trips.tripType,
+      stopCount: 0,
+      stopDuration: "none",
+      type: type,
+      price: ticket.price,
+      desc: ticket.desc,
+      typeTicket: ticket.typeTicket,
+      timeStart: convertToLocalTime(trip.departureLocal),
+      timeEnd: convertToLocalTime(trip.arrivalLocal),
+      fareClassCode: ticket.fareClassCode || "",
+    });
+  };
+
+  // Bước 3: Save Cabin Selection và Navigate - với error handling và loading state
+  const handleAccept = async (flightInstanceId: string) => {
+    // Guard: use selectedTicket (local sync state) instead of Zustand store (async/race-prone)
+    if (!selectedTicket?.fareClassCode || !type || !flightInstanceId) {
+      console.error("[handleAccept] Missing required fields", {
+        fareClassCode: selectedTicket?.fareClassCode,
+        cabinType: type,
+        flightInstanceId,
+      });
+      alert("Please select a fare class first.");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      // Always save to backend Redis (both authenticated and guest users)
+      const headers: Record<string, string> = {};
+
+      // For guest users, get or generate session ID
+      let sessionId: string | null = null;
+      if (!accessToken) {
+        // Check if we have a session ID from previous requests
+        sessionId = sessionStorage.getItem("guest_session_id");
+        if (sessionId) {
+          headers["X-Session-Id"] = sessionId;
+        } else {
+          // Generate new session ID (will be returned from backend)
+          // For now, we'll let backend generate it
         }
-    };
+      }
 
-    // Khi click cabin - generic handler
-    const handleCabinClick = useCallback((code: string, cabinType: string, index: number) => {
-        setActiveIndex(null);
-        setType(cabinType);
+      const isGuest = !isLoggedIn;
+      const axiosClient = isGuest ? axiosPublic : axiosInstance;
 
-        axiosPublic.get(`/api/search/fare-options?flightInstanceId=${code}&cabinType=${cabinType}`)
-            .then((res) => {
-                console.log(res);
-                // Backend returns FareOptionsResponseDto with fareOptions array
-                setTickets(res.data?.fareOptions || res.data || []);
+      const payload = {
+        flightInstanceId,
+        cabinType: type,
+        fareClassCode: selectedTicket.fareClassCode,
+      };
+      console.log("[handleAccept] Saving cabin selection", { ...payload, isGuest });
 
-                // Open the clicked panel and close others
-                setOpenPanelIndex(index);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-            .finally(() => {
-                setLoadingChild(false);
-            });
-    }, []);
+      const response = await axiosClient.post("/api/booking-state/cabin", payload, {
+        headers,
+      });
 
-    const handleChoose = (
-        index2: number,
-        ticket: {
-            typeTicket: string;
-            price: number;
-            desc: { text: string; status: boolean }[];
-            fareClassCode?: string;
-        },
-        trip: TripListType,
-        trips: any,
-        type: string
-    ) => {
-        setActiveIndex(index2);
+      if (response.status === 200 || response.status === 201) {
+        console.log("Cabin selection saved to backend:", response.data);
 
-        setData({
-            id: trip.flightInstanceId,
-            // Quan trọng: lưu cả flightInstanceId để InfoTicketBox nhận diện đã có chuyến được chọn
-            flightInstanceId: trip.flightInstanceId,
-            icon: "/logoBrand.png",
-            airline: "Wanderlust",
-            startDate: convertToDMY(trip.departureLocal),
-            endDate: convertToDMY(trip.arrivalLocal),
-            startCode: trip.origin?.iata || '',
-            endCode: trip.destination?.iata || '',
-            start: trip.origin?.city || '',
-            end: trip.destination?.city || '',
-            service: trips.tripType,
-            stopCount: 0,
-            stopDuration: "none",
-            type: type,
-            price: ticket.price,
-            desc: ticket.desc,
-            typeTicket: ticket.typeTicket,
-            timeStart: convertToLocalTime(trip.departureLocal),
-            timeEnd: convertToLocalTime(trip.arrivalLocal),
-            fareClassCode: ticket.fareClassCode || "",
-        });
-    };
-
-    // Bước 3: Save Cabin Selection và Navigate - với error handling và loading state
-    const handleAccept = async (flightInstanceId: string) => {
-        if (!data.fareClassCode) {
-            alert('Please select a fare class first.');
-            return;
+        // Chỉ lưu sessionId cho guest; user đã được BE nhận diện qua JWT
+        if (isGuest) {
+          if (response.data.sessionId) {
+            sessionStorage.setItem("guest_session_id", response.data.sessionId);
+            console.log("[TripList] Saved guest_session_id for guest:", response.data.sessionId);
+          } else {
+            console.warn("[TripList] No sessionId in response for guest user");
+          }
         }
+      } else {
+        throw new Error("Failed to save cabin selection");
+      }
 
-        setIsSaving(true);
+      // NEW FLOW: Navigate directly to booking info page (seat selection is done during check-in)
+      router.push(`/booking/info?flightInstanceId=${flightInstanceId}`);
+    } catch (err: any) {
+      console.error("Error saving cabin selection:", err);
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to save cabin selection. Please try again.";
+      alert(errorMessage);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-        try {
-            // Always save to backend Redis (both authenticated and guest users)
-                const headers: Record<string, string> = {};
-            
-            // For guest users, get or generate session ID
-            let sessionId: string | null = null;
-            if (!accessToken) {
-                // Check if we have a session ID from previous requests
-                sessionId = sessionStorage.getItem('guest_session_id');
-                if (!sessionId) {
-                    // Generate new session ID (will be returned from backend)
-                    // For now, we'll let backend generate it
-                } else {
-                    headers['X-Session-Id'] = sessionId;
-                }
-            }
+  console.log(trips);
 
-            const isGuest = !isLoggedIn;
-            const axiosClient = isGuest ? axiosPublic : axiosInstance;
-            const response = await axiosClient.post(
-                '/api/booking-state/cabin',
-                {
-                    flightInstanceId: flightInstanceId,
-                    cabinType: type,
-                    fareClassCode: data.fareClassCode
-                },
-                {
-                    headers
-                }
-            );
+  return (
+    <ul className="border-[var(--cl-third)] border-[0.1rem] rounded-[1rem] overflow-hidden">
+      <li className="hidden md:flex gap-x-[1.2rem] items-center p-[1.2rem] sm:p-[1.6rem] bg-[var(--cl-pri)]">
+        <div className="w-[5%]">
+          <p className="text-white font-bold text-base uppercase">Logo</p>
+        </div>
+        <div className="w-[20%]">
+          <p className="text-white font-bold text-base uppercase">Time & Brand</p>
+        </div>
+        <div className="w-[20%]">
+          <p className="text-white font-bold text-base uppercase">Information</p>
+        </div>
+        <div className="w-[15%]">
+          <p className="text-white font-bold text-base uppercase">Transit</p>
+        </div>
+        <div className="w-[10%]">
+          <p className="text-white font-bold text-base uppercase">Service</p>
+        </div>
+        <div className="w-full flex-1">
+          <p className="text-white font-bold text-base uppercase text-center">Cabin</p>
+        </div>
+      </li>
 
-            if (response.status === 200 || response.status === 201) {
-                console.log('Cabin selection saved to backend:', response.data);
+      {loading ? (
+        Array.from({ length: 6 }).map((_, i) => (
+          <li
+            key={i}
+            className="flex flex-col w-full border-b-[0.1rem] border-[var(--cl-third)] last:border-none"
+          >
+            <div className="flex gap-x-[1.2rem] items-center p-[1.6rem] w-full">
+              <div className="w-[5%]">
+                <span className="loading" />
+              </div>
+              <div className="w-[20%]">
+                <span className="loading" />
+              </div>
+              <div className="w-[20%]">
+                <span className="loading" />
+              </div>
+              <div className="w-[15%]">
+                <span className="loading" />
+              </div>
+              <div className="w-[10%]">
+                <span className="loading" />
+              </div>
+              <div className="w-full flex-1">
+                <span className="loading" />
+              </div>
+            </div>
+          </li>
+        ))
+      ) : !trips?.outbound || trips.outbound.length <= 0 ? (
+        <li className="flex flex-col w-full border-b-[0.1rem] border-[var(--cl-third)] last:border-none">
+          <p className="text-lg text-center font-normal text-[var(--cl-red)] p-4">
+            Flight instances are not valid. Please choose another day!
+          </p>
+        </li>
+      ) : (
+        trips.outbound
+          .filter((trip: TripListType) => trip?.origin && trip.destination) // Filter out invalid trips
+          .map((trip: TripListType, index: number) => {
+            console.log(trip);
+            return (
+              <li
+                key={index}
+                className="flex flex-col w-full border-b-[0.1rem] border-[var(--cl-third)] last:border-none"
+              >
+                <div className="flex flex-col md:flex-row gap-y-[1.2rem] md:gap-y-0 md:gap-x-[1.2rem] items-start md:items-center p-[1.2rem] md:p-[1.6rem] w-full">
+                  {/* Logo - Hidden on mobile, visible on tablet+ */}
+                  <div className="hidden md:block w-[5%] flex-shrink-0">
+                    <Image
+                      src="/logoBrand.png"
+                      alt="logoBrand"
+                      width={40}
+                      height={40}
+                      unoptimized
+                      priority
+                    />
+                  </div>
 
-                // Chỉ lưu sessionId cho guest; user đã được BE nhận diện qua JWT
-                if (isGuest) {
-                    if (response.data.sessionId) {
-                        sessionStorage.setItem('guest_session_id', response.data.sessionId);
-                        console.log('[TripList] Saved guest_session_id for guest:', response.data.sessionId);
-                    } else {
-                        console.warn('[TripList] No sessionId in response for guest user');
-                    }
-                }
-            } else {
-                throw new Error('Failed to save cabin selection');
-            }
+                  {/* Time & Brand */}
+                  <div className="w-full md:w-[20%] flex-shrink-0">
+                    <div className="flex flex-col gap-y-[0.2rem]">
+                      <p className="text-[var(--cl-five)] font-bold text-sm md:text-base">
+                        {convertToLocalTime(trip.departureLocal)}AM -
+                        {convertToLocalTime(trip.arrivalLocal)}PM
+                      </p>
+                      <p className="text-[var(--cl-third)] text-sm md:text-base">Wanderlust</p>
+                    </div>
+                  </div>
 
-            // NEW FLOW: Navigate directly to booking info page (seat selection is done during check-in)
-            router.push(`/booking/info?flightInstanceId=${flightInstanceId}`);
-        } catch (err: any) {
-            console.error('Error saving cabin selection:', err);
-            const errorMessage = err.response?.data?.message || 
-                                err.message || 
-                                'Failed to save cabin selection. Please try again.';
-            alert(errorMessage);
-        } finally {
-            setIsSaving(false);
-        }
-    };
+                  {/* Route Info */}
+                  <div className="w-full md:w-[20%] flex-shrink-0">
+                    <div className="flex flex-col gap-y-[0.2rem]">
+                      <p className="text-[var(--cl-five)] font-bold text-sm md:text-base">
+                        {trip.origin?.iata || "N/A"} - {trip.destination?.iata || "N/A"}
+                      </p>
+                      {trip.departureLocal && (
+                        <p className="text-[var(--cl-third)] text-sm md:text-base">
+                          Start: {convertToDMY(trip.departureLocal)}
+                        </p>
+                      )}
+                      {trip.arrivalLocal && (
+                        <p className="text-[var(--cl-third)] text-sm md:text-base">
+                          End: {convertToDMY(trip.arrivalLocal)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
-    console.log(trips)
+                  {/* Transit Info - Hidden on mobile */}
+                  <div className="hidden md:flex md:w-[15%] flex-shrink-0">
+                    <div className="flex flex-col gap-y-[0.2rem]">
+                      <p className="text-[var(--cl-five)] font-bold text-base">
+                        {trip.stopCount || 0}
+                      </p>
+                      <p className="text-[var(--cl-third)] text-base">
+                        {trip.stopDuration || "None"}
+                      </p>
+                    </div>
+                  </div>
 
-    return (
-        <ul className="border-[var(--cl-third)] border-[0.1rem] rounded-[1rem] overflow-hidden">
-            <li className="hidden md:flex gap-x-[1.2rem] items-center p-[1.2rem] sm:p-[1.6rem] bg-[var(--cl-pri)]">
-                <div className="w-[5%]">
-                    <p className="text-white font-bold text-base uppercase">Logo</p>
-                </div>
-                <div className="w-[20%]">
-                    <p className="text-white font-bold text-base uppercase">Time & Brand</p>
-                </div>
-                <div className="w-[20%]">
-                    <p className="text-white font-bold text-base uppercase">Information</p>
-                </div>
-                <div className="w-[15%]">
-                    <p className="text-white font-bold text-base uppercase">Transit</p>
-                </div>
-                <div className="w-[10%]">
-                    <p className="text-white font-bold text-base uppercase">Service</p>
-                </div>
-                <div className="w-full flex-1">
-                    <p className="text-white font-bold text-base uppercase text-center">Cabin</p>
-                </div>
-            </li>
+                  {/* Trip Type - Hidden on mobile */}
+                  <div className="hidden md:block md:w-[10%] flex-shrink-0">
+                    <p className="text-[var(--cl-five)] font-bold text-base">{trips.tripType}</p>
+                  </div>
 
-            {
-                loading
-                    ?
-                    (
-                        Array.from({ length: 6 }).map((_, i) => (
-                            <li
-                                key={i}
-                                className="flex flex-col w-full border-b-[0.1rem] border-[var(--cl-third)] last:border-none"
+                  {/* Cabin Selection Buttons */}
+                  <div className="w-full md:w-auto md:flex-1">
+                    <div className="flex flex-col sm:flex-row gap-y-[0.8rem] sm:gap-y-0 sm:gap-x-[1rem] items-stretch sm:items-center">
+                      {trip.cabinTypes && trip.cabinTypes.length > 0 ? (
+                        trip.cabinTypes.map((cabinInfo, cabinIndex) => {
+                          const displayInfo = getCabinDisplayInfo(cabinInfo.cabinType);
+                          const cabinTypesLength = trip.cabinTypes?.length || 0;
+                          // Responsive width: full width on mobile, auto on larger screens
+                          const widthClass =
+                            cabinTypesLength === 1
+                              ? "w-full sm:w-full"
+                              : cabinTypesLength === 2
+                                ? "w-full sm:w-[calc(50%-0.5rem)]"
+                                : "w-full sm:w-[calc(33.333%-0.67rem)]";
+
+                          return (
+                            <div
+                              key={`${trip.flightInstanceId}-${cabinInfo.cabinType}-${cabinIndex}`}
+                              className={`${displayInfo.bgColor} ${displayInfo.hoverColor} flex flex-col items-center justify-center p-[1rem] sm:p-[1.2rem] ${widthClass} rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear min-h-[8rem] sm:min-h-auto`}
+                              onClick={() => {
+                                handleCabinClick(trip.flightInstanceId, cabinInfo.cabinType, index);
+                              }}
                             >
-                                <div className="flex gap-x-[1.2rem] items-center p-[1.6rem] w-full">
-                                    <div className="w-[5%]"><span className="loading"></span></div>
-                                    <div className="w-[20%]"><span className="loading"></span></div>
-                                    <div className="w-[20%]"><span className="loading"></span></div>
-                                    <div className="w-[15%]"><span className="loading"></span></div>
-                                    <div className="w-[10%]"><span className="loading"></span></div>
-                                    <div className="w-full flex-1"><span className="loading"></span></div>
-                                </div>
-                            </li>
-                        ))
-                    )
-                    :
-                    (
-                        !trips?.outbound || trips.outbound.length <= 0
-                            ?
-                            (
+                              <p className="text-sm sm:text-base text-white font-bold text-center">
+                                {displayInfo.name}
+                              </p>
+                              <span className="text-sm sm:text-base text-white text-center">
+                                Total seats: {cabinInfo.availableSeats}
+                              </span>
+                              <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
+                            </div>
+                          );
+                        })
+                      ) : (
+                        // Fallback: Show default Economy and Business if cabinTypes is not available (backward compatibility)
+                        <>
+                          <div
+                            className="bg-[var(--cl-five)] hover:bg-green-700 flex flex-col items-center justify-center p-[1rem] sm:p-[1.2rem] w-full sm:w-[calc(50%-0.5rem)] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear min-h-[8rem] sm:min-h-auto"
+                            onClick={() => {
+                              handleCabinClick(trip.flightInstanceId, "economy", index);
+                            }}
+                          >
+                            <p className="text-sm sm:text-base text-white font-bold text-center">
+                              Economy
+                            </p>
+                            <span className="text-sm sm:text-base text-white text-center">
+                              Total seats: {trip.availableSeats}
+                            </span>
+                            <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
+                          </div>
+                          <div
+                            className="bg-[var(--cl-pri)] hover:bg-blue-950 flex flex-col items-center justify-center p-[1rem] sm:p-[1.2rem] w-full sm:w-[calc(50%-0.5rem)] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear min-h-[8rem] sm:min-h-auto"
+                            onClick={() => {
+                              handleCabinClick(trip.flightInstanceId, "business", index);
+                            }}
+                          >
+                            <p className="text-sm sm:text-base text-white font-bold text-center">
+                              Business
+                            </p>
+                            <span className="text-sm sm:text-base text-white text-center">
+                              Total seats: {trip.availableSeats}
+                            </span>
+                            <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-                                <li className="flex flex-col w-full border-b-[0.1rem] border-[var(--cl-third)] last:border-none">
-                                    <p className="text-lg text-center font-normal text-[var(--cl-red)] p-4">Flight instances are not valid. Please choose another day!</p>
-                                </li>
+                {/* Panel with CSS transition instead of jQuery */}
+                <div
+                  ref={(el) => {
+                    itemRefs.current[index] = el;
+                  }}
+                  className={`w-full overflow-hidden transition-all duration-300 ease-in-out ${
+                    openPanelIndex === index ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
+                  }`}
+                >
+                  <div className="flex flex-col justify-center items-center gap-y-[1.2rem] p-[1.2rem] sm:p-[1.6rem] w-full border-t-[0.1rem] border-[var(--cl-third)]">
+                    <p
+                      className={`${
+                        type === "economy" ? "text-[var(--cl-five)]" : "text-[var(--cl-pri)]"
+                      } uppercase font-bold text-center text-xl sm:text-2xl md:text-[2.4rem]`}
+                    >
+                      Choose Cabin
+                    </p>
 
-                            )
-                            :
-                            (
-                                trips.outbound
-                                    .filter((trip: TripListType) => trip && trip.origin && trip.destination) // Filter out invalid trips
-                                    .map((trip: TripListType, index: number) => {
-                                    console.log(trip)
-                                    return (
-                                        <li
-                                            key={index}
-                                            className="flex flex-col w-full border-b-[0.1rem] border-[var(--cl-third)] last:border-none"
-                                        >
-                                            <div className="flex flex-col md:flex-row gap-y-[1.2rem] md:gap-y-0 md:gap-x-[1.2rem] items-start md:items-center p-[1.2rem] md:p-[1.6rem] w-full">
-                                                {/* Logo - Hidden on mobile, visible on tablet+ */}
-                                                <div className="hidden md:block w-[5%] flex-shrink-0">
-                                                    <Image src="/logoBrand.png" alt="logoBrand" width={40} height={40} unoptimized priority />
-                                                </div>
+                    {/* Responsive grid: 1 column on mobile, 2 on tablet, 3 on desktop */}
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.2rem] sm:gap-[1.6rem] w-full">
+                      {tickets?.map((ticket, index2) => {
+                        const sameTypeCount =
+                          tickets?.filter((t) => t.typeTicket === ticket.typeTicket).length ?? 0;
+                        const displayLabel =
+                          sameTypeCount > 1
+                            ? ticket.description || `${ticket.typeTicket} (${ticket.fareClassCode})`
+                            : ticket.typeTicket;
+                        return (
+                          <li key={ticket.fareClassCode ?? index2} className="w-full">
+                            <Ticket
+                              type={type}
+                              tickets={ticket}
+                              index={index2}
+                              displayLabel={displayLabel}
+                              onChoose={() => {
+                                handleChoose(index2, ticket, trip, trips, type);
+                              }}
+                              active={activeIndex === index2}
+                            />
+                          </li>
+                        );
+                      })}
+                    </ul>
 
-                                                {/* Time & Brand */}
-                                                <div className="w-full md:w-[20%] flex-shrink-0">
-                                                    <div className="flex flex-col gap-y-[0.2rem]">
-                                                        <p className="text-[var(--cl-five)] font-bold text-sm md:text-base">{convertToLocalTime(trip.departureLocal)}AM - {convertToLocalTime(trip.arrivalLocal)}PM</p>
-                                                        <p className="text-[var(--cl-third)] text-xs md:text-base">Wanderlust</p>
-                                                    </div>
-                                                </div>
-
-                                                {/* Route Info */}
-                                                <div className="w-full md:w-[20%] flex-shrink-0">
-                                                    <div className="flex flex-col gap-y-[0.2rem]">
-                                                        <p className="text-[var(--cl-five)] font-bold text-sm md:text-base">
-                                                            {trip.origin?.iata || 'N/A'} - {trip.destination?.iata || 'N/A'}
-                                                        </p>
-                                                        {trip.departureLocal && <p className="text-[var(--cl-third)] text-xs md:text-sm">Start: {convertToDMY(trip.departureLocal)}</p>}
-                                                        {trip.arrivalLocal && <p className="text-[var(--cl-third)] text-xs md:text-sm">End: {convertToDMY(trip.arrivalLocal)}</p>}
-                                                    </div>
-                                                </div>
-
-                                                {/* Transit Info - Hidden on mobile */}
-                                                <div className="hidden md:flex md:w-[15%] flex-shrink-0">
-                                                    <div className="flex flex-col gap-y-[0.2rem]">
-                                                        <p className="text-[var(--cl-five)] font-bold text-base">{trip.stopCount || 0}</p>
-                                                        <p className="text-[var(--cl-third)] text-base">{trip.stopDuration || "None"}</p>
-                                                    </div>
-                                                </div>
-
-                                                {/* Trip Type - Hidden on mobile */}
-                                                <div className="hidden md:block md:w-[10%] flex-shrink-0">
-                                                    <p className="text-[var(--cl-five)] font-bold text-base">{trips.tripType}</p>
-                                                </div>
-
-                                                {/* Cabin Selection Buttons */}
-                                                <div className="w-full md:w-auto md:flex-1">
-                                                    <div className="flex flex-col sm:flex-row gap-y-[0.8rem] sm:gap-y-0 sm:gap-x-[1rem] items-stretch sm:items-center">
-                                                        {trip.cabinTypes && trip.cabinTypes.length > 0 ? (
-                                                            trip.cabinTypes.map((cabinInfo, cabinIndex) => {
-                                                                const displayInfo = getCabinDisplayInfo(cabinInfo.cabinType);
-                                                                const cabinTypesLength = trip.cabinTypes?.length || 0;
-                                                                // Responsive width: full width on mobile, auto on larger screens
-                                                                const widthClass = cabinTypesLength === 1 
-                                                                    ? 'w-full sm:w-full' 
-                                                                    : cabinTypesLength === 2 
-                                                                    ? 'w-full sm:w-[calc(50%-0.5rem)]' 
-                                                                    : 'w-full sm:w-[calc(33.333%-0.67rem)]';
-                                                                
-                                                                return (
-                                                                    <div
-                                                                        key={`${trip.flightInstanceId}-${cabinInfo.cabinType}-${cabinIndex}`}
-                                                                        className={`${displayInfo.bgColor} ${displayInfo.hoverColor} flex flex-col items-center justify-center p-[1rem] sm:p-[1.2rem] ${widthClass} rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear min-h-[8rem] sm:min-h-auto`}
-                                                                        onClick={() => {
-                                                                            handleCabinClick(trip.flightInstanceId, cabinInfo.cabinType, index);
-                                                                        }}
-                                                                    >
-                                                                        <p className="text-sm sm:text-base text-white font-bold text-center">
-                                                                            {displayInfo.name}
-                                                                        </p>
-                                                                        <span className="text-xs sm:text-sm text-white text-center">
-                                                                            Total seats: {cabinInfo.availableSeats}
-                                                                        </span>
-                                                                        <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
-                                                                    </div>
-                                                                );
-                                                            })
-                                                        ) : (
-                                                            // Fallback: Show default Economy and Business if cabinTypes is not available (backward compatibility)
-                                                            <>
-                                                                <div
-                                                                    className={`bg-[var(--cl-five)] hover:bg-green-700 flex flex-col items-center justify-center p-[1rem] sm:p-[1.2rem] w-full sm:w-[calc(50%-0.5rem)] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear min-h-[8rem] sm:min-h-auto`}
-                                                                    onClick={() => {
-                                                                        handleCabinClick(trip.flightInstanceId, 'economy', index);
-                                                                    }}
-                                                                >
-                                                                    <p className="text-sm sm:text-base text-white font-bold text-center">
-                                                                        Economy
-                                                                    </p>
-                                                                    <span className="text-xs sm:text-sm text-white text-center">Total seats: {trip.availableSeats}</span>
-                                                                    <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
-                                                                </div>
-                                                                <div
-                                                                    className={`bg-[var(--cl-pri)] hover:bg-blue-950 flex flex-col items-center justify-center p-[1rem] sm:p-[1.2rem] w-full sm:w-[calc(50%-0.5rem)] rounded-md cursor-pointer gap-y-[0.2rem] transition ease-linear min-h-[8rem] sm:min-h-auto`}
-                                                                    onClick={() => {
-                                                                        handleCabinClick(trip.flightInstanceId, 'business', index);
-                                                                    }}
-                                                                >
-                                                                    <p className="text-sm sm:text-base text-white font-bold text-center">
-                                                                        Business
-                                                                    </p>
-                                                                    <span className="text-xs sm:text-sm text-white text-center">Total seats: {trip.availableSeats}</span>
-                                                                    <ChevronDown className="w-[1rem] h-[1rem] sm:w-[1.2rem] sm:h-[1.4rem] text-white" />
-                                                                </div>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Panel with CSS transition instead of jQuery */}
-                                            <div
-                                                ref={(el) => {
-                                                    itemRefs.current[index] = el;
-                                                }}
-                                                className={`w-full overflow-hidden transition-all duration-300 ease-in-out ${
-                                                    openPanelIndex === index 
-                                                        ? 'max-h-[2000px] opacity-100' 
-                                                        : 'max-h-0 opacity-0'
-                                                }`}
-                                            >
-                                                <div className="flex flex-col justify-center items-center gap-y-[1.2rem] p-[1.2rem] sm:p-[1.6rem] w-full border-t-[0.1rem] border-[var(--cl-third)]">
-                                                    <p className={`${type === "economy"
-                                                        ? "text-[var(--cl-five)]"
-                                                        : "text-[var(--cl-pri)]"
-                                                        } uppercase font-bold text-center text-xl sm:text-2xl md:text-[2.4rem]`}
-                                                    >
-                                                        Choose Cabin
-                                                    </p>
-
-                                                    {/* Responsive grid: 1 column on mobile, 2 on tablet, 3 on desktop */}
-                                                    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1.2rem] sm:gap-[1.6rem] w-full">
-                                                        {tickets?.map((ticket, index2) => {
-                                                            console.log("trip", trip)
-                                                            console.log("ticket", ticket);
-                                                            return (
-                                                                <li key={index2} className="w-full">
-                                                                    <Ticket
-                                                                        type={type}
-                                                                        tickets={ticket}
-                                                                        index={index2}
-                                                                        onChoose={() => {
-                                                                            handleChoose(index2, ticket, trip, trips, type);
-                                                                        }}
-                                                                        active={activeIndex === index2}
-                                                                    />
-                                                                </li>
-                                                            );
-                                                        })}
-                                                    </ul>
-
-
-                                                    {activeIndex !== null && (
-                                                        <Button
-                                                            onClick={() => { handleAccept(trip.flightInstanceId) }}
-                                                            disabled={isSaving}
-                                                            className={`${type === "economy"
-                                                                ? "bg-[var(--cl-five)] hover:bg-green-700"
-                                                                : "bg-[var(--cl-pri)] hover:bg-blue-900"
-                                                                } w-full sm:w-fit h-[4rem] sm:h-[4.4rem] text-sm sm:text-base md:text-[1.6rem] px-[1.6rem] sm:px-[2rem] uppercase disabled:opacity-50 disabled:cursor-not-allowed`}
-                                                        >
-                                                            {isSaving ? 'Saving...' : 'Accept'}
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </li>
-                                    );
-                                })
-                            )
-
-                    )
-            }
-
-
-        </ul>
-    );
+                    {activeIndex !== null && selectedTicket && (
+                      <Button
+                        onClick={() => {
+                          handleAccept(trip.flightInstanceId);
+                        }}
+                        disabled={isSaving}
+                        className={`${
+                          type === "economy"
+                            ? "bg-[var(--cl-five)] hover:bg-green-700"
+                            : "bg-[var(--cl-pri)] hover:bg-blue-900"
+                        } w-full sm:w-fit h-[4rem] sm:h-[4.4rem] text-sm sm:text-base md:text-[1.6rem] px-[1.6rem] sm:px-[2rem] uppercase disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        {isSaving ? "Saving..." : "Accept"}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </li>
+            );
+          })
+      )}
+    </ul>
+  );
 };
 
 export default TripList;

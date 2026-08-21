@@ -1,12 +1,12 @@
-import { SeatItem } from "@/types/seat-type";
-import { SeatRow, SeatSection } from "@/types/seat-utils-type";
+import type { SeatItem } from "@/types/seat-type";
+import type { SeatRow, SeatSection } from "@/types/seat-utils-type";
 
 /**
  * Extract row number from seat number (e.g., "10A" -> 10, "21B" -> 21)
  */
 export function extractRowNumber(seatNumber: string): number {
   const match = seatNumber.match(/^(\d+)/);
-  return match ? parseInt(match[1], 10) : 0;
+  return match ? Number.parseInt(match[1], 10) : 0;
 }
 
 /**
@@ -24,13 +24,13 @@ export function extractSeatLetter(seatNumber: string): string {
 export function groupSeatsByRow(seats: SeatItem[]): SeatRow[] {
   // Group by row number
   const rowMap = new Map<number, SeatItem[]>();
-  
+
   seats.forEach((seat) => {
     const rowNumber = extractRowNumber(seat.seatNumber);
     if (!rowMap.has(rowNumber)) {
       rowMap.set(rowNumber, []);
     }
-    rowMap.get(rowNumber)!.push(seat);
+    rowMap.get(rowNumber)?.push(seat);
   });
 
   // Convert to array and sort by row number
@@ -111,8 +111,5 @@ export function divideRowsIntoSections(rows: SeatRow[]): SeatSection[] {
  * Filter seats by selectability and availability
  */
 export function filterSelectableSeats(seats: SeatItem[]): SeatItem[] {
-  return seats.filter(
-    (seat) => seat.isSelectable !== false && seat.isAvailable
-  );
+  return seats.filter((seat) => seat.isSelectable !== false && seat.isAvailable);
 }
-
