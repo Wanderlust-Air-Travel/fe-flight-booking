@@ -25,8 +25,8 @@ const ServiceAll = () => {
     (async () => {
       try {
         const response = await axios.get("/api/services/deals");
-        if (!cancelled && response.data?.deals && Array.isArray(response.data.deals)) {
-          setServices(response.data.deals);
+        if (!cancelled && Array.isArray(response.data)) {
+          setServices(response.data);
         }
       } catch {
         // Silent fail; empty deals list will be rendered.
